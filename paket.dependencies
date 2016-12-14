@@ -1,0 +1,18 @@
+redirects: on
+
+source https://nuget.org/api/v2
+
+nuget FSharp.Core >= 4.0.0.1
+nuget FSPowerPack.Community >= 3.0.0.0
+nuget FSPowerPack.Core.Community >= 3.0.0.0
+nuget FSPowerPack.Linq.Community >= 3.0.0.0
+nuget FSPowerPack.Metadata.Community >= 3.0.0.0
+nuget FSPowerPack.Parallel.Seq.Community >= 3.0.0.0
+nuget xunit >= 2.1.0
+nuget xunit.abstractions >= 2.0.0
+nuget xunit.assert >= 2.1.0
+nuget xunit.core >= 2.1.0
+nuget xunit.extensibility.core >= 2.1.0
+nuget xunit.extensibility.execution >= 2.1.0
+nuget xunit.runner.console >= 2.1.0
+nuget xunit.runner.visualstudio >= 2.1.0

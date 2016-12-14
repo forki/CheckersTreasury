@@ -1,0 +1,14 @@
+FSharp.Core
+FSPowerPack.Community
+FSPowerPack.Core.Community
+FSPowerPack.Linq.Community
+FSPowerPack.Metadata.Community
+FSPowerPack.Parallel.Seq.Community
+xunit
+xunit.abstractions
+xunit.assert
+xunit.core
+xunit.extensibility.core
+xunit.extensibility.execution
+xunit.runner.console
+xunit.runner.visualstudio
