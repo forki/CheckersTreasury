@@ -2,7 +2,6 @@ redirects: on
 
 source https://nuget.org/api/v2
 
-nuget FSharp.Core >= 4.0.0.1
 nuget FSPowerPack.Community >= 3.0.0.0
 nuget FSPowerPack.Core.Community >= 3.0.0.0
 nuget FSPowerPack.Linq.Community >= 3.0.0.0
