@@ -1,28 +1,14 @@
 ﻿namespace Checkers
 
-type Piece(player:Player, pieceType:PieceType) =
-    member this.Player = player
-    member this.PieceType = pieceType
+open Checkers.Types
 
-    member this.Promote() =
-        new Piece(player, PieceType.King)
+module Piece =
+    type Piece = { Player :Player; PieceType :PieceType }
 
-    override this.Equals (obj) =
-        let piece = obj :?> Piece
-        piece.Player = this.Player &&
-        piece.PieceType = this.PieceType
+    let Promote piece = { Player = piece.Player; PieceType = King }
 
-    override this.GetHashCode() =
-        this.Player.GetHashCode() ^^^ this.PieceType.GetHashCode()
+    let whiteChecker = Some <| { Player = White; PieceType = Checker }
+    let whiteKing = Some <| { Player = White; PieceType = King }
 
-    static member WhiteChecker() =
-        Some <| new Piece(Player.White, PieceType.Checker)
-
-    static member BlackChecker() =
-        Some <| new Piece(Player.Black, PieceType.Checker)
-
-    static member WhiteKing() =
-        Some <| new Piece(Player.White, PieceType.King)
-
-    static member BlackKing() =
-        Some <| new Piece(Player.Black, PieceType.King)
+    let blackChecker = Some <| { Player = Black; PieceType = Checker }
+    let blackKing = Some <| { Player = Black; PieceType = King }

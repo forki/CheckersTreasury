@@ -104,9 +104,6 @@
     <Compile Include="PieceTests.fs" />
     <Compile Include="BoardTests.fs" />
     <None Include="Script.fsx" />
-    <Content Include="InstallationDummyFile.txt">
-      <Paket>True</Paket>
-    </Content>
     <Content Include="packages.config" />
     <Content Include="App.config" />
   </ItemGroup>

@@ -1,33 +1,23 @@
 ﻿namespace Checkers
 
-open System.Collections.Generic
-open System.Linq
+open Checkers.Types
+open Checkers.Piece
 
-type Board(board) =
-    new () = Board(Board.DefaultBoard)
+module Board =
 
-    new(board :IEnumerable<IEnumerable<Option<Piece>>>) =
-        let boardArray = List.ofSeq(board.Select(fun r -> List.ofSeq(r)))
-        Board(boardArray)
+    type Board = Piece option list list
 
-    member this.Board :Option<Piece> list list = board
+    let row = List.item
+    let square coord = List.item coord.Row >> List.item coord.Column
 
-    member this.Item
-        with get(coord :Coord) =
-            this.Board.[coord.Row].[coord.Column]
-
-    member this.Item
-        with get(row :int) =
-            this.Board.[row]
-
-    static member DefaultBoard :Option<Piece> list list =
+    let defaultBoard = 
         [
-            [None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker()];
-            [Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker(); None];
-            [None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker()];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [Piece.WhiteChecker(); None; Piece.WhiteChecker(); None; Piece.WhiteChecker(); None; Piece.WhiteChecker(); None];
-            [None; Piece.WhiteChecker(); None; Piece.WhiteChecker(); None; Piece.WhiteChecker(); None; Piece.WhiteChecker()];
-            [Piece.WhiteChecker(); None; Piece.WhiteChecker(); None; Piece.WhiteChecker(); None; Piece.WhiteChecker(); None];
-        ];
+            List.replicate 4 [None; blackChecker] |> List.concat
+            List.replicate 4 [blackChecker; None] |> List.concat
+            List.replicate 4 [None; blackChecker] |> List.concat
+            List.replicate 8 None
+            List.replicate 8 None
+            List.replicate 4 [whiteChecker; None] |> List.concat
+            List.replicate 4 [None; whiteChecker] |> List.concat
+            List.replicate 4 [whiteChecker; None] |> List.concat
+        ]

@@ -1,7 +1,9 @@
 ﻿namespace Checkers.Extensions
 
 open Checkers
+open Checkers.Board
 open Checkers.FSharpExtensions
+open Checkers.Types
 open System
 open System.Collections.Generic
 open System.Runtime.CompilerServices
@@ -10,14 +12,14 @@ open System.Runtime.CompilerServices
 type ExtensionMethods() =
 
     [<Extension>]
-    static member IsValidMove(board :Board, startCoord :Coord, endCoord :Coord) =
-        board.CoordExists(startCoord) &&
-        board.CoordExists(endCoord) &&
-        board.[startCoord].IsSome &&
-        moveIsDiagonal(startCoord, endCoord) &&
+    static member IsValidMove(board :Board, startCoord, endCoord) =
+        coordExists startCoord &&
+        coordExists endCoord &&
+        (square startCoord board).IsSome &&
+        moveIsDiagonal startCoord endCoord &&
         match Math.Abs(startCoord.Row - endCoord.Row) with
-        | 1 -> board.IsValidHop(startCoord, endCoord)
-        | 2 -> board.IsValidJump(startCoord, endCoord)
+        | 1 -> isValidHop startCoord endCoord board
+        | 2 -> isValidJump startCoord endCoord board
         | _ -> false
 
     [<Extension>]
@@ -26,8 +28,8 @@ type ExtensionMethods() =
         | false -> None
         | true ->
             match Math.Abs(startCoord.Row - endCoord.Row) with
-            | 1 -> Some <| board.Hop (startCoord, endCoord)
-            | 2 -> Some <| board.Jump (startCoord, endCoord)
+            | 1 -> Some <| hop startCoord endCoord board
+            | 2 -> Some <| jump startCoord endCoord board
             | _ -> None
 
     [<Extension>]
@@ -40,7 +42,7 @@ type ExtensionMethods() =
             ExtensionMethods.Move (newBoard, coords.Tail)
         | _ -> ExtensionMethods.Move (board, coords.Head, coords.[1])
 
-    static member internal Move(board :Option<Board>, coordinates :IEnumerable<Coord>) =
+    static member internal Move(board :Option<Board> ,coordinates :IEnumerable<Coord>) =
         match board.IsSome with
         | false -> None
         | true -> ExtensionMethods.Move(board.Value, coordinates)

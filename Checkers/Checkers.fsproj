@@ -114,9 +114,6 @@
     <Compile Include="FSharpExtensions.fs" />
     <Compile Include="ExtensionMethods.fs" />
     <None Include="Script.fsx" />
-    <Content Include="InstallationDummyFile.txt">
-      <Paket>True</Paket>
-    </Content>
     <Content Include="packages.config" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
