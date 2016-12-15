@@ -1,9 +1,16 @@
 ﻿namespace Checkers
 
+open System.Collections.Generic
+open System.Linq
+
 type Board(board) =
     new () = Board(Board.DefaultBoard)
 
-    member this.Board :List<List<Option<Piece>>> = board
+    new(board :IEnumerable<IEnumerable<Option<Piece>>>) =
+        let boardArray = List.ofSeq(board.Select(fun r -> List.ofSeq(r)))
+        Board(boardArray)
+
+    member this.Board :Option<Piece> list list = board
 
     member this.Item
         with get(coord :Coord) =
@@ -13,7 +20,7 @@ type Board(board) =
         with get(row :int) =
             this.Board.[row]
 
-    static member DefaultBoard =
+    static member DefaultBoard :Option<Piece> list list =
         [
             [None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker()];
             [Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker(); None; Piece.BlackChecker(); None];

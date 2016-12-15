@@ -11,8 +11,8 @@ type ExtensionMethods() =
 
     [<Extension>]
     static member IsValidMove(board :Board, startCoord :Coord, endCoord :Coord) =
-        startCoord.Exists() &&
-        endCoord.Exists() &&
+        board.CoordExists(startCoord) &&
+        board.CoordExists(endCoord) &&
         board.[startCoord].IsSome &&
         moveIsDiagonal(startCoord, endCoord) &&
         match Math.Abs(startCoord.Row - endCoord.Row) with

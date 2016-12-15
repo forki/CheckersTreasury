@@ -26,17 +26,19 @@ module FSharpExtensions =
         | Player.White -> 0
         
     type Board with
+        member internal board.CoordExists(coord :Coord) =
+            coord.Row > 0 && coord.Row < board.Board.Length &&
+            coord.Column > 0 && coord.Column < board.Board.[0].Length
+
         member internal board.IsValidCheckerHop(startCoord :Coord, endCoord :Coord) =
             let piece = board.[startCoord].Value
 
             checkMoveDirection(piece, startCoord, endCoord) &&
             board.[endCoord].IsNone
 
-    type Board with
         member internal board.IsValidKingHop(startCoord :Coord, endCoord :Coord) =
             board.[endCoord].IsNone
 
-    type Board with
         member internal board.IsValidCheckerJump(startCoord :Coord, endCoord :Coord) =
             let piece = board.[startCoord].Value
         
@@ -48,7 +50,6 @@ module FSharpExtensions =
             jumpedPiece.IsSome &&
             jumpedPiece.Value.Player <> piece.Player
 
-    type Board with
         member internal board.IsValidKingJump(startCoord :Coord, endCoord :Coord) =
             let piece = board.[startCoord].Value
 
@@ -59,19 +60,16 @@ module FSharpExtensions =
             jumpedPiece.IsSome &&
             jumpedPiece.Value.Player <> piece.Player
             
-    type Board with
         member internal board.IsValidHop(startCoord :Coord, endCoord :Coord) =
             match board.[startCoord].Value.PieceType with
             | PieceType.Checker -> board.IsValidCheckerHop(startCoord, endCoord)
             | PieceType.King -> board.IsValidKingHop(startCoord, endCoord)
         
-    type Board with
         member internal board.IsValidJump(startCoord :Coord, endCoord :Coord) =
             match board.[startCoord].Value.PieceType with
             | PieceType.Checker -> board.IsValidCheckerJump(startCoord, endCoord)
             | PieceType.King -> board.IsValidKingJump(startCoord, endCoord)
 
-    type Board with
         member internal board.SetPieceAt(coord :Coord, piece :Option<Piece>) =
             let boardItems = List.init 8 (fun row ->
                 match row with
@@ -85,7 +83,6 @@ module FSharpExtensions =
             )
             new Board(boardItems)
 
-    type Board with
         member internal board.Jump(startCoord :Coord, endCoord :Coord) =
             let kingRowIndex = kingRowIndex(board.[startCoord].Value.Player)
 
@@ -98,7 +95,6 @@ module FSharpExtensions =
 
             board.SetPieceAt(startCoord, None).SetPieceAt(endCoord, piece).SetPieceAt(jumpedCoord, None)
 
-    type Board with
         member internal board.Hop(startCoord :Coord, endCoord :Coord) =
             let kingRowIndex = kingRowIndex(board.[startCoord].Value.Player)
 

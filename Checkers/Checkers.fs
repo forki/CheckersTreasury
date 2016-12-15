@@ -4,8 +4,9 @@ type Player = Black | White
 
 type PieceType = Checker | King
 
-type Coord = {Row: int; Column :int}
-    with
-    member coord.Exists() =
-        coord.Row >= 0 && coord.Row <= 7 &&
-        coord.Column >= 0 && coord.Column <= 7
+type Coord = {
+    Row :int
+    Column :int
+} with
+    static member (+) (coord1 :Coord, coord2 :Coord) =
+        {Row = coord1.Row + coord2.Row; Column = coord1.Column + coord2.Column}
