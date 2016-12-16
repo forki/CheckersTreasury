@@ -1,6 +1,6 @@
 ﻿namespace Checkers
 
-module Types =
+module public Types =
     type Player = Black | White
 
     type PieceType = Checker | King

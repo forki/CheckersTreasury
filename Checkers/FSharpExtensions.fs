@@ -8,7 +8,7 @@ open System
 open System.Collections.Generic
 open System.Linq
 
-module FSharpExtensions =
+module internal FSharpExtensions =
 
     let internal getJumpedCoord startCoord endCoord =
         { Row = startCoord.Row - Math.Sign(startCoord.Row - endCoord.Row); Column = startCoord.Column - Math.Sign(startCoord.Column - endCoord.Column) }
@@ -74,19 +74,35 @@ module FSharpExtensions =
         | PieceType.Checker -> isValidCheckerJump startCoord endCoord board
         | PieceType.King -> isValidKingJump startCoord endCoord board
 
+    let internal hasValidHop startCoord (board :Board) =
+        let hopCoords =
+            [
+                startCoord + {Row = -1; Column = 1};
+                startCoord + {Row = -1; Column = -1};
+                startCoord + {Row = 1; Column = 1};
+                startCoord + {Row = 1; Column = -1}
+            ]
+
+        let flattenedList = seq {
+            for coord in hopCoords do
+            yield coordExists coord && isValidHop startCoord coord board }
+
+        flattenedList.Any(fun item -> item)
+
     let internal hasValidJump startCoord (board :Board) =
-        let jumpUpRightCoord = startCoord + {Row = -2; Column = 2}
-        let jumpUpLeftCoord = startCoord + {Row = -2; Column = -2}
-        let jumpDownRightCoord = startCoord + {Row = 2; Column = 2}
-        let jumpDownLeftCoord = startCoord + {Row = 2; Column = -2}
+        let jumpCoords =
+            [
+                startCoord + {Row = -2; Column = 2};
+                startCoord + {Row = -2; Column = -2};
+                startCoord + {Row = 2; Column = 2};
+                startCoord + {Row = 2; Column = -2}
+            ]
 
-        let jumpUpRightValid = coordExists jumpUpRightCoord && isValidJump startCoord jumpUpRightCoord board
-        let jumpUpLeftValid = coordExists jumpUpLeftCoord && isValidJump startCoord jumpUpLeftCoord board
-        let jumpDownRightValid = coordExists jumpDownRightCoord && isValidJump startCoord jumpDownRightCoord board
-        let jumpDownLeftValid = coordExists jumpDownLeftCoord && isValidJump startCoord jumpDownLeftCoord board
+        let flattenedList = seq {
+            for coord in jumpCoords do
+            yield coordExists coord && isValidJump startCoord coord board }
 
-        jumpUpRightValid || jumpUpLeftValid ||
-        jumpDownRightValid || jumpDownLeftValid
+        flattenedList.Any(fun item -> item)
 
     let internal jumpAvailable player (board :Board) =
         let pieceHasJump row column =
@@ -97,6 +113,20 @@ module FSharpExtensions =
             for row in 0 .. 7 do
             for column in 0 .. 7 do
             yield (pieceHasJump row column) }
+
+        flattenedList.Any(fun item -> item)
+
+    let internal moveAvailable player (board :Board) =
+        let pieceHasMove row column =
+            let piece = board.[row].[column]
+            piece.IsSome &&
+            piece.Value.Player = player &&
+            (hasValidJump { Row = row; Column = column } board || hasValidHop { Row = row; Column = column } board)
+
+        let flattenedList = seq {
+            for row in 0 .. 7 do
+            for column in 0 .. 7 do
+            yield (pieceHasMove row column) }
 
         flattenedList.Any(fun item -> item)
 

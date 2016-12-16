@@ -638,3 +638,39 @@ let ``Move sequence jumps pieces``() =
     
     let newBoard = (move [{Row = 0; Column = 0}; {Row = 2; Column = 2}; {Row = 0; Column = 4}] (Some <| board)).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
+
+[<Fact>]
+let ``Player has move available``() =
+    Assert.True(moveAvailable White Board.defaultBoard)
+
+[<Fact>]
+let ``Player with no pieces has no move available``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.False(moveAvailable White board)
+
+[<Fact>]
+let ``Player with pieces has no move available``() =
+    let board =
+        [
+            [Piece.whiteKing; None; None; None; None; None; None; None];
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.False(moveAvailable White board)

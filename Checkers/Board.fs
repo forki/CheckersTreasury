@@ -3,7 +3,7 @@
 open Checkers.Types
 open Checkers.Piece
 
-module Board =
+module public Board =
 
     type Board = Piece option list list
 

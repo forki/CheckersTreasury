@@ -2,7 +2,7 @@
 
 open Checkers.Types
 
-module Piece =
+module public Piece =
     type Piece = { Player :Player; PieceType :PieceType }
 
     let Promote piece = { Player = piece.Player; PieceType = King }
