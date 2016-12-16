@@ -29,51 +29,55 @@ module FSharpExtensions =
         | Player.Black -> 7
         | Player.White -> 0
     
-    let coordExists coord =
+    let internal coordExists coord =
         coord.Row >= 0 && coord.Row <= 7 &&
         coord.Column >= 0 && coord.Column <= 7
 
-    let isValidCheckerHop startCoord endCoord (board :Board) =
+    let internal isValidCheckerHop startCoord endCoord (board :Board) =
         let piece = (square startCoord board).Value
 
         checkMoveDirection piece startCoord endCoord &&
+        (square startCoord board).IsSome &&
         (square endCoord board).IsNone
 
-    let isValidKingHop startCoord endCoord (board :Board) =
+    let internal isValidKingHop startCoord endCoord (board :Board) =
+        (square startCoord board).IsSome &&
         (square endCoord board).IsNone
 
-    let isValidCheckerJump startCoord endCoord (board :Board) =
+    let internal isValidCheckerJump startCoord endCoord (board :Board) =
         let piece = (square startCoord board).Value
         
         let jumpedCoord = getJumpedCoord startCoord endCoord
         let jumpedPiece = square jumpedCoord board
         
         checkMoveDirection piece startCoord endCoord &&
+        (square startCoord board).IsSome &&
         (square endCoord board).IsNone &&
         jumpedPiece.IsSome &&
         jumpedPiece.Value.Player <> piece.Player
 
-    let isValidKingJump startCoord endCoord (board :Board) =
+    let internal isValidKingJump startCoord endCoord (board :Board) =
         let piece = (square startCoord board).Value
 
         let jumpedCoord = getJumpedCoord startCoord endCoord
         let jumpedPiece = square jumpedCoord board
 
         (square endCoord board).IsNone &&
+        (square startCoord board).IsSome &&
         jumpedPiece.IsSome &&
         jumpedPiece.Value.Player <> piece.Player
             
-    let isValidHop startCoord endCoord (board :Board) =
+    let internal isValidHop startCoord endCoord (board :Board) =
         match (square startCoord board).Value.PieceType with
         | PieceType.Checker -> isValidCheckerHop startCoord endCoord board
         | PieceType.King -> isValidKingHop startCoord endCoord board
         
-    let isValidJump startCoord endCoord (board :Board) =
+    let internal isValidJump startCoord endCoord (board :Board) =
         match (square startCoord board).Value.PieceType with
         | PieceType.Checker -> isValidCheckerJump startCoord endCoord board
         | PieceType.King -> isValidKingJump startCoord endCoord board
 
-    let hasValidJump startCoord (board :Board) =
+    let internal hasValidJump startCoord (board :Board) =
         let jumpUpRightCoord = startCoord + {Row = -2; Column = 2}
         let jumpUpLeftCoord = startCoord + {Row = -2; Column = -2}
         let jumpDownRightCoord = startCoord + {Row = 2; Column = 2}
@@ -87,10 +91,10 @@ module FSharpExtensions =
         jumpUpRightValid || jumpUpLeftValid ||
         jumpDownRightValid || jumpDownLeftValid
 
-    let jumpAvailable player (board :Board) =
+    let internal jumpAvailable player (board :Board) =
         board.Select(fun row rowIndex -> row.Select(fun item colIndex -> item.IsSome && item.Value.Player = player && hasValidJump { Row = rowIndex; Column = colIndex } board).Any(fun item -> item)).Any(fun item -> item)
 
-    let setPieceAt coord piece (board :Board) =
+    let internal setPieceAt coord piece (board :Board) =
         let boardItems = List.init 8 (fun row ->
             match row with
             | i when i = coord.Row ->
@@ -104,7 +108,7 @@ module FSharpExtensions =
 
         boardItems
 
-    let jump startCoord endCoord (board :Board) =
+    let internal jump startCoord endCoord (board :Board) =
         let kingRowIndex = kingRowIndex((square startCoord board).Value.Player)
 
         let piece =
@@ -119,7 +123,7 @@ module FSharpExtensions =
         |> setPieceAt endCoord piece
         |> setPieceAt jumpedCoord None
 
-    let hop startCoord endCoord (board :Board) =
+    let internal hop startCoord endCoord (board :Board) =
         let kingRowIndex = kingRowIndex (square startCoord board).Value.Player
 
         let piece =

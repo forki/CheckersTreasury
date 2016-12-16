@@ -15,7 +15,6 @@ type ExtensionMethods() =
     static member IsValidMove(board :Board, startCoord, endCoord) =
         coordExists startCoord &&
         coordExists endCoord &&
-        (square startCoord board).IsSome &&
         moveIsDiagonal startCoord endCoord &&
         match Math.Abs(startCoord.Row - endCoord.Row) with
         | 1 -> isValidHop startCoord endCoord board && not <| jumpAvailable (square startCoord board).Value.Player board
