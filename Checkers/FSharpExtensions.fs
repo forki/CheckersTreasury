@@ -38,11 +38,9 @@ module FSharpExtensions =
         let piece = (square startCoord board).Value
 
         checkMoveDirection piece startCoord endCoord &&
-        (square startCoord board).IsSome &&
         (square endCoord board).IsNone
 
-    let internal isValidKingHop startCoord endCoord (board :Board) =
-        (square startCoord board).IsSome &&
+    let internal isValidKingHop endCoord (board :Board) =
         (square endCoord board).IsNone
 
     let internal isValidCheckerJump startCoord endCoord (board :Board) =
@@ -52,7 +50,6 @@ module FSharpExtensions =
         let jumpedPiece = square jumpedCoord board
         
         checkMoveDirection piece startCoord endCoord &&
-        (square startCoord board).IsSome &&
         (square endCoord board).IsNone &&
         jumpedPiece.IsSome &&
         jumpedPiece.Value.Player <> piece.Player
@@ -64,14 +61,13 @@ module FSharpExtensions =
         let jumpedPiece = square jumpedCoord board
 
         (square endCoord board).IsNone &&
-        (square startCoord board).IsSome &&
         jumpedPiece.IsSome &&
         jumpedPiece.Value.Player <> piece.Player
             
     let internal isValidHop startCoord endCoord (board :Board) =
         match (square startCoord board).Value.PieceType with
         | PieceType.Checker -> isValidCheckerHop startCoord endCoord board
-        | PieceType.King -> isValidKingHop startCoord endCoord board
+        | PieceType.King -> isValidKingHop endCoord board
         
     let internal isValidJump startCoord endCoord (board :Board) =
         match (square startCoord board).Value.PieceType with
@@ -149,6 +145,7 @@ module FSharpExtensions =
         coordExists startCoord &&
         coordExists endCoord &&
         moveIsDiagonal startCoord endCoord &&
+        (square startCoord board).IsSome &&
         match Math.Abs(startCoord.Row - endCoord.Row) with
         | 1 -> isValidHop startCoord endCoord board && not <| jumpAvailable (square startCoord board).Value.Player board
         | 2 -> isValidJump startCoord endCoord board
