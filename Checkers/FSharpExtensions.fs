@@ -5,6 +5,7 @@ open Checkers.Piece
 open Checkers.Board
 open Checkers.Types
 open System
+open System.Linq
 
 module FSharpExtensions =
 
@@ -71,6 +72,23 @@ module FSharpExtensions =
         match (square startCoord board).Value.PieceType with
         | PieceType.Checker -> isValidCheckerJump startCoord endCoord board
         | PieceType.King -> isValidKingJump startCoord endCoord board
+
+    let hasValidJump startCoord (board :Board) =
+        let jumpUpRightCoord = startCoord + {Row = -2; Column = 2}
+        let jumpUpLeftCoord = startCoord + {Row = -2; Column = -2}
+        let jumpDownRightCoord = startCoord + {Row = 2; Column = 2}
+        let jumpDownLeftCoord = startCoord + {Row = 2; Column = -2}
+
+        let jumpUpRightValid = coordExists jumpUpRightCoord && isValidJump startCoord jumpUpRightCoord board
+        let jumpUpLeftValid = coordExists jumpUpLeftCoord && isValidJump startCoord jumpUpLeftCoord board
+        let jumpDownRightValid = coordExists jumpDownRightCoord && isValidJump startCoord jumpDownRightCoord board
+        let jumpDownLeftValid = coordExists jumpDownLeftCoord && isValidJump startCoord jumpDownLeftCoord board
+
+        jumpUpRightValid || jumpUpLeftValid ||
+        jumpDownRightValid || jumpDownLeftValid
+
+    let jumpAvailable player (board :Board) =
+        board.Select(fun row rowIndex -> row.Select(fun item colIndex -> item.IsSome && item.Value.Player = player && hasValidJump { Row = rowIndex; Column = colIndex } board).Any(fun item -> item)).Any(fun item -> item)
 
     let setPieceAt coord piece (board :Board) =
         let boardItems = List.init 8 (fun row ->

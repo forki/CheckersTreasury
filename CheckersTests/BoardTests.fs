@@ -243,6 +243,86 @@ let ``King cannot jump friend``() =
     Assert.False(board |> isValidCheckerJump {Row = 4; Column = 5} {Row = 6; Column = 7})
 
 [<Fact>]
+let ``King has valid jump``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.blackKing; None; None];
+            [None; None; None; None; None; None; Piece.whiteChecker; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+    
+    Assert.True(hasValidJump {Row = 4; Column = 5} board)
+
+[<Fact>]
+let ``King does not have valid jump``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.blackKing; None; None];
+            [None; None; None; None; None; None; Piece.blackChecker; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+    
+    Assert.False(hasValidJump {Row = 4; Column = 5} board)
+
+[<Fact>]
+let ``Checker has valid jump``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.blackChecker; None; None];
+            [None; None; None; None; None; None; Piece.whiteChecker; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+    
+    Assert.True(hasValidJump {Row = 4; Column = 5} board)
+
+[<Fact>]
+let ``Checker does not have valid jump``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; Piece.blackChecker; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+    
+    Assert.False(hasValidJump {Row = 4; Column = 5} board)
+
+[<Fact>]
+let ``Other checker has valid jump``() =
+    let board =
+        [
+            [Piece.blackChecker; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.blackChecker; None; None];
+            [None; None; None; None; None; None; Piece.whiteChecker; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+    
+    Assert.True(jumpAvailable Player.Black board)
+
+[<Fact>]
 let ``setPieceAt places piece``() =
     let board =
         [

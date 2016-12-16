@@ -18,7 +18,7 @@ type ExtensionMethods() =
         (square startCoord board).IsSome &&
         moveIsDiagonal startCoord endCoord &&
         match Math.Abs(startCoord.Row - endCoord.Row) with
-        | 1 -> isValidHop startCoord endCoord board
+        | 1 -> isValidHop startCoord endCoord board && not <| jumpAvailable (square startCoord board).Value.Player board
         | 2 -> isValidJump startCoord endCoord board
         | _ -> false
 
