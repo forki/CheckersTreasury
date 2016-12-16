@@ -93,7 +93,16 @@ module FSharpExtensions =
         jumpDownRightValid || jumpDownLeftValid
 
     let internal jumpAvailable player (board :Board) =
-        board.Select(fun row rowIndex -> row.Select(fun item colIndex -> item.IsSome && item.Value.Player = player && hasValidJump { Row = rowIndex; Column = colIndex } board).Any(fun item -> item)).Any(fun item -> item)
+        let pieceHasJump row column =
+            let piece = board.[row].[column]
+            piece.IsSome && piece.Value.Player = player && hasValidJump { Row = row; Column = column } board
+
+        let flattenedList = seq {
+            for row in 0 .. 7 do
+            for column in 0 .. 7 do
+            yield (pieceHasJump row column) }
+
+        flattenedList.Any(fun item -> item)
 
     let internal setPieceAt coord piece (board :Board) =
         let boardItems = List.init 8 (fun row ->
