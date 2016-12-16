@@ -112,7 +112,6 @@
     <Compile Include="Piece.fs" />
     <Compile Include="Board.fs" />
     <Compile Include="FSharpExtensions.fs" />
-    <Compile Include="ExtensionMethods.fs" />
     <None Include="Script.fsx" />
     <Content Include="packages.config" />
   </ItemGroup>

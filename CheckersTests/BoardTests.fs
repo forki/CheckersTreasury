@@ -1,7 +1,6 @@
 ﻿module BoardTests
 
 open Checkers
-open Checkers.Extensions
 open Checkers.FSharpExtensions
 open Checkers.Piece
 open Checkers.Types
@@ -10,22 +9,22 @@ open Xunit
 [<Fact>]
 let ``Starting coord row must exist``() =
     let board = Board.defaultBoard
-    Assert.False(board.IsValidMove({Row = -1; Column = 0}, {Row = 0; Column = 0}))
+    Assert.False(board |> isValidMove {Row = -1; Column = 0} {Row = 0; Column = 0})
 
 [<Fact>]
 let ``Starting coord column must exist``() =
     let board = Board.defaultBoard
-    Assert.False(board.IsValidMove({Row = 0; Column = -1}, {Row = 0; Column = 0}))
+    Assert.False(board |> isValidMove {Row = 0; Column = -1} {Row = 0; Column = 0})
 
 [<Fact>]
 let ``Ending coord row must exist``() =
     let board = Board.defaultBoard
-    Assert.False(board.IsValidMove({Row = 0; Column = 0}, {Row = -1; Column = 0}))
+    Assert.False(board |> isValidMove {Row = 0; Column = 0} {Row = -1; Column = 0})
 
 [<Fact>]
 let ``Ending coord column must exist``() =
     let board = Board.defaultBoard
-    Assert.False(board.IsValidMove({Row = 0; Column = 0}, {Row = 0; Column = -1}))
+    Assert.False(board |> isValidMove {Row = 0; Column = 0} {Row = 0; Column = -1})
 
 [<Fact>]
 let ``Move must be diagonal``() =
@@ -376,7 +375,7 @@ let ``Move hops piece``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 0; Column = 1}, {Row = 1; Column = 2}).Value
+    let newBoard = (board |> movePiece {Row = 0; Column = 1} {Row = 1; Column = 2}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -405,7 +404,7 @@ let ``Hopping black to line 7 promotes``() =
             [None; Piece.blackKing; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 6; Column = 0}, {Row = 7; Column = 1}).Value
+    let newBoard = (board |> movePiece {Row = 6; Column = 0} {Row = 7; Column = 1}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -434,7 +433,7 @@ let ``Hopping white to line 0 promotes``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 1; Column = 1}, {Row = 0; Column = 0}).Value
+    let newBoard = (board |> movePiece {Row = 1; Column = 1} {Row = 0; Column = 0}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -463,7 +462,7 @@ let ``Jumping black to line 7 promotes``() =
             [None; None; Piece.blackKing; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 5; Column = 0}, {Row = 7; Column = 2}).Value
+    let newBoard = (board |> movePiece {Row = 5; Column = 0} {Row = 7; Column = 2}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -492,7 +491,7 @@ let ``Jumping white to line 0 promotes``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 2; Column = 2}, {Row = 0; Column = 0}).Value
+    let newBoard = (board |> movePiece {Row = 2; Column = 2} {Row = 0; Column = 0}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -521,7 +520,7 @@ let ``Move jump down right jumps piece``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 0; Column = 1}, {Row = 2; Column = 3}).Value
+    let newBoard = (board |> movePiece {Row = 0; Column = 1} {Row = 2; Column = 3}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -550,7 +549,7 @@ let ``Move jump down left jumps piece``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 0; Column = 2}, {Row = 2; Column = 0}).Value
+    let newBoard = (board |> movePiece {Row = 0; Column = 2} {Row = 2; Column = 0}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -579,7 +578,7 @@ let ``Move jump up right jumps piece``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 2; Column = 0}, {Row = 0; Column = 2}).Value
+    let newBoard = (board |> movePiece {Row = 2; Column = 0} {Row = 0; Column = 2}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -608,7 +607,7 @@ let ``Move jump up left jumps piece``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move({Row = 2; Column = 2}, {Row = 0; Column = 0}).Value
+    let newBoard = (board |> movePiece {Row = 2; Column = 2} {Row = 0; Column = 0}).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -637,5 +636,5 @@ let ``Move sequence jumps pieces``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = board.Move([{Row = 0; Column = 0}; {Row = 2; Column = 2}; {Row = 0; Column = 4}]).Value
+    let newBoard = (move [{Row = 0; Column = 0}; {Row = 2; Column = 2}; {Row = 0; Column = 4}] (Some <| board)).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)

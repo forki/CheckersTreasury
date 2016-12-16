@@ -5,6 +5,7 @@ open Checkers.Piece
 open Checkers.Board
 open Checkers.Types
 open System
+open System.Collections.Generic
 open System.Linq
 
 module FSharpExtensions =
@@ -134,3 +135,33 @@ module FSharpExtensions =
         board
         |> setPieceAt startCoord None
         |> setPieceAt endCoord piece
+
+    let public isValidMove startCoord endCoord (board :Board) =
+        coordExists startCoord &&
+        coordExists endCoord &&
+        moveIsDiagonal startCoord endCoord &&
+        match Math.Abs(startCoord.Row - endCoord.Row) with
+        | 1 -> isValidHop startCoord endCoord board && not <| jumpAvailable (square startCoord board).Value.Player board
+        | 2 -> isValidJump startCoord endCoord board
+        | _ -> false
+
+    let public movePiece startCoord endCoord (board :Board) :Option<Board> =
+        match isValidMove startCoord endCoord board with
+        | false -> None
+        | true ->
+            match Math.Abs(startCoord.Row - endCoord.Row) with
+            | 1 -> Some <| hop startCoord endCoord board
+            | 2 -> Some <| jump startCoord endCoord board
+            | _ -> None
+
+    let rec public move (coordinates :IEnumerable<Coord>) (board :Option<Board>) =
+        let coords = List.ofSeq(coordinates)
+
+        match board.IsNone with
+        | true -> None
+        | false ->
+            match coords.Length with
+            | b when b >= 3 ->
+                let newBoard = movePiece coords.Head coords.[1] board.Value
+                move coords.Tail newBoard
+            | _ -> movePiece coords.Head coords.[1] board.Value
