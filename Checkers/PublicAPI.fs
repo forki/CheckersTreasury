@@ -20,9 +20,12 @@ module public PublicAPI =
         | White -> Black
         | Black -> White
 
-    let internal playerTurnEnds lastMoveStartCoord lastMoveEndCoord currentBoard =
+    let internal playerTurnEnds lastMoveStartCoord lastMoveEndCoord (originalBoard :Board) (currentBoard :Board) =
         let lastMoveWasJump = Math.Abs(lastMoveStartCoord.Row - lastMoveEndCoord.Row) = 2
+        let pieceWasPromoted = (square lastMoveEndCoord currentBoard).Value.PieceType = King &&
+                               (square lastMoveStartCoord originalBoard).Value.PieceType = Checker
 
+        pieceWasPromoted ||
         not (lastMoveWasJump && hasValidJump lastMoveEndCoord currentBoard)
 
     let move startCoord endCoord gameController :Option<GameController> =
@@ -32,10 +35,10 @@ module public PublicAPI =
         | true -> Some <|
                   {
                       Board = newBoard.Value;
-                      CurrentPlayer = match playerTurnEnds startCoord endCoord newBoard.Value with
+                      CurrentPlayer = match playerTurnEnds startCoord endCoord gameController.Board newBoard.Value with
                                       | true -> otherPlayer gameController.CurrentPlayer
                                       | false -> gameController.CurrentPlayer        
-                      CurrentCoord = match playerTurnEnds startCoord endCoord newBoard.Value with
+                      CurrentCoord = match playerTurnEnds startCoord endCoord gameController.Board newBoard.Value with
                                       | true -> None
                                       | false -> Some endCoord
                   }
