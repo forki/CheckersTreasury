@@ -1,10 +1,17 @@
 ﻿module public Checkers.Board
 open Checkers.Types
 open Checkers.Piece
+open System.Collections.Generic
 
 type Board = Piece option list list
 
 let square (coord :Coord) = List.item coord.Row >> List.item coord.Column
+
+let rec rowFromSeq (value :'a IEnumerable) =
+    Some (List.ofSeq value)
+
+let rec listFromSeq (value :'a IEnumerable IEnumerable) =
+    List.ofSeq (Seq.choose rowFromSeq value)
 
 let defaultBoard = 
     [
