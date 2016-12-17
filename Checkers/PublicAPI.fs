@@ -10,7 +10,10 @@ module public PublicAPI =
 
     let isValidMove startCoord endCoord gameController =
         isValidMove startCoord endCoord gameController.Board &&
-        (square startCoord gameController.Board).Value.Player = gameController.Player
+        (square startCoord gameController.Board).Value.Player = gameController.CurrentPlayer &&
+        match gameController.CurrentCoord with
+        | None -> true
+        | coord -> startCoord = coord.Value
 
     let private otherPlayer player =
         match player with
@@ -29,9 +32,12 @@ module public PublicAPI =
         | true -> Some <|
                   {
                       Board = newBoard.Value;
-                      Player = match playerTurnEnds startCoord endCoord newBoard.Value with
-                               | true -> otherPlayer gameController.Player
-                               | false -> gameController.Player
+                      CurrentPlayer = match playerTurnEnds startCoord endCoord newBoard.Value with
+                                      | true -> otherPlayer gameController.CurrentPlayer
+                                      | false -> gameController.CurrentPlayer        
+                      CurrentCoord = match playerTurnEnds startCoord endCoord newBoard.Value with
+                                      | true -> None
+                                      | false -> Some endCoord
                   }
         | false -> None
 
