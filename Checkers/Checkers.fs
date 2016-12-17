@@ -1,11 +1,10 @@
-﻿namespace Checkers
+﻿module public Checkers.Types
+type Player = Black | White
 
-module public Types =
-    type Player = Black | White
+type PieceType = Checker | King
 
-    type PieceType = Checker | King
+type Coord = { Row :int; Column :int }
 
-    type Coord = { Row :int; Column :int }
-
-    let (+) coord1 coord2 =
-        { Row = coord1.Row + coord2.Row; Column = coord1.Column + coord2.Column }
+type Coord with
+    static member (+) (c1 :Coord, c2 :Coord) =
+        { Row = c1.Row + c2.Row; Column = c1.Column + c2.Column }

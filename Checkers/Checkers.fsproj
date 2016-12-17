@@ -112,6 +112,7 @@
     <Compile Include="Piece.fs" />
     <Compile Include="Board.fs" />
     <Compile Include="FSharpExtensions.fs" />
+    <Compile Include="Variants/AmericanCheckers.fs" />
     <Compile Include="GameController.fs" />
     <Compile Include="PublicAPI.fs" />
     <None Include="Script.fsx" />

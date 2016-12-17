@@ -104,6 +104,7 @@
     <Compile Include="PieceTests.fs" />
     <Compile Include="BoardTests.fs" />
     <Compile Include="GameControllerTests.fs" />
+    <Compile Include="AmericanCheckersTests.fs" />
     <None Include="Script.fsx" />
     <Content Include="packages.config" />
     <Content Include="App.config" />
