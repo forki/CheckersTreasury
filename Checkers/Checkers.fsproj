@@ -117,6 +117,7 @@
     <Compile Include="PublicAPI.fs" />
     <None Include="Script.fsx" />
     <Content Include="packages.config" />
+    <Compile Include="AIs\AmericanCheckersAI.fs" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
