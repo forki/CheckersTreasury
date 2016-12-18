@@ -18,3 +18,8 @@ let internal checkMoveDirection piece startCoord endCoord =
 let internal moveIsDiagonal startCoord endCoord =
     startCoord <> endCoord &&
     System.Math.Abs(startCoord.Row - endCoord.Row) = System.Math.Abs(startCoord.Column - endCoord.Column)
+
+let internal otherPlayer player =
+    match player with
+    | White -> Black
+    | Black -> White

@@ -674,3 +674,143 @@ let ``Player with pieces has no move available``() =
         ];
 
     Assert.False(moveAvailable board White)
+
+[<Fact>]
+let ``Player turn not ended``() =
+    let originalBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.whiteKing; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.whiteKing; None; None; None; None];
+            [None; None; None; None; Piece.blackKing; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let newBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.whiteKing; None; None; None; None; None; None];
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.False(playerTurnEnds { Row = 4; Column = 4 } { Row = 2; Column = 2 } originalBoard newBoard)
+
+[<Fact>]
+let ``Player turn not ended--checker piece``() =
+    let originalBoard =
+        [
+            [Piece.blackChecker; None; None; None; None; None; None; None];
+            [None; Piece.whiteChecker; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.whiteKing; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let newBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; Piece.blackChecker; None; None; None; None; None];
+            [None; None; None; Piece.whiteKing; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.False(playerTurnEnds { Row = 0; Column = 0 } { Row = 2; Column = 2 } originalBoard newBoard)
+
+[<Fact>]
+let ``Player turn ends when move is hop``() =
+    let originalBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.whiteKing; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.blackKing; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let newBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.whiteKing; None; None; None; None; None; None];
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.True(playerTurnEnds { Row = 3; Column = 3 } { Row = 2; Column = 2 } originalBoard newBoard)
+
+[<Fact>]
+let ``Player turn ends when no jumps available``() =
+    let originalBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.whiteChecker; None; None; None; None];
+            [None; None; None; None; Piece.blackKing; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+        
+    let newBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.True(playerTurnEnds { Row = 4; Column = 4 } { Row = 2; Column = 2 } originalBoard newBoard)
+
+[<Fact>]
+let ``Turn cannot continue after promotion``() =
+    let originalBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let newBoard =
+        [
+            [None; None; None; Piece.whiteKing; None; None; None; None];
+            [None; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.True(playerTurnEnds { Row = 2; Column = 5 } { Row = 0; Column = 3 } originalBoard newBoard)

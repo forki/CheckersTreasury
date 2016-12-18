@@ -158,6 +158,14 @@ let internal hop startCoord endCoord (board :Board) =
     |> setPieceAt startCoord None
     |> setPieceAt endCoord piece
 
+let internal playerTurnEnds lastMoveStartCoord lastMoveEndCoord (originalBoard :Board) (currentBoard :Board) =
+    let lastMoveWasJump = Math.Abs(lastMoveStartCoord.Row - lastMoveEndCoord.Row) = 2
+    let pieceWasPromoted = (square lastMoveEndCoord currentBoard).Value.PieceType = King &&
+                            (square lastMoveStartCoord originalBoard).Value.PieceType = Checker
+
+    pieceWasPromoted ||
+    not (lastMoveWasJump && hasValidJump lastMoveEndCoord currentBoard)
+
 let public isValidMove startCoord endCoord (board :Board) =
     coordExists startCoord &&
     coordExists endCoord &&
