@@ -42,3 +42,20 @@ let ``Calculate moves prefers jumps to hops``() =
 
     let moves = calculateMoves Black board
     Assert.Equal(1, moves.Length)
+
+[<Fact>]
+let ``Calculate moves prefers jumps to hops 1``() =
+    let board =
+        [
+            [None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker];
+            [Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
+            [None; Piece.blackChecker; None; None; None; None; None; Piece.blackChecker];
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.whiteChecker; None; None; None; None; None; Piece.blackChecker];
+            [Piece.whiteChecker; None; Piece.whiteChecker; None; None; None; Piece.blackChecker; None];
+            [None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker];
+            [Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None];
+        ];
+
+    let moves = calculateMoves White board
+    Assert.Equal(1, moves.Length)

@@ -3,6 +3,7 @@ open Checkers.Types
 open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
+open Checkers.AIs.AmericanCheckersAI
 open Checkers.GameController
 
 let isValidMove startCoord endCoord gameController =
@@ -27,6 +28,9 @@ let move startCoord endCoord gameController :Option<GameController> =
                                     | false -> Some endCoord
                 }
     | false -> None
+
+let getMove gameController =
+    getBestMove gameController.CurrentPlayer gameController.Board
 
 let isWon controller =
     match (moveAvailable controller.Board) with

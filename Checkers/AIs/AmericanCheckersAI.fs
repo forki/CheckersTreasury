@@ -129,7 +129,7 @@ let calculateMoves player (board :Board) =
                 | None -> newHopAcc
             | false ->
                 match nextPoint coord with
-                | Some c -> loop newJumpAcc hopAcc c
+                | Some c -> loop newJumpAcc [] c
                 | None -> newJumpAcc
         | false ->
             match nextPoint coord with
@@ -137,3 +137,9 @@ let calculateMoves player (board :Board) =
             | None -> jumpAcc @ hopAcc
     
     loop [] [] {Row = 0; Column = 0}
+
+let getBestMove player (board :Board) =
+    let rnd = new Random()
+    let moves = calculateMoves player board
+
+    moves.[rnd.Next(moves.Length - 1)]
