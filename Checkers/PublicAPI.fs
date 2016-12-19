@@ -37,17 +37,7 @@ let move (moves :System.Collections.Generic.IEnumerable<Coord>) (gameController)
     | None -> None
 
 let getMove searchDepth gameController =
-    let rec loop (moves :(Coord * Coord) List) controller =
-        let pieceMove = getBestMove controller.CurrentPlayer searchDepth controller.Board
-        let startCoord, endCoord = pieceMove
-        let newController = movePiece startCoord endCoord controller
-        let newMoves = moves @ [pieceMove]
-        
-        match newController.IsSome && newController.Value.CurrentPlayer = controller.CurrentPlayer with
-        | true -> loop newMoves newController.Value
-        | false -> newMoves
-
-    loop [] gameController
+    getBestMove gameController.CurrentPlayer searchDepth gameController.Board
 
 let isWon controller =
     isWon controller.Board
