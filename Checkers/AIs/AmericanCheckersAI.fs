@@ -1,6 +1,7 @@
 ﻿module Checkers.AIs.AmericanCheckersAI
 
 open Checkers.Board
+open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
 open Checkers.Types
 open System
@@ -138,8 +139,31 @@ let calculateMoves player (board :Board) =
     
     loop [] [] {Row = 0; Column = 0}
 
-let getBestMove player (board :Board) =
-    let rnd = new Random()
+let rec getBestMove player (searchDepth :int) (board :Board) =
     let moves = calculateMoves player board
 
-    moves.[rnd.Next(moves.Length - 1)]
+    let wonBoards = List.map (fun x -> (isWon (movePiece (fst x) (snd x) board).Value).IsSome) moves
+
+    let opponentMoves =
+        match searchDepth = 0 || List.exists id wonBoards with
+        | false -> List.map (fun x -> getBestMove (otherPlayer player) (searchDepth - 1) (movePiece (fst x) (snd x) board).Value) moves
+        | true -> List.empty
+
+    let weightedMoves = List.mapi (fun i (m :Coord * Coord) -> (calculateWeight player (match (opponentMoves.IsEmpty) with
+                                                                                        | true -> (movePiece (fst m) (snd m) board).Value
+                                                                                        | false -> let newBoard = (movePiece (fst m) (snd m) board).Value
+                                                                                                   (movePiece (fst opponentMoves.[i]) (snd opponentMoves.[i]) newBoard).Value)
+                                                                , m)) moves
+
+    let rec loop highestWeight moveForHighestWeight (list :List<float * (Coord * Coord)>) =
+        let weight = fst list.Head
+        let newMoveForHighestWeight =
+            match weight >= highestWeight with
+            | true -> snd list.Head
+            | false -> moveForHighestWeight
+
+        match list.Tail.IsEmpty with
+        | false -> loop (Math.Max(highestWeight, weight)) newMoveForHighestWeight list.Tail
+        | true -> newMoveForHighestWeight
+
+    loop (fst weightedMoves.Head) (snd weightedMoves.Head) weightedMoves

@@ -117,6 +117,12 @@ let internal moveAvailable (board :Board) player =
             
     flattenedList |> Seq.exists id
 
+let isWon (board :Board) =
+    match (moveAvailable board) with
+    | x when not <| x White -> Some Black
+    | x when not <| x Black -> Some White
+    | _ -> None
+
 let internal setPieceAt coord piece (board :Board) =
     let boardItems = List.init (Rows + 1) (fun row ->
         match row with

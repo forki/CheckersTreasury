@@ -7,30 +7,6 @@ open Checkers.PublicAPI
 open Xunit
 
 [<Fact>]
-let ``Game won returns player``() =
-    let board =
-        [
-            [Piece.whiteKing; None; None; None; None; None; None; None];
-            [None; Piece.blackKing; None; None; None; None; None; None];
-            [None; None; Piece.blackKing; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-        ];
-
-    let gameController = { Board = board; CurrentPlayer = Black; CurrentCoord = None }
-
-    Assert.Equal(Black, (isWon gameController).Value)
-
-[<Fact>]
-let ``Game not won returns None``() =
-    let gameController = { Board = Board.defaultBoard; CurrentPlayer = Black; CurrentCoord = None }
-
-    Assert.True((isWon gameController).IsNone)
-
-[<Fact>]
 let ``Opponent cannot move when player turn not ended``() =
     let board =
         [

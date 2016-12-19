@@ -2,6 +2,7 @@
 open Checkers
 open Checkers.Types
 open Checkers.AIs.AmericanCheckersAI
+open Checkers.PublicAPI
 open Xunit
 
 [<Fact>]
@@ -59,3 +60,20 @@ let ``Calculate moves prefers jumps to hops 1``() =
 
     let moves = calculateMoves White board
     Assert.Equal(1, moves.Length)
+
+[<Fact>]
+let ``Calculate moves double jump``() =
+    let board =
+        [
+            [Piece.blackChecker; None; None; None; None; None; None; None];
+            [None; Piece.whiteChecker; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.whiteChecker; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let moves = getMove 1 {Board = board; CurrentPlayer = Black; CurrentCoord = None }
+    Assert.Equal(2, moves.Length)

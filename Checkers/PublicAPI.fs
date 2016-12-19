@@ -1,4 +1,5 @@
 ﻿module public Checkers.PublicAPI
+open Checkers.Variants
 open Checkers.Types
 open Checkers.Board
 open Checkers.FSharpExtensions
@@ -13,7 +14,7 @@ let isValidMove startCoord endCoord gameController =
     | None -> true
     | coord -> startCoord = coord.Value
 
-let move startCoord endCoord gameController :Option<GameController> =
+let movePiece startCoord endCoord gameController :Option<GameController> =
     let newBoard = movePiece startCoord endCoord gameController.Board
 
     match (isValidMove startCoord endCoord gameController) with
@@ -29,11 +30,24 @@ let move startCoord endCoord gameController :Option<GameController> =
                 }
     | false -> None
 
-let getMove gameController =
-    getBestMove gameController.CurrentPlayer gameController.Board
+let move (moves :System.Collections.Generic.IEnumerable<Coord>) (gameController) :Option<GameController> =
+    let board = move moves (Some gameController.Board)
+    match board with
+    | Some b -> Some {Board = board.Value; CurrentPlayer = otherPlayer gameController.CurrentPlayer; CurrentCoord = gameController.CurrentCoord}
+    | None -> None
+
+let getMove searchDepth gameController =
+    let rec loop (moves :(Coord * Coord) List) controller =
+        let pieceMove = getBestMove controller.CurrentPlayer searchDepth controller.Board
+        let startCoord, endCoord = pieceMove
+        let newController = movePiece startCoord endCoord controller
+        let newMoves = moves @ [pieceMove]
+        
+        match newController.IsSome && newController.Value.CurrentPlayer = controller.CurrentPlayer with
+        | true -> loop newMoves newController.Value
+        | false -> newMoves
+
+    loop [] gameController
 
 let isWon controller =
-    match (moveAvailable controller.Board) with
-    | x when not <| x White -> Some Black
-    | x when not <| x Black -> Some White
-    | _ -> None
+    isWon controller.Board

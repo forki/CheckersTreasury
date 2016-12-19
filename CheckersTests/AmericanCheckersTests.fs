@@ -814,3 +814,23 @@ let ``Turn cannot continue after promotion``() =
         ];
 
     Assert.True(playerTurnEnds { Row = 2; Column = 5 } { Row = 0; Column = 3 } originalBoard newBoard)
+
+[<Fact>]
+let ``Game won returns player``() =
+    let board =
+        [
+            [Piece.whiteKing; None; None; None; None; None; None; None];
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.Equal(Black, (isWon board).Value)
+
+[<Fact>]
+let ``Game not won returns None``() =
+    Assert.True((isWon Board.defaultBoard).IsNone)
