@@ -636,7 +636,7 @@ let ``Move sequence jumps pieces``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = (move [{Row = 0; Column = 0}; {Row = 2; Column = 2}; {Row = 0; Column = 4}] (Some <| board)).Value
+    let newBoard = (moveSequence [{Row = 0; Column = 0}; {Row = 2; Column = 2}; {Row = 0; Column = 4}] (Some <| board)).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]

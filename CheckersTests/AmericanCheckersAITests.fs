@@ -2,7 +2,6 @@
 open Checkers
 open Checkers.Types
 open Checkers.AIs.AmericanCheckersAI
-open Checkers.PublicAPI
 open Xunit
 
 [<Fact>]
@@ -68,12 +67,12 @@ let ``Calculate moves double jump``() =
             [Piece.blackChecker; None; None; None; None; None; None; None];
             [None; Piece.whiteChecker; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
-            [None; None; None; Piece.whiteChecker; None; None; None; None];
+            [None; Piece.whiteChecker; None; Piece.whiteChecker; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
         ];
 
-    let moves = getMove 1 {Board = board; CurrentPlayer = Black; CurrentCoord = None }
-    Assert.Equal(2, moves.Length)
+    let tree = createMoveTree [{Row = 0; Column = 0}] board
+    Assert.False(true)

@@ -90,7 +90,7 @@ let getPieceJumps coord (board :Board) =
         | Checker -> checkerJumps piece.Player
         | King -> kingJumps piece.Player
 
-    let jumps = List.ofSeq (seq {
+    let hops = List.ofSeq (seq {
         for move in moves do
         let endCoord = coord + move
         yield
@@ -98,7 +98,29 @@ let getPieceJumps coord (board :Board) =
             | true -> Some [coord; endCoord]
             | false -> None })
 
-    List.map (fun (item :Option<Move>) -> item.Value) (List.where (fun (item :Option<Move>) -> item.IsSome) jumps)
+    List.map (fun (item :Option<Move>) -> item.Value) (List.where (fun (item :Option<Move>) -> item.IsSome) hops)
+
+let rec createMoveTree (move :Move) (board :Board) =
+    let moveTree =
+        {
+            Move = move;
+            Parent = None;
+            Children =
+                let newBoard =
+                    match move.Length with
+                    | 1 -> board
+                    | _ -> (moveSequence move (Some board)).Value
+                let newJumps = getPieceJumps (List.last move) newBoard
+                let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
+                match newMoveEndCoords.IsEmpty with
+                | false ->
+                    let moves = List.map (fun (item :Coord) -> move @ [item]) newMoveEndCoords
+                    let children = List.map (fun item -> createMoveTree item board) moves
+                    Some children
+                | true -> None
+        }
+
+    moveTree
 
 let getPieceHops coord (board :Board) =
     let piece = (square coord board).Value
@@ -142,18 +164,18 @@ let calculateMoves player (board :Board) =
 let rec getBestMove player (searchDepth :int) (board :Board) =
     let moves = calculateMoves player board
 
-    let wonBoards = List.map (fun x -> (isWon (move x (Some board)).Value).IsSome) moves
+    let wonBoards = List.map (fun x -> (isWon (moveSequence x (Some board)).Value).IsSome) moves
 
     let opponentMoves =
         match searchDepth = 0 || List.exists id wonBoards with
-        | false -> List.map (fun x -> getBestMove (otherPlayer player) (searchDepth - 1) (move x (Some board)).Value) moves
+        | false -> List.map (fun x -> getBestMove (otherPlayer player) (searchDepth - 1) (moveSequence x (Some board)).Value) moves
         | true -> List.empty
 
     let weightedMoves = List.mapi (fun i m -> (calculateWeight player (match (opponentMoves.IsEmpty) with
-                                                                                        | true -> (move m (Some board)).Value
-                                                                                        | false -> let newBoard = (move m (Some board)).Value
-                                                                                                   (move opponentMoves.[i] (Some newBoard)).Value)
-                                                                , m)) moves
+                                                                       | true -> (moveSequence m (Some board)).Value
+                                                                       | false -> let newBoard = (moveSequence m (Some board)).Value
+                                                                                  (moveSequence opponentMoves.[i] (Some newBoard)).Value),
+                                                                       m)) moves
 
     let rec loop highestWeight moveForHighestWeight (list :List<float * Move>) =
         let weight = fst list.Head

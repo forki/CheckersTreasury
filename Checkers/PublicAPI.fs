@@ -31,7 +31,7 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
     | false -> None
 
 let move (moves :System.Collections.Generic.IEnumerable<Coord>) (gameController) :Option<GameController> =
-    let board = move moves (Some gameController.Board)
+    let board = moveSequence moves (Some gameController.Board)
     match board with
     | Some b -> Some {Board = board.Value; CurrentPlayer = otherPlayer gameController.CurrentPlayer; CurrentCoord = gameController.CurrentCoord}
     | None -> None

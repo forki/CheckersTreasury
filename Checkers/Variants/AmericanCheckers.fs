@@ -191,7 +191,7 @@ let public movePiece startCoord endCoord (board :Board) :Option<Board> =
         | 2 -> Some <| jump startCoord endCoord board
         | _ -> None
 
-let rec public move (coordinates :IEnumerable<Coord>) (board :Option<Board>) =
+let rec public moveSequence (coordinates :IEnumerable<Coord>) (board :Option<Board>) =
     let coords = List.ofSeq(coordinates)
 
     match board.IsNone with
@@ -200,5 +200,5 @@ let rec public move (coordinates :IEnumerable<Coord>) (board :Option<Board>) =
         match coords.Length with
         | b when b >= 3 ->
             let newBoard = movePiece coords.Head coords.[1] board.Value
-            move coords.Tail newBoard
+            moveSequence coords.Tail newBoard
         | _ -> movePiece coords.Head coords.[1] board.Value

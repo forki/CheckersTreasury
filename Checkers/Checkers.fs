@@ -10,3 +10,5 @@ type Coord with
         { Row = c1.Row + c2.Row; Column = c1.Column + c2.Column }
 
 type Move = Coord List
+
+type MoveTree = { Move :Move; Parent :Option<MoveTree>; Children :Option<List<MoveTree>> }
