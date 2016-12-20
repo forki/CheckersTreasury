@@ -112,7 +112,11 @@ let rec createMoveTree (move :Move) (board :Board) =
                     | _ -> (moveSequence move (Some board)).Value
                 let newJumps = getPieceSingleJumps (List.last move) newBoard
                 let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
-                match newMoveEndCoords.IsEmpty with
+
+                let oldPieceType = (square move.Head board).Value.PieceType
+                let newPieceType = (square (List.last move) newBoard).Value.PieceType
+
+                match newMoveEndCoords.IsEmpty || (oldPieceType = Checker && newPieceType = King) with
                 | false ->
                     let moves = List.map (fun (item :Coord) -> move @ [item]) newMoveEndCoords
                     let children = List.map (fun item -> createMoveTree item board) moves
