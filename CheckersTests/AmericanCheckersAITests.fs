@@ -61,7 +61,7 @@ let ``Calculate moves prefers jumps to hops 1``() =
     Assert.Equal(1, moves.Length)
 
 [<Fact>]
-let ``Calculate moves double jump``() =
+let ``Calculate moves returns multi double jump``() =
     let board =
         [
             [Piece.blackChecker; None; None; None; None; None; None; None];
@@ -74,5 +74,5 @@ let ``Calculate moves double jump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let tree = createMoveTree [{Row = 0; Column = 0}] board
-    Assert.False(true)
+    let moves = getPieceJumps {Row = 0; Column = 0} board
+    Assert.Equal(2, moves.Length)

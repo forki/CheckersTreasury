@@ -83,7 +83,7 @@ let kingHops player =
         | White -> [{Row = 1; Column = -1}; {Row = 1; Column = 1}]
         | Black -> [{Row = -1; Column = -1}; {Row = -1; Column = 1}])
 
-let getPieceJumps coord (board :Board) =
+let getPieceSingleJumps coord (board :Board) =
     let piece = (square coord board).Value
     let moves = 
         match piece.PieceType with
@@ -110,7 +110,7 @@ let rec createMoveTree (move :Move) (board :Board) =
                     match move.Length with
                     | 1 -> board
                     | _ -> (moveSequence move (Some board)).Value
-                let newJumps = getPieceJumps (List.last move) newBoard
+                let newJumps = getPieceSingleJumps (List.last move) newBoard
                 let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
                 match newMoveEndCoords.IsEmpty with
                 | false ->
@@ -121,6 +121,21 @@ let rec createMoveTree (move :Move) (board :Board) =
         }
 
     moveTree
+
+let getPieceJumps coord (board :Board) =
+    let moves = new System.Collections.Generic.List<Move>()
+
+    let rec loop (moveTree :MoveTree) =
+        match moveTree.Children with
+        | None -> moves.Add(moveTree.Move)
+        | Some t -> List.iter (fun item -> (loop item)) t
+
+    let moveTree = createMoveTree [coord] board
+    match moveTree.Children with
+    | Some t -> loop <| createMoveTree [coord] board
+    | None -> ()
+
+    List.ofSeq moves
 
 let getPieceHops coord (board :Board) =
     let piece = (square coord board).Value
