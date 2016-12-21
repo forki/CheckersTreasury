@@ -179,32 +179,3 @@ let calculateMoves player (board :Board) =
             | None -> jumpAcc @ hopAcc
     
     loop [] [] {Row = 0; Column = 0}
-
-let rec getBestMove player (searchDepth :int) (board :Board) =
-    let moves = calculateMoves player board
-
-    let wonBoards = List.map (fun x -> (isWon (moveSequence x (Some board)).Value).IsSome) moves
-
-    let opponentMoves =
-        match searchDepth = 0 || List.exists id wonBoards with
-        | false -> List.map (fun x -> getBestMove (otherPlayer player) (searchDepth - 1) (moveSequence x (Some board)).Value) moves
-        | true -> List.empty
-
-    let weightedMoves = List.mapi (fun i m -> (calculateWeight player (match (opponentMoves.IsEmpty) with
-                                                                       | true -> (moveSequence m (Some board)).Value
-                                                                       | false -> let newBoard = (moveSequence m (Some board)).Value
-                                                                                  (moveSequence opponentMoves.[i] (Some newBoard)).Value),
-                                                                       m)) moves
-
-    let rec loop highestWeight moveForHighestWeight (list :List<float * Move>) =
-        let weight = fst list.Head
-        let newMoveForHighestWeight =
-            match weight >= highestWeight with
-            | true -> snd list.Head
-            | false -> moveForHighestWeight
-
-        match list.Tail.IsEmpty with
-        | false -> loop (Math.Max(highestWeight, weight)) newMoveForHighestWeight list.Tail
-        | true -> newMoveForHighestWeight
-
-    loop (fst weightedMoves.Head) (snd weightedMoves.Head) weightedMoves
