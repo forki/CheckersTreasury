@@ -47,21 +47,30 @@ let rec getMove player (searchDepth :int) (board :Board) =
         | false -> List.map (fun x -> getMove (otherPlayer player) (searchDepth - 1) (moveSequence x (Some board)).Value) moves
         | true -> List.empty
 
-    let weightedMoves = List.mapi (fun i m -> (calculateWeight player (match (opponentMoves.IsEmpty) with
-                                                                       | true -> (moveSequence m (Some board)).Value
-                                                                       | false -> let newBoard = (moveSequence m (Some board)).Value
-                                                                                  (moveSequence opponentMoves.[i] (Some newBoard)).Value),
+    let weightedMoves = List.mapi (fun i m -> (calculateWeightDifference (match (opponentMoves.IsEmpty) with
+                                                                          | true -> (moveSequence m (Some board)).Value
+                                                                          | false -> let newBoard = (moveSequence m (Some board)).Value
+                                                                                     (moveSequence opponentMoves.[i] (Some newBoard)).Value),
                                                                        m)) moves
 
-    let rec loop highestWeight moveForHighestWeight (list :List<float * Move>) =
+    let rec loop highestDifference moveForHighestDifference (list :List<float * Move>) =
         let weight = fst list.Head
         let newMoveForHighestWeight =
-            match weight >= highestWeight with
-            | true -> snd list.Head
-            | false -> moveForHighestWeight
+            match player with
+            | Black -> match weight > highestDifference with
+                       | true -> snd list.Head
+                       | false -> moveForHighestDifference
+            | White -> match weight < highestDifference with
+                       | true -> snd list.Head
+                       | false -> moveForHighestDifference
+
+        let newHighestDifference =
+            match player with
+            | Black -> Math.Max(highestDifference, weight)
+            | White -> Math.Min(highestDifference, weight)
 
         match list.Tail.IsEmpty with
-        | false -> loop (Math.Max(highestWeight, weight)) newMoveForHighestWeight list.Tail
+        | false -> loop newHighestDifference newMoveForHighestWeight list.Tail
         | true -> newMoveForHighestWeight
 
     loop (fst weightedMoves.Head) (snd weightedMoves.Head) weightedMoves
