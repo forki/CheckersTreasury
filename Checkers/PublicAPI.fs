@@ -58,7 +58,6 @@ let rec bestMatchInList player highestDifference moveForHighestDifference (list 
     | true -> (highestDifference, newMoveForHighestDifference)
 
 let rec getMove player (searchDepth :int) alpha beta (board :Board) :AlphaBetaMove =
-    System.Diagnostics.Debug.WriteLine(String.Format("Alpha: {0};  Beta: {1}", alpha, beta))
     match alpha >= beta with
     | true -> {Alpha = alpha; Beta = beta; Move = []}
     | false ->
@@ -80,8 +79,6 @@ let rec getMove player (searchDepth :int) alpha beta (board :Board) :AlphaBetaMo
 
                        List.where (fun (item :Move * Move) -> not (snd item).IsEmpty) opponentMoves
             | true -> List.empty
-
-        System.Diagnostics.Debug.WriteLine(String.Format("Moves: {0};  Opponent moves: {1}", moves.Length, moveWithOpponentResponse.Length))
 
         let weightedMoves = 
                 match moveWithOpponentResponse.IsEmpty with
