@@ -12,3 +12,5 @@ type Coord with
 type Move = Coord List
 
 type MoveTree = { Move :Move; Parent :Option<MoveTree>; Children :Option<List<MoveTree>> }
+
+type AlphaBetaMove = { Alpha :float; Beta :float; Move :Move }

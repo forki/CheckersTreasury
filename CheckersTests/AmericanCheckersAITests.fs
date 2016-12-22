@@ -2,6 +2,7 @@
 open Checkers
 open Checkers.Types
 open Checkers.AIs.AmericanCheckersAI
+open Checkers.PublicAPI
 open Xunit
 
 [<Fact>]
