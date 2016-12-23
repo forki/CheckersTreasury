@@ -42,11 +42,11 @@ let rec bestMatchInList player highestDifference moveForHighestDifference (list 
     let newMoveForHighestDifference =
         match player with
         | Black -> match weight > highestDifference with
-                    | true -> snd list.Head
-                    | false -> moveForHighestDifference
+                   | true -> snd list.Head
+                   | false -> moveForHighestDifference
         | White -> match weight < highestDifference with
-                    | true -> snd list.Head
-                    | false -> moveForHighestDifference
+                   | true -> snd list.Head
+                   | false -> moveForHighestDifference
 
     let newHighestDifference =
         match player with
@@ -57,6 +57,28 @@ let rec bestMatchInList player highestDifference moveForHighestDifference (list 
     | false -> bestMatchInList player newHighestDifference newMoveForHighestDifference list.Tail
     | true -> (highestDifference, newMoveForHighestDifference)
 
+let chooseNewAlpha player currentAlpha candidateAlpha =
+    match player with
+    | Black ->
+        match currentAlpha > candidateAlpha with
+        | true -> currentAlpha
+        | false -> candidateAlpha
+    | White ->
+        match currentAlpha < candidateAlpha with
+        | true -> currentAlpha
+        | false -> candidateAlpha
+
+let chooseNewBeta player currentBeta candidateBeta =
+    match player with
+    | Black ->
+        match currentBeta < candidateBeta with
+        | true -> currentBeta
+        | false -> candidateBeta
+    | White ->
+        match currentBeta > candidateBeta with
+        | true -> currentBeta
+        | false -> candidateBeta
+
 let rec getMove player (searchDepth :int) alpha beta (board :Board) :AlphaBetaMove =
     match alpha >= beta with
     | true -> {Alpha = alpha; Beta = beta; Move = []}
@@ -66,14 +88,13 @@ let rec getMove player (searchDepth :int) alpha beta (board :Board) :AlphaBetaMo
         let wonBoards = List.map (fun x -> (isWon (moveSequence x (Some board)).Value).IsSome) moves
 
         let moveWithOpponentResponse =
-            match searchDepth = 0 || List.exists id wonBoards with
-            | false ->
-                       let mutable newAlpha = alpha
+            match searchDepth = 0 || moves.Length = 1 || List.exists id wonBoards with
+            | false -> let mutable newAlpha = alpha
                        let mutable newBeta = beta
                        let opponentMoves = List.map (fun x ->
                                                         let alphaBetaMove = (getMove (otherPlayer player) (searchDepth - 1) newAlpha newBeta (moveSequence x (Some board)).Value)
-                                                        newAlpha <- alphaBetaMove.Alpha
-                                                        newBeta <- alphaBetaMove.Beta
+                                                        newAlpha <- chooseNewAlpha player newAlpha alphaBetaMove.Alpha
+                                                        newBeta <- chooseNewAlpha player newBeta alphaBetaMove.Beta
                                                         x, alphaBetaMove.Move)
                                                     moves
 

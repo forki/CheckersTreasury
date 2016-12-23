@@ -47,7 +47,7 @@ let calculateCheckerWeight coord (board :Board) =
 
 let calculateKingWeight coord (board :Board) =
     let piece = (square coord board).Value
-    let weight = 10.0 + (square coord kingWeights)
+    let weight = 8.0 + (square coord kingWeights)
 
     match piece.Player with
     | Black -> weight
@@ -71,7 +71,7 @@ let calculateWeight player (board :Board) =
     loop 0.0 {Row = 0; Column = 0}
 
 let calculateWeightDifference (board :Board) =
-    let rec loop (weight :float) coord :float =
+    let rec loop (weight :float) coord =
         match nextPoint coord with
         | Some c ->
             match (square coord board).IsSome with
