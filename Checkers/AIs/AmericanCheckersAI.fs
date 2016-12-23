@@ -5,14 +5,14 @@ open Checkers.Types
 open System
 
 let checkerWeights =
-    [[0.0; 1.20; 0.0; 1.20; 0.0; 1.20; 0.0; 1.10];
+    [[0.0; 3.20; 0.0; 3.20; 0.0; 3.20; 0.0; 3.10];
     [1.15; 0.0; 1.05; 0.0; 1.0; 0.0; 1.10; 0.0];
     [0.0; 1.10; 0.0; 1.0; 0.0; 1.05; 0.0; 1.15];
     [1.15; 0.0; 1.05; 0.0; 1.0; 0.0; 1.10; 0.0];
     [0.0; 1.10; 0.0; 1.0; 0.0; 1.05; 0.0; 1.15];
     [1.15; 0.0; 1.05; 0.0; 1.0; 0.0; 1.10; 0.0];
     [0.0; 1.10; 0.0; 1.0; 0.0; 1.05; 0.0; 1.15];
-    [1.10; 0.0; 1.20; 0.0; 1.20; 0.0; 1.20; 0.0]]
+    [3.10; 0.0; 3.20; 0.0; 3.20; 0.0; 3.20; 0.0]]
 
 let kingWeights =
     [[0.0; 1.05; 0.0; 1.0; 0.0; 1.0; 0.0; 1.0];
@@ -72,7 +72,8 @@ let calculateWeightDifference (board :Board) =
     let rec loop (weight :float) coord =
         match nextPoint coord with
         | Some c ->
-            match (square coord board).IsSome with
+            let piece = square coord board
+            match piece.IsSome with
             | true -> loop (weight + (calculatePieceWeight coord board)) c
             | false -> loop weight c
         | None -> weight

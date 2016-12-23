@@ -39,8 +39,8 @@ let ``AI forces win``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 3 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Contains(move.Move.[1], [{Row = 2; Column = 7}; {Row = 2; Column = 5}])
+    let move = minimax White 2 (*Double.NegativeInfinity Double.PositiveInfinity*) board
+    Assert.Contains(move.[1], [{Row = 2; Column = 7}; {Row = 2; Column = 5}])
 
 [<Fact>]
 let ``AI prefers double jump to single jump``() =
@@ -56,8 +56,8 @@ let ``AI prefers double jump to single jump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax Black 0 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Equal(3, move.Move.Length)
+    let move = minimax Black 0 (*Double.NegativeInfinity Double.PositiveInfinity*) board
+    Assert.Equal(3, move.Length)
 
 [<Fact>]
 let ``AI should not give free double jump``() =
@@ -73,5 +73,5 @@ let ``AI should not give free double jump``() =
             [Piece.whiteChecker; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 1 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Equal({Row = 3; Column = 6}, move.Move.[1])
+    let move = minimax White 1 (*Double.NegativeInfinity Double.PositiveInfinity*) board
+    Assert.Equal({Row = 3; Column = 6}, move.[1])

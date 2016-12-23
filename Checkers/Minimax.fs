@@ -48,50 +48,40 @@ let internal chooseNewBeta player currentBeta candidateBeta =
         | true -> currentBeta
         | false -> candidateBeta
 
-let rec internal minimax player (searchDepth :int) alpha beta (board :Board) :AlphaBetaMove =
-    match alpha >= beta with
-    | true -> {Alpha = alpha; Beta = beta; Move = []}
-    | false ->
-        let moves = calculateMoves player board
+let rec minimax player (searchDepth :int) (board :Board) =
+    let moves = calculateMoves player board
 
-        let wonBoards = List.map (fun x -> (isWon (uncheckedMoveSequence x board)).IsSome) moves
+    let wonBoards = List.map (fun x -> (isWon (moveSequence x (Some board)).Value).IsSome) moves
 
-        let mutable newAlpha = alpha
-        let mutable newBeta = beta
+    let opponentMoves =
+        match searchDepth = 0 || List.exists id wonBoards with
+        | false -> List.map (fun x -> minimax (otherPlayer player) (searchDepth - 1) (moveSequence x (Some board)).Value) moves
+        | true -> List.empty
 
-        let moveWithOpponentResponse =
-            match searchDepth = 0 || moves.Length = 1 || List.exists id wonBoards with
-            | false -> let opponentMoves = List.map (fun x ->
-                                                        let alphaBetaMove = (minimax (otherPlayer player) (searchDepth - 1) newAlpha newBeta (uncheckedMoveSequence x board))
-                                                        newAlpha <- chooseNewAlpha player newAlpha alphaBetaMove.Alpha
-                                                        newBeta <- chooseNewBeta player newBeta alphaBetaMove.Beta
-                                                        x, alphaBetaMove.Move)
-                                                    moves
+    let weightedMoves = List.mapi (fun i m -> (calculateWeightDifference (match (opponentMoves.IsEmpty) with
+                                                                          | true -> (moveSequence m (Some board)).Value
+                                                                          | false -> let newBoard = (moveSequence m (Some board)).Value
+                                                                                     (moveSequence opponentMoves.[i] (Some newBoard)).Value),
+                                                                       m)) moves
 
-                       List.where (fun (item :Move * Move) -> not (snd item).IsEmpty) opponentMoves
-            | true -> List.empty
+    let rec loop highestDifference moveForHighestDifference (list :List<float * Move>) =
+        let weight = fst list.Head
+        let newMoveForHighestWeight =
+            match player with
+            | Black -> match weight > highestDifference with
+                       | true -> snd list.Head
+                       | false -> moveForHighestDifference
+            | White -> match weight < highestDifference with
+                       | true -> snd list.Head
+                       | false -> moveForHighestDifference
 
-        let weightedMoves = 
-                match moveWithOpponentResponse.IsEmpty with
-                | false -> List.map (fun m -> (calculateWeightDifference (uncheckedMoveSequence (snd m) (uncheckedMoveSequence (fst m) board))), (fst m)) moveWithOpponentResponse
-                | true -> List.map (fun m -> (calculateWeightDifference (uncheckedMoveSequence m board), m)) moves
-        
-        match weightedMoves.IsEmpty with
-        | true -> {
-                      Alpha = match Double.IsInfinity(newBeta) with
-                              | true -> newAlpha
-                              | false -> newBeta
-                      Beta = match Double.IsInfinity(newAlpha) with
-                             | true -> newBeta
-                             | false -> newAlpha
-                      Move = []
-                  }
-        | false ->
-            let weightedMove = bestMatchInList player (fst weightedMoves.Head) (snd weightedMoves.Head) weightedMoves
-            {
-                Alpha = fst weightedMove;
-                Beta = match Double.IsInfinity(newAlpha) with
-                        | true -> newBeta
-                        | false -> newAlpha
-                Move = snd weightedMove
-            }
+        let newHighestDifference =
+            match player with
+            | Black -> Math.Max(highestDifference, weight)
+            | White -> Math.Min(highestDifference, weight)
+
+        match list.Tail.IsEmpty with
+        | false -> loop newHighestDifference newMoveForHighestWeight list.Tail
+        | true -> newMoveForHighestWeight
+
+    loop (fst weightedMoves.Head) (snd weightedMoves.Head) weightedMoves

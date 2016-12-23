@@ -31,14 +31,14 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
                 }
     | false -> None
 
-let move (moves :System.Collections.Generic.IEnumerable<Coord>) (gameController) :Option<GameController> =
+let move (moves :Coord seq) (gameController) :Option<GameController> =
     let board = moveSequence moves (Some gameController.Board)
     match board with
     | Some b -> Some {Board = board.Value; CurrentPlayer = otherPlayer gameController.CurrentPlayer; CurrentCoord = gameController.CurrentCoord}
     | None -> None
 
 let getMove searchDepth gameController =
-    (minimax gameController.CurrentPlayer searchDepth Double.NegativeInfinity Double.PositiveInfinity gameController.Board).Move
+    (minimax gameController.CurrentPlayer searchDepth (*Double.NegativeInfinity Double.PositiveInfinity*) gameController.Board)//.Move
 
 let isWon controller =
     isWon controller.Board
