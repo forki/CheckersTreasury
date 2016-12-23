@@ -1,5 +1,4 @@
 ﻿module Checkers.AIs.AmericanCheckersAI
-
 open Checkers.Board
 open Checkers.Variants.AmericanCheckers
 open Checkers.Types

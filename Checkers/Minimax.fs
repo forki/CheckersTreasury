@@ -29,22 +29,22 @@ let rec internal bestMatchInList player highestDifference moveForHighestDifferen
 let internal chooseNewAlpha player currentAlpha candidateAlpha =
     match player with
     | Black ->
-        match currentAlpha < candidateAlpha with
+        match currentAlpha > candidateAlpha with
         | true -> currentAlpha
         | false -> candidateAlpha
     | White ->
-        match currentAlpha > candidateAlpha with
+        match currentAlpha < candidateAlpha with
         | true -> currentAlpha
         | false -> candidateAlpha
 
 let internal chooseNewBeta player currentBeta candidateBeta =
     match player with
     | Black ->
-        match currentBeta > candidateBeta with
+        match currentBeta < candidateBeta with
         | true -> currentBeta
         | false -> candidateBeta
     | White ->
-        match currentBeta < candidateBeta with
+        match currentBeta > candidateBeta with
         | true -> currentBeta
         | false -> candidateBeta
 
@@ -56,14 +56,15 @@ let rec internal minimax player (searchDepth :int) alpha beta (board :Board) :Al
 
         let wonBoards = List.map (fun x -> (isWon (uncheckedMoveSequence x board)).IsSome) moves
 
+        let mutable newAlpha = alpha
+        let mutable newBeta = beta
+
         let moveWithOpponentResponse =
             match searchDepth = 0 || moves.Length = 1 || List.exists id wonBoards with
-            | false -> let mutable newAlpha = alpha
-                       let mutable newBeta = beta
-                       let opponentMoves = List.map (fun x ->
+            | false -> let opponentMoves = List.map (fun x ->
                                                         let alphaBetaMove = (minimax (otherPlayer player) (searchDepth - 1) newAlpha newBeta (uncheckedMoveSequence x board))
-                                                        newAlpha <- chooseNewBeta player newAlpha alphaBetaMove.Alpha
-                                                        newBeta <- chooseNewAlpha player newBeta alphaBetaMove.Beta
+                                                        newAlpha <- chooseNewAlpha player newAlpha alphaBetaMove.Alpha
+                                                        newBeta <- chooseNewBeta player newBeta alphaBetaMove.Beta
                                                         x, alphaBetaMove.Move)
                                                     moves
 
@@ -77,20 +78,20 @@ let rec internal minimax player (searchDepth :int) alpha beta (board :Board) :Al
         
         match weightedMoves.IsEmpty with
         | true -> {
-                      Alpha = match Double.IsInfinity(beta) with
-                              | true -> alpha
-                              | false -> beta
-                      Beta = match Double.IsInfinity(alpha) with
-                             | true -> beta
-                             | false -> alpha
+                      Alpha = match Double.IsInfinity(newBeta) with
+                              | true -> newAlpha
+                              | false -> newBeta
+                      Beta = match Double.IsInfinity(newAlpha) with
+                             | true -> newBeta
+                             | false -> newAlpha
                       Move = []
                   }
         | false ->
             let weightedMove = bestMatchInList player (fst weightedMoves.Head) (snd weightedMoves.Head) weightedMoves
             {
                 Alpha = fst weightedMove;
-                Beta = match Double.IsInfinity(alpha) with
-                        | true -> beta
-                        | false -> alpha
+                Beta = match Double.IsInfinity(newAlpha) with
+                        | true -> newBeta
+                        | false -> newAlpha
                 Move = snd weightedMove
             }
