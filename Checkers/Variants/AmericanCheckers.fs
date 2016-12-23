@@ -21,6 +21,14 @@ let internal coordExists coord =
     coord.Row >= 0 && coord.Row <= Rows &&
     coord.Column >= 0 && coord.Column <= Columns
 
+let internal checkMoveDirection piece startCoord endCoord =
+    match piece.PieceType with
+    | PieceType.Checker ->
+        match piece.Player with
+        | Player.Black -> startCoord.Row < endCoord.Row
+        | Player.White -> startCoord.Row > endCoord.Row
+    | PieceType.King -> true
+
 let internal isValidCheckerHop startCoord endCoord (board :Board) =
     let piece = (square startCoord board).Value
 

@@ -6,24 +6,24 @@ open System
 open Xunit
 
 [<Fact>]
-let ``chooseNewAlpha picks highest value for black``() =
+let ``chooseNewAlpha picks lowest value for black``() =
     let newAlpha = chooseNewAlpha Black 1 0
-    Assert.Equal(1, newAlpha)
-
-[<Fact>]
-let ``chooseNewAlpha picks lowest value for white``() =
-    let newAlpha = chooseNewAlpha White 1 0
     Assert.Equal(0, newAlpha)
 
 [<Fact>]
-let ``chooseNewBeta picks lowest value for black``() =
-    let newBeta = chooseNewBeta Black 1 0
-    Assert.Equal(0, newBeta)
+let ``chooseNewAlpha picks highest value for white``() =
+    let newAlpha = chooseNewAlpha White 1 0
+    Assert.Equal(1, newAlpha)
 
 [<Fact>]
-let ``chooseNewBeta picks highest value for white``() =
-    let newBeta = chooseNewBeta White 1 0
+let ``chooseNewBeta picks highest value for black``() =
+    let newBeta = chooseNewBeta Black 1 0
     Assert.Equal(1, newBeta)
+
+[<Fact>]
+let ``chooseNewBeta picks lowest value for white``() =
+    let newBeta = chooseNewBeta White 1 0
+    Assert.Equal(0, newBeta)
 
 [<Fact>]
 let ``AI forces win``() =
