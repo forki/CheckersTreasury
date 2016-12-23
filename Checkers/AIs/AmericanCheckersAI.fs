@@ -129,7 +129,7 @@ let rec createMoveTree (move :Move) (board :Board) =
                 let newBoard =
                     match move.Length with
                     | 1 -> board
-                    | _ -> (moveSequence move (Some board)).Value
+                    | _ -> (uncheckedMoveSequence move board)
                 let newJumps = getPieceSingleJumps (List.last move) newBoard
                 let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
 

@@ -2,7 +2,6 @@
 open Checkers
 open Checkers.Types
 open Checkers.AIs.AmericanCheckersAI
-open Checkers.PublicAPI
 open System
 open Xunit
 
@@ -78,54 +77,3 @@ let ``Calculate moves returns multi double jump``() =
 
     let moves = getPieceJumps {Row = 0; Column = 0} board
     Assert.Equal(2, moves.Length)
-
-[<Fact>]
-let ``AI forces win``() =
-    let board =
-        [
-            [None; None; None; None; None; None; None; Piece.blackKing];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; Piece.whiteKing; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-        ];
-
-    let move = getMove White 3 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Contains(move.Move.[1], [{Row = 2; Column = 7}; {Row = 2; Column = 5}])
-
-[<Fact>]
-let ``AI prefers double jump to single jump``() =
-    let board =
-        [
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; Piece.blackKing; None; None; None; None];
-            [None; None; Piece.whiteKing; None; Piece.whiteKing; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; Piece.whiteKing; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-        ];
-
-    let move = getMove Black 0 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Equal(3, move.Move.Length)
-
-[<Fact>]
-let ``AI should not give free double jump``() =
-    let board =
-        [
-            [None; None; None; None; None; None; None; Piece.blackChecker];
-            [Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
-            [None; Piece.blackChecker; None; Piece.blackChecker; None; None; None; Piece.blackChecker];
-            [Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
-            [None; None; None; None; None; Piece.whiteChecker; None; Piece.whiteChecker];
-            [Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None];
-            [None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; None];
-            [Piece.whiteChecker; None; None; None; None; None; None; None];
-        ];
-
-    let move = getMove White 1 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Equal({Row = 3; Column = 6}, move.Move.[1])

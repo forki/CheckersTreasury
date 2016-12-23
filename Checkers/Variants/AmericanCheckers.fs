@@ -202,3 +202,17 @@ let rec public moveSequence (coordinates :IEnumerable<Coord>) (board :Option<Boa
             let newBoard = movePiece coords.Head coords.[1] board.Value
             moveSequence coords.Tail newBoard
         | _ -> movePiece coords.Head coords.[1] board.Value
+
+let internal uncheckedMovePiece startCoord endCoord (board :Board) =
+    match Math.Abs(startCoord.Row - endCoord.Row) with
+    | 1 -> hop startCoord endCoord board
+    | 2 -> jump startCoord endCoord board
+
+let rec internal uncheckedMoveSequence (coordinates :IEnumerable<Coord>) (board :Board) =
+    let coords = List.ofSeq(coordinates)
+
+    match coords.Length with
+    | b when b >= 3 ->
+        let newBoard = uncheckedMovePiece coords.Head coords.[1] board
+        uncheckedMoveSequence coords.Tail newBoard
+    | _ -> uncheckedMovePiece coords.Head coords.[1] board
