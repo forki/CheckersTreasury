@@ -2,7 +2,6 @@
 open Checkers
 open Checkers.Types
 open Checkers.Minimax
-open System
 open Xunit
 
 [<Fact>]
@@ -41,6 +40,23 @@ let ``AI forces win``() =
 
     let move = minimax White 3 None None board
     Assert.Equal(2, move.Move.[1].Row)
+
+[<Fact>]
+let ``AI forces win 1``() =
+    let board =
+        [
+            [None; None; None; None; None; Piece.blackKing; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.whiteKing; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let move = minimax White 4 None None board
+    Assert.Equal({Row = 2; Column = 5}, move.Move.[1])
 
 [<Fact>]
 let ``AI prefers double jump to single jump``() =

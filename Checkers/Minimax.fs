@@ -51,36 +51,39 @@ let rec minimax player searchDepth (alpha :Option<float>) (beta :Option<float>) 
             let weightDifference = Some <| calculateWeightDifference board
             let newAlpha =
                 match player with
-                | Black -> chooseNewAlpha alpha weightDifference
+                | Black -> weightDifference
                 | White -> alpha
 
             let newBeta =
                 match player with
-                | White -> chooseNewBeta beta weightDifference
+                | White -> weightDifference
                 | Black -> beta
 
             { Alpha = newBeta; Beta = newAlpha; Move = [] }
         | false ->
             let moves = calculateMoves player board
+            let mutable alphaForNode = None
+            let mutable betaForNode = None
+
             let mutable newAlpha = alpha
             let mutable newBeta = beta
             let mutable move = []
 
             if searchDepth <> 0 then
                 ignore <| List.map (fun x -> let newBoard = uncheckedMoveSequence x board
-                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alpha beta newBoard
-                                              
-                                             if player = Black then
-                                                newAlpha <- chooseNewAlpha newAlpha alphaBetaMove.Alpha
+                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alphaForNode betaForNode newBoard
+                                             
+                                             match player with
+                                             | Black ->
+                                                alphaForNode <- chooseNewAlpha alphaForNode alphaBetaMove.Alpha
+                                                newAlpha <- chooseNewAlpha newAlpha alphaForNode
+                                                move <- if newAlpha = alphaBetaMove.Alpha then x else move
+                                             | White ->
+                                                betaForNode <- chooseNewBeta betaForNode alphaBetaMove.Beta
+                                                newBeta <- chooseNewBeta newBeta betaForNode
+                                                move <- if newBeta = alphaBetaMove.Beta then x else move
 
-                                             if player = White then
-                                                newBeta <- chooseNewBeta newBeta alphaBetaMove.Beta
-
-                                             move <- if (player = Black && newAlpha = alphaBetaMove.Alpha) || (player = White && newBeta = alphaBetaMove.Beta) then
-                                                        x
-                                                     else
-                                                        move
                                              ())
                                     moves
 
-            { Alpha = newBeta; Beta = newAlpha; Move = move }
+            { Alpha = betaForNode; Beta = alphaForNode; Move = move }
