@@ -44,7 +44,7 @@ let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
 // Use the same principles for min nodes, except the opposite
 let rec minimax player searchDepth (alpha :Option<float>) (beta :Option<float>) (board :Board) =
     match alpha.IsSome && beta.IsSome && alpha.Value >= beta.Value with
-    | true -> { Alpha = alpha; Beta = beta; Move = []}
+    | true -> { Alpha = None; Beta = None; Move = []}
     | false ->
         match searchDepth = 0 || (isWon board).IsSome with
         | true ->
