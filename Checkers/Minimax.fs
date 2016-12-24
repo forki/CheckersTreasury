@@ -26,47 +26,67 @@ let rec internal bestMatchInList player highestDifference moveForHighestDifferen
     | false -> bestMatchInList player newHighestDifference newMoveForHighestDifference list.Tail
     | true -> (highestDifference, newMoveForHighestDifference)
 
-let internal chooseNewAlpha player currentAlpha candidateAlpha =
-    match player with
-    | Black ->
-        match currentAlpha > candidateAlpha with
-        | true -> currentAlpha
-        | false -> candidateAlpha
-    | White ->
-        match currentAlpha < candidateAlpha with
-        | true -> currentAlpha
-        | false -> candidateAlpha
+let internal chooseNewAlpha currentAlpha (candidateAlpha :float Option) =
+    match currentAlpha with
+    | Some x -> if candidateAlpha.IsSome then Some <| max x candidateAlpha.Value else currentAlpha
+    | None -> candidateAlpha
 
-let internal chooseNewBeta player currentBeta candidateBeta =
-    match player with
-    | Black ->
-        match currentBeta < candidateBeta with
-        | true -> currentBeta
-        | false -> candidateBeta
-    | White ->
-        match currentBeta > candidateBeta with
-        | true -> currentBeta
-        | false -> candidateBeta
+let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
+    match currentBeta with
+    | Some x -> if candidateBeta.IsSome then Some <| min x candidateBeta.Value else currentBeta
+    | None -> candidateBeta
 
 // When the player = Black, the node is a Max node
-// When the search depth is 0 or the board is won, return the value
+// When the search depth is 0 or the board is won, return the value                       - done
 // When the node is a max node, get the best value for the nodes below it
 // if the new value is higher than the minimum, set the temp value to the new value
 // if the temp value is higher than the maximum value, return the max and an empty move
 // Use the same principles for min nodes, except the opposite
-let rec minimax player searchDepth alpha beta (board :Board) =
-    let moves = calculateMoves player board
+let rec minimax player searchDepth (alpha :Option<float>) (beta :Option<float>) (board :Board) =
+    match alpha.IsSome && beta.IsSome && alpha.Value >= beta.Value with
+    | true -> { Alpha = alpha; Beta = beta; Move = []}
+    | false ->
+        match searchDepth = 0 || (isWon board).IsSome with
+        | true ->
+            let weightDifference = Some <| calculateWeightDifference board
+            let newAlpha =
+                match player with
+                | White -> chooseNewAlpha beta weightDifference
+                | Black -> if beta.IsNone then None else chooseNewAlpha beta weightDifference
 
-    let opponentMoves =
-        match searchDepth = 0 with
-        | false -> List.map (fun x -> let newBoard = uncheckedMoveSequence x board
-                                      minimax (otherPlayer player) (searchDepth - 1) alpha beta newBoard)
-                            moves
-        | true -> List.empty
+            let newBeta =
+                match player with
+                | Black -> chooseNewBeta alpha weightDifference
+                | White -> if alpha.IsNone then None else chooseNewBeta alpha weightDifference
 
-    let weightedMoves = List.mapi (fun i m -> (calculateWeightDifference (match (opponentMoves.IsEmpty) with
-                                                                          | true -> uncheckedMoveSequence m board
-                                                                          | false -> let newBoard = uncheckedMoveSequence m board
-                                                                                     uncheckedMoveSequence opponentMoves.[i] newBoard), m)) moves
+            { Alpha = newAlpha; Beta = newBeta; Move = [] }
+        | false ->
+            let moves = calculateMoves player board
+            let mutable newAlpha = alpha
+            let mutable newBeta = beta
+            let mutable move = []
 
-    snd (bestMatchInList player (fst weightedMoves.Head) (snd weightedMoves.Head) weightedMoves)
+            if searchDepth <> 0 then
+                ignore <| List.map (fun x -> let newBoard = uncheckedMoveSequence x board
+                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alpha beta newBoard
+                                             
+                                             let mutable alphaBetaChanged = false
+
+                                             let potentialAlpha = chooseNewAlpha newAlpha alphaBetaMove.Alpha
+                                             if newAlpha <> potentialAlpha then
+                                                newAlpha <- potentialAlpha
+                                                alphaBetaChanged <- true
+
+                                             let potentialBeta = chooseNewBeta newBeta alphaBetaMove.Beta
+                                             if newBeta <> potentialBeta then
+                                                newBeta <- potentialBeta
+                                                alphaBetaChanged <- true
+
+                                             move <- if alphaBetaChanged || (player = Black && newAlpha = alphaBetaMove.Alpha) || (player = White && newBeta = alphaBetaMove.Beta) then
+                                                        x
+                                                     else
+                                                        move
+                                             ())
+                                    moves
+
+            { Alpha = newBeta; Beta = newAlpha; Move = move }

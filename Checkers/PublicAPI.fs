@@ -38,7 +38,7 @@ let move (moves :Coord seq) (gameController) :Option<GameController> =
     | None -> None
 
 let getMove searchDepth gameController =
-    (minimax gameController.CurrentPlayer searchDepth Double.NegativeInfinity Double.PositiveInfinity gameController.Board)//.Move
+    (minimax gameController.CurrentPlayer searchDepth None None gameController.Board).Move
 
 let isWon controller =
     isWon controller.Board

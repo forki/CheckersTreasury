@@ -6,24 +6,24 @@ open System
 open Xunit
 
 [<Fact>]
-let ``chooseNewAlpha picks highest value for black``() =
-    let newAlpha = chooseNewAlpha Black 1 0
-    Assert.Equal(1, newAlpha)
+let ``chooseNewAlpha picks highest value``() =
+    let newAlpha = chooseNewAlpha (Some 1.0) (Some 0.0)
+    Assert.Equal(1.0, newAlpha.Value)
 
 [<Fact>]
-let ``chooseNewAlpha picks lowest value for white``() =
-    let newAlpha = chooseNewAlpha White 1 0
-    Assert.Equal(0, newAlpha)
+let ``chooseNewAlpha picks some value``() =
+    let newAlpha = chooseNewAlpha None (Some 1.0)
+    Assert.Equal(1.0, newAlpha.Value)
 
 [<Fact>]
-let ``chooseNewBeta picks lowest value for black``() =
-    let newBeta = chooseNewBeta Black 1 0
-    Assert.Equal(0, newBeta)
+let ``chooseNewBeta picks lowest value``() =
+    let newBeta = chooseNewBeta (Some 1.0) (Some 0.0)
+    Assert.Equal(0.0, newBeta.Value)
 
 [<Fact>]
-let ``chooseNewBeta picks highest value for white``() =
-    let newBeta = chooseNewBeta White 1 0
-    Assert.Equal(1, newBeta)
+let ``chooseNewBeta picks some value``() =
+    let newBeta = chooseNewBeta None (Some 1.0)
+    Assert.Equal(1.0, newBeta.Value)
 
 [<Fact>]
 let ``AI forces win``() =
@@ -39,8 +39,8 @@ let ``AI forces win``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 2 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Contains(move.[1], [{Row = 2; Column = 7}; {Row = 2; Column = 5}])
+    let move = minimax White 3 None None board
+    Assert.Equal(2, move.Move.[1].Row)
 
 [<Fact>]
 let ``AI prefers double jump to single jump``() =
@@ -56,8 +56,8 @@ let ``AI prefers double jump to single jump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax Black 0 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Equal(3, move.Length)
+    let move = minimax Black 1 None None board
+    Assert.Equal(3, move.Move.Length)
 
 [<Fact>]
 let ``AI should not give free double jump``() =
@@ -73,5 +73,5 @@ let ``AI should not give free double jump``() =
             [Piece.whiteChecker; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 1 Double.NegativeInfinity Double.PositiveInfinity board
-    Assert.Equal({Row = 3; Column = 6}, move.[1])
+    let move = minimax White 2 None None board
+    Assert.Equal({Row = 3; Column = 6}, move.Move.[1])
