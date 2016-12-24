@@ -42,48 +42,46 @@ let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
 // if the new value is higher than the minimum, set the temp value to the new value
 // if the temp value is higher than the maximum value, return the max and an empty move
 // Use the same principles for min nodes, except the opposite
-let rec minimax player searchDepth (alpha :Option<float>) (beta :Option<float>) (board :Board) =
-    match alpha.IsSome && beta.IsSome && alpha.Value >= beta.Value with
-    | true -> { Alpha = None; Beta = None; Move = []}
+let rec minimax player searchDepth alpha beta (board :Board) =
+    match searchDepth = 0 || (isWon board).IsSome with
+    | true ->
+        let weightDifference = Some <| calculateWeightDifference board
+        let newAlpha =
+            match player with
+            | Black -> weightDifference
+            | White -> alpha
+
+        let newBeta =
+            match player with
+            | White -> weightDifference
+            | Black -> beta
+
+        { Alpha = newBeta; Beta = newAlpha; Move = [] }
     | false ->
-        match searchDepth = 0 || (isWon board).IsSome with
-        | true ->
-            let weightDifference = Some <| calculateWeightDifference board
-            let newAlpha =
-                match player with
-                | Black -> weightDifference
-                | White -> alpha
+        let moves = calculateMoves player board
+        let mutable alphaForNode = None
+        let mutable betaForNode = None
 
-            let newBeta =
-                match player with
-                | White -> weightDifference
-                | Black -> beta
+        let mutable newAlpha = alpha
+        let mutable newBeta = beta
+        let mutable move = []
 
-            { Alpha = newBeta; Beta = newAlpha; Move = [] }
-        | false ->
-            let moves = calculateMoves player board
-            let mutable alphaForNode = None
-            let mutable betaForNode = None
-
-            let mutable newAlpha = alpha
-            let mutable newBeta = beta
-            let mutable move = []
-
-            if searchDepth <> 0 then
-                ignore <| List.map (fun x -> let newBoard = uncheckedMoveSequence x board
+        if searchDepth <> 0 then
+            ignore <| List.map (fun x -> if newAlpha.IsNone || newBeta.IsNone || newAlpha.Value < newBeta.Value then
+                                             let newBoard = uncheckedMoveSequence x board
                                              let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alphaForNode betaForNode newBoard
                                              
                                              match player with
                                              | Black ->
-                                                alphaForNode <- chooseNewAlpha alphaForNode alphaBetaMove.Alpha
-                                                newAlpha <- chooseNewAlpha newAlpha alphaForNode
-                                                move <- if newAlpha = alphaBetaMove.Alpha then x else move
+                                                 alphaForNode <- chooseNewAlpha alphaForNode alphaBetaMove.Alpha
+                                                 newAlpha <- chooseNewAlpha newAlpha alphaForNode
+                                                 move <- if newAlpha = alphaBetaMove.Alpha then x else move
                                              | White ->
-                                                betaForNode <- chooseNewBeta betaForNode alphaBetaMove.Beta
-                                                newBeta <- chooseNewBeta newBeta betaForNode
-                                                move <- if newBeta = alphaBetaMove.Beta then x else move
+                                                 betaForNode <- chooseNewBeta betaForNode alphaBetaMove.Beta
+                                                 newBeta <- chooseNewBeta newBeta betaForNode
+                                                 move <- if newBeta = alphaBetaMove.Beta then x else move
 
-                                             ())
-                                    moves
+                                         ())
+                               moves
 
-            { Alpha = betaForNode; Beta = alphaForNode; Move = move }
+        { Alpha = betaForNode; Beta = alphaForNode; Move = move }

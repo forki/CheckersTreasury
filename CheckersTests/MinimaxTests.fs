@@ -48,14 +48,14 @@ let ``AI forces win 1``() =
             [None; None; None; None; None; Piece.blackKing; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; Piece.whiteKing; None; None];
+            [None; None; None; None; Piece.whiteKing; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 4 None None board
+    let move = minimax White 3 None None board
     Assert.Equal({Row = 2; Column = 5}, move.Move.[1])
 
 [<Fact>]
