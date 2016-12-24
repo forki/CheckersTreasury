@@ -68,21 +68,17 @@ let rec minimax player searchDepth (alpha :Option<float>) (beta :Option<float>) 
 
             if searchDepth <> 0 then
                 ignore <| List.map (fun x -> let newBoard = uncheckedMoveSequence x board
-                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) newAlpha newBeta newBoard
+                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alpha beta newBoard
                                              
-                                             let mutable alphaBetaChanged = false
-
                                              let potentialAlpha = chooseNewAlpha newAlpha alphaBetaMove.Alpha
-                                             if newAlpha <> potentialAlpha then
+                                             if player = Black && newAlpha <> potentialAlpha then
                                                 newAlpha <- potentialAlpha
-                                                alphaBetaChanged <- true
 
                                              let potentialBeta = chooseNewBeta newBeta alphaBetaMove.Beta
-                                             if newBeta <> potentialBeta then
+                                             if player = White && newBeta <> potentialBeta then
                                                 newBeta <- potentialBeta
-                                                alphaBetaChanged <- true
 
-                                             move <- if alphaBetaChanged || (player = Black && newAlpha = alphaBetaMove.Alpha) || (player = White && newBeta = alphaBetaMove.Beta) then
+                                             move <- if (player = Black && newAlpha = alphaBetaMove.Alpha) || (player = White && newBeta = alphaBetaMove.Beta) then
                                                         x
                                                      else
                                                         move

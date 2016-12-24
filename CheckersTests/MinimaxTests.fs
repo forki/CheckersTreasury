@@ -75,3 +75,20 @@ let ``AI should not give free double jump``() =
 
     let move = minimax White 2 None None board
     Assert.Equal({Row = 3; Column = 6}, move.Move.[1])
+
+[<Fact>]
+let ``AI should not give free single jump``() =
+    let board =
+        [
+            [None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker];
+            [None; None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None];
+            [None; None; None; None; None; Piece.blackChecker; None; Piece.blackChecker];
+            [Piece.blackChecker; None; None; None; None; None; None; None];
+            [None; None; None; Piece.whiteChecker; None; None; None; None];
+            [Piece.blackChecker; None; None; None; None; None; Piece.whiteChecker; None];
+            [None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker];
+            [Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None];
+        ];
+
+    let move = minimax White 8 None None board
+    Assert.Equal({Row = 5; Column = 2}, move.Move.[1])
