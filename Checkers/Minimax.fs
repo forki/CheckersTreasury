@@ -51,15 +51,15 @@ let rec minimax player searchDepth (alpha :Option<float>) (beta :Option<float>) 
             let weightDifference = Some <| calculateWeightDifference board
             let newAlpha =
                 match player with
-                | White -> chooseNewAlpha beta weightDifference
-                | Black -> if beta.IsNone then None else chooseNewAlpha beta weightDifference
+                | Black -> chooseNewAlpha alpha weightDifference
+                | White -> alpha
 
             let newBeta =
                 match player with
-                | Black -> chooseNewBeta alpha weightDifference
-                | White -> if alpha.IsNone then None else chooseNewBeta alpha weightDifference
+                | White -> chooseNewBeta beta weightDifference
+                | Black -> beta
 
-            { Alpha = newAlpha; Beta = newBeta; Move = [] }
+            { Alpha = newBeta; Beta = newAlpha; Move = [] }
         | false ->
             let moves = calculateMoves player board
             let mutable newAlpha = alpha
