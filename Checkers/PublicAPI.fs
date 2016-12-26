@@ -16,25 +16,34 @@ let isValidMove startCoord endCoord gameController =
     | coord -> startCoord = coord.Value
 
 let movePiece startCoord endCoord gameController :Option<GameController> =
-    let newBoard = movePiece startCoord endCoord gameController.Board
+    let board = movePiece startCoord endCoord gameController.Board
 
     match (isValidMove startCoord endCoord gameController) with
     | true -> Some <|
                 {
-                    Board = newBoard.Value;
-                    CurrentPlayer = match playerTurnEnds startCoord endCoord gameController.Board newBoard.Value with
+                    Board = board.Value;
+                    CurrentPlayer = match playerTurnEnds [startCoord; endCoord] gameController.Board board.Value with
                                     | true -> otherPlayer gameController.CurrentPlayer
                                     | false -> gameController.CurrentPlayer        
-                    CurrentCoord = match playerTurnEnds startCoord endCoord gameController.Board newBoard.Value with
-                                    | true -> None
-                                    | false -> Some endCoord
+                    CurrentCoord = match playerTurnEnds [startCoord; endCoord] gameController.Board board.Value with
+                                   | true -> None
+                                   | false -> Some endCoord
                 }
     | false -> None
 
-let move (moves :Coord seq) (gameController) :Option<GameController> =
-    let board = moveSequence moves (Some gameController.Board)
+let move (move :Coord seq) (gameController) :Option<GameController> =
+    let board = moveSequence move (Some gameController.Board)
     match board with
-    | Some b -> Some {Board = board.Value; CurrentPlayer = otherPlayer gameController.CurrentPlayer; CurrentCoord = gameController.CurrentCoord}
+    | Some b -> Some <|
+                {
+                    Board = board.Value;
+                    CurrentPlayer = match playerTurnEnds (List.ofSeq move) gameController.Board board.Value with
+                                    | true -> otherPlayer gameController.CurrentPlayer
+                                    | false -> gameController.CurrentPlayer        
+                    CurrentCoord = match playerTurnEnds (List.ofSeq move) gameController.Board board.Value with
+                                   | true -> None
+                                   | false -> Some (Seq.last move)
+                }
     | None -> None
 
 let getMove searchDepth gameController =

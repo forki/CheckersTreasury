@@ -125,10 +125,8 @@ let rec createMoveTree (move :Move) (board :Board) =
             Move = move;
             Parent = None;
             Children =
-                let newBoard =
-                    match move.Length with
-                    | 1 -> board
-                    | _ -> (uncheckedMoveSequence move board)
+                let newBoard = if move.Length = 1 then board else uncheckedMoveSequence move board
+
                 let newJumps = getPieceSingleJumps (List.last move) newBoard
                 let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
 
@@ -182,13 +180,13 @@ let calculateMoves player (board :Board) =
         match isPlayerPiece player coord board with
         | true ->
             let newJumpAcc = getPieceJumps coord board @ jumpAcc
-            match newJumpAcc.IsEmpty with
-            | true ->
+            match newJumpAcc with
+            | [] ->
                 let newHopAcc = getPieceHops coord board @ hopAcc
                 match nextPoint coord with
                 | Some c -> loop newJumpAcc newHopAcc c
                 | None -> newHopAcc
-            | false ->
+            | _ ->
                 match nextPoint coord with
                 | Some c -> loop newJumpAcc [] c
                 | None -> newJumpAcc

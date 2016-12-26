@@ -43,15 +43,9 @@ let rec minimax player searchDepth alpha beta (board :Board) =
     match searchDepth = 0 || (isWon board).IsSome with
     | true ->
         let weightDifference = Some <| calculateWeightDifference board
-        let newAlpha =
-            match player with
-            | Black -> weightDifference
-            | White -> alpha
 
-        let newBeta =
-            match player with
-            | White -> weightDifference
-            | Black -> beta
+        let newAlpha = if player = Black then weightDifference else alpha
+        let newBeta = if player = White then weightDifference else beta
 
         { Alpha = newBeta; Beta = newAlpha; Move = [] }
     | false ->
