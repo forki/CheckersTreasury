@@ -69,7 +69,7 @@ let rec minimax player searchDepth alpha beta (board :Board) =
         if searchDepth <> 0 then
             ignore <| List.map (fun x -> if newAlpha.IsNone || newBeta.IsNone || newAlpha.Value < newBeta.Value then
                                              let newBoard = uncheckedMoveSequence x board
-                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alphaForNode betaForNode newBoard
+                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) (chooseNewAlpha alpha alphaForNode) (chooseNewBeta beta betaForNode) newBoard
                                              
                                              match player with
                                              | Black ->
