@@ -72,10 +72,10 @@ let internal isValidJump startCoord endCoord (board :Board) =
 let internal hasValidHop startCoord (board :Board) =
     let hopCoords =
         [
-            startCoord + {Row = -1; Column = 1};
-            startCoord + {Row = -1; Column = -1};
-            startCoord + {Row = 1; Column = 1};
-            startCoord + {Row = 1; Column = -1}
+            offset startCoord {Row = -1; Column = 1};
+            offset startCoord {Row = -1; Column = -1};
+            offset startCoord {Row = 1; Column = 1};
+            offset startCoord {Row = 1; Column = -1}
         ]
 
     let flattenedList = seq {
@@ -87,10 +87,10 @@ let internal hasValidHop startCoord (board :Board) =
 let internal hasValidJump startCoord (board :Board) =
     let jumpCoords =
         [
-            startCoord + {Row = -2; Column = 2};
-            startCoord + {Row = -2; Column = -2};
-            startCoord + {Row = 2; Column = 2};
-            startCoord + {Row = 2; Column = -2}
+            offset startCoord {Row = -2; Column = 2};
+            offset startCoord {Row = -2; Column = -2};
+            offset startCoord {Row = 2; Column = 2};
+            offset startCoord {Row = 2; Column = -2}
         ]
 
     let flattenedList = seq {

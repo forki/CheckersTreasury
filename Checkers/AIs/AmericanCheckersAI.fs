@@ -111,7 +111,7 @@ let getPieceSingleJumps coord (board :Board) =
 
     let hops = List.ofSeq (seq {
         for move in moves do
-        let endCoord = coord + move
+        let endCoord = offset coord move
         yield
             match coordExists endCoord && isValidJump coord endCoord board with
             | true -> Some [coord; endCoord]
@@ -169,7 +169,7 @@ let getPieceHops coord (board :Board) =
 
     let hops = List.ofSeq (seq {
         for move in moves do
-        let endCoord = coord + move
+        let endCoord = offset coord move
         yield
             match coordExists endCoord && isValidHop coord endCoord board with
             | true -> Some [coord; endCoord]
