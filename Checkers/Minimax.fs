@@ -7,24 +7,27 @@ open Checkers.AIs.AmericanCheckersAI
 open System
 
 let rec internal bestMatchInList player highestDifference moveForHighestDifference (list :List<float * Move>) =
-    let weight = fst list.Head
+    let head::tail = list
+    let weight = fst head
+
     let newMoveForHighestDifference =
         match player with
         | Black -> match weight > highestDifference with
-                   | true -> snd list.Head
+                   | true -> snd head
                    | false -> moveForHighestDifference
         | White -> match weight < highestDifference with
-                   | true -> snd list.Head
+                   | true -> snd head
                    | false -> moveForHighestDifference
 
     let newHighestDifference =
-        match player with
-        | Black -> Math.Max(highestDifference, weight)
-        | White -> Math.Min(highestDifference, weight)
+        (highestDifference, weight)
+        ||> match player with
+            | Black -> max
+            | White -> min
 
-    match list.Tail.IsEmpty with
-    | false -> bestMatchInList player newHighestDifference newMoveForHighestDifference list.Tail
-    | true -> (highestDifference, newMoveForHighestDifference)
+    match tail with
+    | [] -> (highestDifference, newMoveForHighestDifference)
+    | _ -> bestMatchInList player newHighestDifference newMoveForHighestDifference list.Tail
 
 let internal chooseNewAlpha currentAlpha (candidateAlpha :float Option) =
     match currentAlpha with
@@ -36,12 +39,6 @@ let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
     | Some x -> if candidateBeta.IsSome then Some <| min x candidateBeta.Value else currentBeta
     | None -> candidateBeta
 
-// When the player = Black, the node is a Max node
-// When the search depth is 0 or the board is won, return the value                       - done
-// When the node is a max node, get the best value for the nodes below it
-// if the new value is higher than the minimum, set the temp value to the new value
-// if the temp value is higher than the maximum value, return the max and an empty move
-// Use the same principles for min nodes, except the opposite
 let rec minimax player searchDepth alpha beta (board :Board) =
     match searchDepth = 0 || (isWon board).IsSome with
     | true ->

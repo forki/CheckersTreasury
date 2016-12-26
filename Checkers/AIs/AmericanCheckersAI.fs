@@ -32,7 +32,7 @@ let nextPoint coord =
     match coord with
     | c when c.Row = Rows && c.Column = Columns -> None
     | c when c.Column = Columns -> Some {Row = c.Row + 1; Column = 0}
-    | _ -> Some {Row = coord.Row; Column = coord.Column + 1}
+    | _ -> Some {coord with Column = coord.Column + 1}
 
 let calculateCheckerWeight coord (board :Board) =
     let piece = (square coord board).Value

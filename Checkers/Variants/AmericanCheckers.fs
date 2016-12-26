@@ -199,7 +199,7 @@ let public movePiece startCoord endCoord (board :Board) :Option<Board> =
         | 2 -> Some <| jump startCoord endCoord board
         | _ -> None
 
-let rec public moveSequence (coordinates :IEnumerable<Coord>) (board :Option<Board>) =
+let rec public moveSequence (coordinates :Coord seq) (board :Option<Board>) =
     let coords = List.ofSeq(coordinates)
 
     match board.IsNone with
@@ -216,7 +216,7 @@ let internal uncheckedMovePiece startCoord endCoord (board :Board) =
     | 1 -> hop startCoord endCoord board
     | 2 -> jump startCoord endCoord board
 
-let rec internal uncheckedMoveSequence (coordinates :IEnumerable<Coord>) (board :Board) =
+let rec internal uncheckedMoveSequence (coordinates :Coord seq) (board :Board) =
     let coords = List.ofSeq(coordinates)
 
     match coords.Length with

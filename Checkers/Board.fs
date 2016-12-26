@@ -7,10 +7,10 @@ type Board = Piece option list list
 
 let square (coord :Coord) = List.item coord.Row >> List.item coord.Column
 
-let rowFromSeq (value :'a IEnumerable) =
+let rowFromSeq (value :'a seq) =
     Some (List.ofSeq value)
 
-let listFromSeq (value :'a IEnumerable IEnumerable) =
+let listFromSeq (value :'a seq seq) =
     List.ofSeq (Seq.choose rowFromSeq value)
 
 let defaultBoard = 
