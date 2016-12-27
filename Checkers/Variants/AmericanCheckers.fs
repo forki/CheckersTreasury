@@ -21,6 +21,14 @@ let internal coordExists coord =
     coord.Row >= 0 && coord.Row <= Rows &&
     coord.Column >= 0 && coord.Column <= Columns
 
+let internal checkMoveDirection piece startCoord endCoord =
+    match piece.PieceType with
+    | PieceType.Checker ->
+        match piece.Player with
+        | Player.Black -> startCoord.Row < endCoord.Row
+        | Player.White -> startCoord.Row > endCoord.Row
+    | PieceType.King -> true
+
 let internal isValidCheckerHop startCoord endCoord (board :Board) =
     let piece = (square startCoord board).Value
 
@@ -64,10 +72,10 @@ let internal isValidJump startCoord endCoord (board :Board) =
 let internal hasValidHop startCoord (board :Board) =
     let hopCoords =
         [
-            startCoord + {Row = -1; Column = 1};
-            startCoord + {Row = -1; Column = -1};
-            startCoord + {Row = 1; Column = 1};
-            startCoord + {Row = 1; Column = -1}
+            offset startCoord {Row = -1; Column = 1};
+            offset startCoord {Row = -1; Column = -1};
+            offset startCoord {Row = 1; Column = 1};
+            offset startCoord {Row = 1; Column = -1}
         ]
 
     let flattenedList = seq {
@@ -79,10 +87,10 @@ let internal hasValidHop startCoord (board :Board) =
 let internal hasValidJump startCoord (board :Board) =
     let jumpCoords =
         [
-            startCoord + {Row = -2; Column = 2};
-            startCoord + {Row = -2; Column = -2};
-            startCoord + {Row = 2; Column = 2};
-            startCoord + {Row = 2; Column = -2}
+            offset startCoord {Row = -2; Column = 2};
+            offset startCoord {Row = -2; Column = -2};
+            offset startCoord {Row = 2; Column = 2};
+            offset startCoord {Row = 2; Column = -2}
         ]
 
     let flattenedList = seq {
@@ -116,6 +124,12 @@ let internal moveAvailable (board :Board) player =
         yield (pieceHasMove row column) }
             
     flattenedList |> Seq.exists id
+
+let isWon (board :Board) =
+    match (moveAvailable board) with
+    | x when not <| x White -> Some Black
+    | x when not <| x Black -> Some White
+    | _ -> None
 
 let internal setPieceAt coord piece (board :Board) =
     let boardItems = List.init (Rows + 1) (fun row ->
@@ -158,13 +172,13 @@ let internal hop startCoord endCoord (board :Board) =
     |> setPieceAt startCoord None
     |> setPieceAt endCoord piece
 
-let internal playerTurnEnds lastMoveStartCoord lastMoveEndCoord (originalBoard :Board) (currentBoard :Board) =
-    let lastMoveWasJump = Math.Abs(lastMoveStartCoord.Row - lastMoveEndCoord.Row) = 2
-    let pieceWasPromoted = (square lastMoveEndCoord currentBoard).Value.PieceType = King &&
-                            (square lastMoveStartCoord originalBoard).Value.PieceType = Checker
+let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :Board) =
+    let lastMoveWasJump = Math.Abs(move.[0].Row - move.[1].Row) = 2
+    let pieceWasPromoted = (square (List.last move) currentBoard).Value.PieceType = King &&
+                            (square move.[0] originalBoard).Value.PieceType = Checker
 
     pieceWasPromoted ||
-    not (lastMoveWasJump && hasValidJump lastMoveEndCoord currentBoard)
+    not (lastMoveWasJump && hasValidJump (List.last move) currentBoard)
 
 let public isValidMove startCoord endCoord (board :Board) =
     coordExists startCoord &&
@@ -185,14 +199,28 @@ let public movePiece startCoord endCoord (board :Board) :Option<Board> =
         | 2 -> Some <| jump startCoord endCoord board
         | _ -> None
 
-let rec public move (coordinates :IEnumerable<Coord>) (board :Option<Board>) =
+let rec public moveSequence (coordinates :Coord seq) (board :Option<Board>) =
     let coords = List.ofSeq(coordinates)
 
-    match board.IsNone with
-    | true -> None
-    | false ->
+    match board with
+    | None -> None
+    | Some b ->
         match coords.Length with
         | b when b >= 3 ->
             let newBoard = movePiece coords.Head coords.[1] board.Value
-            move coords.Tail newBoard
+            moveSequence coords.Tail newBoard
         | _ -> movePiece coords.Head coords.[1] board.Value
+
+let internal uncheckedMovePiece startCoord endCoord (board :Board) =
+    match Math.Abs(startCoord.Row - endCoord.Row) with
+    | 1 -> hop startCoord endCoord board
+    | 2 -> jump startCoord endCoord board
+
+let rec internal uncheckedMoveSequence (coordinates :Coord seq) (board :Board) =
+    let coords = List.ofSeq(coordinates)
+
+    match coords.Length with
+    | b when b >= 3 ->
+        let newBoard = uncheckedMovePiece coords.Head coords.[1] board
+        uncheckedMoveSequence coords.Tail newBoard
+    | _ -> uncheckedMovePiece coords.Head coords.[1] board

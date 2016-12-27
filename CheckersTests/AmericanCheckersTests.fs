@@ -636,7 +636,7 @@ let ``Move sequence jumps pieces``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    let newBoard = (move [{Row = 0; Column = 0}; {Row = 2; Column = 2}; {Row = 0; Column = 4}] (Some <| board)).Value
+    let newBoard = (moveSequence [{Row = 0; Column = 0}; {Row = 2; Column = 2}; {Row = 0; Column = 4}] (Some <| board)).Value
     Assert.Equal<List<List<Option<Piece>>>>(expectedBoard, newBoard)
 
 [<Fact>]
@@ -701,7 +701,7 @@ let ``Player turn not ended``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    Assert.False(playerTurnEnds { Row = 4; Column = 4 } { Row = 2; Column = 2 } originalBoard newBoard)
+    Assert.False(playerTurnEnds [{ Row = 4; Column = 4 }; { Row = 2; Column = 2 }] originalBoard newBoard)
 
 [<Fact>]
 let ``Player turn not ended--checker piece``() =
@@ -729,7 +729,7 @@ let ``Player turn not ended--checker piece``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    Assert.False(playerTurnEnds { Row = 0; Column = 0 } { Row = 2; Column = 2 } originalBoard newBoard)
+    Assert.False(playerTurnEnds [{ Row = 0; Column = 0 }; { Row = 2; Column = 2 }] originalBoard newBoard)
 
 [<Fact>]
 let ``Player turn ends when move is hop``() =
@@ -757,7 +757,7 @@ let ``Player turn ends when move is hop``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    Assert.True(playerTurnEnds { Row = 3; Column = 3 } { Row = 2; Column = 2 } originalBoard newBoard)
+    Assert.True(playerTurnEnds [{ Row = 3; Column = 3 }; { Row = 2; Column = 2 }] originalBoard newBoard)
 
 [<Fact>]
 let ``Player turn ends when no jumps available``() =
@@ -785,7 +785,7 @@ let ``Player turn ends when no jumps available``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    Assert.True(playerTurnEnds { Row = 4; Column = 4 } { Row = 2; Column = 2 } originalBoard newBoard)
+    Assert.True(playerTurnEnds [{ Row = 4; Column = 4 }; { Row = 2; Column = 2 }] originalBoard newBoard)
 
 [<Fact>]
 let ``Turn cannot continue after promotion``() =
@@ -813,4 +813,24 @@ let ``Turn cannot continue after promotion``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    Assert.True(playerTurnEnds { Row = 2; Column = 5 } { Row = 0; Column = 3 } originalBoard newBoard)
+    Assert.True(playerTurnEnds [{ Row = 2; Column = 5 }; { Row = 0; Column = 3 }] originalBoard newBoard)
+
+[<Fact>]
+let ``Game won returns player``() =
+    let board =
+        [
+            [Piece.whiteKing; None; None; None; None; None; None; None];
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.Equal(Black, (isWon board).Value)
+
+[<Fact>]
+let ``Game not won returns None``() =
+    Assert.True((isWon Board.defaultBoard).IsNone)

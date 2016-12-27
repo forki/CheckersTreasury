@@ -24,6 +24,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Debug\Checkers.XML</DocumentationFile>
+    <StartAction>Project</StartAction>
+    <StartProgram>
+    </StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -113,7 +116,9 @@
     <Compile Include="Board.fs" />
     <Compile Include="FSharpExtensions.fs" />
     <Compile Include="Variants/AmericanCheckers.fs" />
+    <Compile Include="AIs\AmericanCheckersAI.fs" />
     <Compile Include="GameController.fs" />
+    <Compile Include="Minimax.fs" />
     <Compile Include="PublicAPI.fs" />
     <None Include="Script.fsx" />
     <Content Include="packages.config" />
