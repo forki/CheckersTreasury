@@ -1,6 +1,5 @@
 ﻿module internal Checkers.FSharpExtensions
 open Checkers
-open Checkers.Piece
 open Checkers.Types
 open System
 
@@ -9,7 +8,7 @@ let internal getJumpedCoord startCoord endCoord =
 
 let internal moveIsDiagonal startCoord endCoord =
     startCoord <> endCoord &&
-    System.Math.Abs(startCoord.Row - endCoord.Row) = System.Math.Abs(startCoord.Column - endCoord.Column)
+    abs (startCoord.Row - endCoord.Row) = abs (startCoord.Column - endCoord.Column)
 
 let internal otherPlayer player =
     match player with

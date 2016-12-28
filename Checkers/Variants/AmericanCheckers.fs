@@ -3,8 +3,6 @@ open Checkers.Types
 open Checkers.Piece
 open Checkers.Board
 open Checkers.FSharpExtensions
-open System
-open System.Collections.Generic
 
 [<Literal>]
 let Rows = 7
@@ -173,7 +171,7 @@ let internal hop startCoord endCoord (board :Board) =
     |> setPieceAt endCoord piece
 
 let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :Board) =
-    let lastMoveWasJump = Math.Abs(move.[0].Row - move.[1].Row) = 2
+    let lastMoveWasJump = abs(move.[0].Row - move.[1].Row) = 2
     let pieceWasPromoted = (square (List.last move) currentBoard).Value.PieceType = King &&
                             (square move.[0] originalBoard).Value.PieceType = Checker
 
@@ -185,7 +183,7 @@ let public isValidMove startCoord endCoord (board :Board) =
     coordExists endCoord &&
     moveIsDiagonal startCoord endCoord &&
     (square startCoord board).IsSome &&
-    match Math.Abs(startCoord.Row - endCoord.Row) with
+    match abs(startCoord.Row - endCoord.Row) with
     | 1 -> isValidHop startCoord endCoord board && not <| jumpAvailable (square startCoord board).Value.Player board
     | 2 -> isValidJump startCoord endCoord board
     | _ -> false
@@ -194,7 +192,7 @@ let public movePiece startCoord endCoord (board :Board) :Option<Board> =
     match isValidMove startCoord endCoord board with
     | false -> None
     | true ->
-        match Math.Abs(startCoord.Row - endCoord.Row) with
+        match abs(startCoord.Row - endCoord.Row) with
         | 1 -> Some <| hop startCoord endCoord board
         | 2 -> Some <| jump startCoord endCoord board
         | _ -> None
@@ -212,7 +210,7 @@ let rec public moveSequence (coordinates :Coord seq) (board :Option<Board>) =
         | _ -> movePiece coords.Head coords.[1] board.Value
 
 let internal uncheckedMovePiece startCoord endCoord (board :Board) =
-    match Math.Abs(startCoord.Row - endCoord.Row) with
+    match abs(startCoord.Row - endCoord.Row) with
     | 1 -> hop startCoord endCoord board
     | 2 -> jump startCoord endCoord board
 

@@ -38,7 +38,7 @@ let calculateCheckerWeight coord (board :Board) =
     let piece = (square coord board).Value
     let kingRow = kingRowIndex piece.Player
 
-    let weight = 8.0 - (float <| Math.Abs(kingRow - coord.Row)) + (square coord checkerWeights)
+    let weight = 8.0 - (float <| abs(kingRow - coord.Row)) + (square coord checkerWeights)
     match piece.Player with
     | Black -> weight
     | White -> -weight
@@ -165,15 +165,12 @@ let getPieceHops coord (board :Board) =
         | Checker -> checkerHops piece.Player
         | King -> kingHops piece.Player
 
-    let hops = List.ofSeq (seq {
-        for move in moves do
-        let endCoord = offset coord move
-        yield
-            match coordExists endCoord && isValidHop coord endCoord board with
-            | true -> Some [coord; endCoord]
-            | false -> None })
+    let hopsFilter = List.filter (fun (head::tail) ->
+        let startCoord = head
+        let endCoord = tail |> List.head
+        coordExists endCoord && isValidHop startCoord endCoord board)
 
-    List.map (fun (item :Option<Move>) -> item.Value) (List.where (fun (item :Option<Move>) -> item.IsSome) hops)
+    moves |> List.map (fun move -> [coord; offset coord move]) |> hopsFilter
 
 let calculateMoves player (board :Board) =
     let rec loop jumpAcc hopAcc coord =
