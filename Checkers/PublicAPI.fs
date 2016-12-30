@@ -20,19 +20,21 @@ let internal newGameHistory (currentGameHistory :PDNTurn List) player move =
     let newTurnValue =
         match player with
         | Black ->
+            let moveNumber = currentGameHistory.Length + 1
             {
-                MoveNumber = currentGameHistory.Length;
+                MoveNumber = moveNumber;
                 BlackMove = pdnMove;
                 WhiteMove = None;
-                DisplayString = String.Join((if isJump move then "x" else "-"), pdnMove)
+                DisplayString = moveNumber.ToString() + ": " + String.Join((if isJump move then "x" else "-"), pdnMove)
             }
         | White ->
             let lastMovePDN = List.last currentGameHistory
+            let moveNumber = currentGameHistory.Length
             {
-                MoveNumber = currentGameHistory.Length - 1;
+                MoveNumber = moveNumber;
                 BlackMove = lastMovePDN.BlackMove;
                 WhiteMove = Some pdnMove;
-                DisplayString = lastMovePDN.DisplayString + ", " + String.Join((if isJump move then "x" else "-"), pdnMove)
+                DisplayString = moveNumber.ToString() + ": " + lastMovePDN.DisplayString + ", " + String.Join((if isJump move then "x" else "-"), pdnMove)
             }
 
     match player with

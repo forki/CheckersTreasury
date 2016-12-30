@@ -64,7 +64,7 @@ let ``Moving records move history: black hop``() =
     let controller = { Board = Board.defaultBoard; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
     let newController = movePiece { Row = 2; Column = 1 } { Row = 3; Column = 0 } controller
 
-    Assert.Equal("9-13", (List.last newController.Value.MoveHistory).DisplayString)
+    Assert.Equal("1: 9-13", (List.last newController.Value.MoveHistory).DisplayString)
 
 [<Fact>]
 let ``Moving records move history: black jump``() =
@@ -83,7 +83,7 @@ let ``Moving records move history: black jump``() =
     let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
     let newController = movePiece { Row = 0; Column = 1 } { Row = 2; Column = 3 } controller
 
-    Assert.Equal("1x10", (List.last newController.Value.MoveHistory).DisplayString)
+    Assert.Equal("1: 1x10", (List.last newController.Value.MoveHistory).DisplayString)
 
 [<Fact>]
 let ``Moving records move history: white hop``() =
@@ -102,4 +102,4 @@ let ``Moving records move history: white hop``() =
     let controller = { Board = board; CurrentPlayer = White; CurrentCoord = None; MoveHistory = [{MoveNumber = 1; BlackMove = [1; 10]; WhiteMove = None; DisplayString = "1x10"}] }
     let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
 
-    Assert.Equal("1x10, 15x6", (List.last newController.Value.MoveHistory).DisplayString)
+    Assert.Equal("1: 1x10, 15x6", (List.last newController.Value.MoveHistory).DisplayString)
