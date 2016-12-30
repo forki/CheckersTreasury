@@ -10,6 +10,18 @@ let Rows = 7
 [<Literal>]
 let Columns = 7
 
+let PDNBoard =
+    [
+        [None; Some 1; None; Some 2; None; Some 3; None; Some 4];
+        [Some 5; None; Some 6; None; Some 7; None; Some 8; None];
+        [None; Some 9; None; Some 10; None; Some 11; None; Some 12];
+        [Some 13; None; Some 14; None; Some 15; None; Some 16; None];
+        [None; Some 17; None; Some 18; None; Some 19; None; Some 20];
+        [Some 21; None; Some 22; None; Some 23; None; Some 24; None];
+        [None; Some 25; None; Some 26; None; Some 27; None; Some 28];
+        [Some 29; None; Some 30; None; Some 31; None; Some 32; None];
+    ]
+
 let internal kingRowIndex(player) =
     match player with
     | Player.Black -> Rows

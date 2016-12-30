@@ -1,7 +1,6 @@
 ﻿module public Checkers.Board
 open Checkers.Types
 open Checkers.Piece
-open System.Collections.Generic
 
 type Board = Piece option list list
 

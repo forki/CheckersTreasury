@@ -119,7 +119,7 @@ let getPieceSingleJumps coord (board :Board) =
 
     List.map (fun (item :Option<Move>) -> item.Value) (List.where (fun (item :Option<Move>) -> item.IsSome) hops)
 
-let rec createMoveTree (move :Move) (board :Board) =
+let rec internal createMoveTree (move :Move) (board :Board) =
     let moveTree =
         {
             Move = move;
