@@ -1,6 +1,7 @@
 ﻿module internal Checkers.FSharpExtensions
 open Checkers
 open Checkers.Types
+open Checkers.Board
 open System
 
 let internal getJumpedCoord startCoord endCoord =
@@ -19,3 +20,7 @@ let internal otherPlayer player =
     match player with
     | White -> Black
     | Black -> White
+
+let isPlayerPiece player coord (board :Board) =
+    let piece = square coord board
+    piece.IsSome && player = piece.Value.Player

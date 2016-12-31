@@ -124,3 +124,23 @@ let ``Create controller from FEN string``() =
     
     Assert.Equal(expectedPlayer, controller.CurrentPlayer)
     Assert.Equal<Checkers.Board.Board>(expectedBoard, controller.Board)
+
+[<Fact>]
+let ``Create FEN from controller string``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.blackKing; None; None; None; None];
+            [None; None; None; None; Piece.whiteKing; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let controller = {Board = board; CurrentPlayer = Player.White; CurrentCoord = None; MoveHistory = []}
+
+    let expectedFENString = "[FEN \"W:WK15,19:BK10\"]"
+    
+    Assert.Equal(expectedFENString, (FENFromController controller))

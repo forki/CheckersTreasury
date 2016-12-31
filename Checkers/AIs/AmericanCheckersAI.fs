@@ -2,7 +2,7 @@
 open Checkers.Board
 open Checkers.Variants.AmericanCheckers
 open Checkers.Types
-open System
+open Checkers.FSharpExtensions
 
 let checkerWeights =
     [[0.0; 3.20; 0.0; 3.20; 0.0; 3.20; 0.0; 3.10];
@@ -23,10 +23,6 @@ let kingWeights =
     [1.0; 0.0; 1.10; 0.0; 1.15; 0.0; 1.10; 0.0];
     [0.0; 1.05; 0.0; 1.05; 0.0; 1.10; 0.0; 1.05];
     [1.0; 0.0; 1.0; 0.0; 1.0; 0.0; 1.05; 0.0]]
-
-let isPlayerPiece player coord (board :Board) =
-    let piece = square coord board
-    piece.IsSome && player = piece.Value.Player
 
 let nextPoint coord =
     match coord with

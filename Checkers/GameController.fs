@@ -2,9 +2,18 @@
 open Checkers.Types
 open Checkers.Piece
 open Checkers.Board
+open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
+open Checkers.AIs.AmericanCheckersAI
+open System
 open System.Collections
 open System.Linq
+
+[<Literal>]
+let BlackSymbol = 'B'
+
+[<Literal>]
+let WhiteSymbol = 'W'
 
 type GameController = { Board :Board; CurrentPlayer :Player; CurrentCoord :Option<Coord>; MoveHistory :PDNTurn List }
 
@@ -21,12 +30,12 @@ let controllerFromFEN (fen :string) =
     let fenValue = fen.Split('"').[1]
     let fenSubsections = fenValue.Split(':')
     let playerTurn =
-        match fenSubsections.[0] with
-        | "B" -> Player.Black
-        | "W" -> Player.White
+        match fenSubsections.[0].[0] with
+        | BlackSymbol -> Player.Black
+        | WhiteSymbol -> Player.White
         
-    let whitePieces = getPieceNotation fenSubsections 'W'
-    let blackPieces = getPieceNotation fenSubsections 'B'
+    let whitePieces = getPieceNotation fenSubsections WhiteSymbol
+    let blackPieces = getPieceNotation fenSubsections BlackSymbol
 
     let rec loop (fenPieces :string List) player =
         let (head::tail) = fenPieces
@@ -50,5 +59,28 @@ let controllerFromFEN (fen :string) =
     loop (List.ofArray blackPieces) Player.Black
 
     {Board = (listFromSeq ((Seq.map (fun (row :Generic.List<Option<Piece>>) -> row.AsEnumerable()) board).AsEnumerable())); CurrentPlayer = playerTurn; CurrentCoord = None; MoveHistory = []}
+
+let FENFromController controller =
+    let turnSymbol =
+        match controller.CurrentPlayer with
+        | White -> WhiteSymbol
+        | Black -> BlackSymbol
+
+    let rec loop (fenNumbers :string List) player coord =
+        match nextPoint coord with
+        | Some c ->
+            let piece = square coord controller.Board
+            match piece.IsSome && isPlayerPiece player coord controller.Board with
+            | true ->
+                let isKing = piece.Value.PieceType = PieceType.King
+                let fenNumber = (square coord PDNBoard).Value
+                loop (fenNumbers @ [(if isKing then "K" else "") + fenNumber.ToString()]) player c
+            | false -> loop fenNumbers player c
+        | None -> fenNumbers
+
+    let whitePieceFEN = String.Join(",", (loop [] Player.White {Row = 0; Column = 0}))
+    let blackPieceFEN = String.Join(",", (loop [] Player.Black {Row = 0; Column = 0}))
+
+    "[FEN \"" + turnSymbol.ToString() + ":W" + whitePieceFEN + ":B" + blackPieceFEN + "\"]"
 
 let newGame = { Board = Board.defaultBoard; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
