@@ -103,3 +103,24 @@ let ``Moving records move history: white hop``() =
     let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
 
     Assert.Equal("1: 1x10, 15x6", (List.last newController.Value.MoveHistory).DisplayString)
+
+[<Fact>]
+let ``Create controller from FEN string``() =
+    let expectedBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.blackKing; None; None; None; None];
+            [None; None; None; None; Piece.whiteKing; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+    let expectedPlayer = Player.White
+
+    let fenString = "[FEN \"W:WK15,19:BK10\"]"
+    let controller = controllerFromFEN fenString
+    
+    Assert.Equal(expectedPlayer, controller.CurrentPlayer)
+    Assert.Equal<Checkers.Board.Board>(expectedBoard, controller.Board)

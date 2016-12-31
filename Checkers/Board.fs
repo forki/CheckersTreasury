@@ -1,6 +1,8 @@
 ﻿module public Checkers.Board
 open Checkers.Types
 open Checkers.Piece
+open System.Collections
+open System.Linq
 
 type Board = Piece option list list
 
@@ -23,3 +25,9 @@ let defaultBoard =
         List.replicate 4 [None; whiteChecker] |> List.concat
         List.replicate 4 [whiteChecker; None] |> List.concat
     ]
+
+let emptyBoard =
+    let row :Piece Option seq = Seq.replicate 8 None
+    let board = Seq.replicate 8 row
+
+    board.Select(fun item -> item.ToList()).ToList()
