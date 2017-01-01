@@ -99,7 +99,7 @@ let ``Moving records move history: white hop``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = White; CurrentCoord = None; MoveHistory = [{MoveNumber = 1; BlackMove = [1; 10]; WhiteMove = None; DisplayString = "1x10"}] }
+    let controller = { Board = board; CurrentPlayer = White; CurrentCoord = None; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; PreviousFen = ""; AfterFen = "" }; WhiteMove = None; DisplayString = "1x10"}] }
     let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
 
     Assert.Equal("1: 1x10, 15x6", (List.last newController.Value.MoveHistory).DisplayString)
@@ -143,4 +143,4 @@ let ``Create FEN from controller string``() =
 
     let expectedFENString = "[FEN \"W:WK15,19:BK10\"]"
     
-    Assert.Equal(expectedFENString, (FENFromController controller))
+    Assert.Equal(expectedFENString, (CreateFen Player.White board))

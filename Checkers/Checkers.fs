@@ -9,7 +9,7 @@ let offset c1 c2 =
         { Row = c1.Row + c2.Row; Column = c1.Column + c2.Column }
 
 type Move = Coord List
-type PDNMove = int List
+type PDNMove = { Move :int List; PreviousFen :string; AfterFen :string }
 
 type PDNTurn = { MoveNumber :int; BlackMove :PDNMove; WhiteMove :PDNMove Option; DisplayString :string }
 

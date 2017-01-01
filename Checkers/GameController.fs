@@ -60,17 +60,17 @@ let controllerFromFEN (fen :string) =
 
     {Board = (listFromSeq ((Seq.map (fun (row :Generic.List<Option<Piece>>) -> row.AsEnumerable()) board).AsEnumerable())); CurrentPlayer = playerTurn; CurrentCoord = None; MoveHistory = []}
 
-let FENFromController controller =
+let CreateFen player (board :Board) =
     let turnSymbol =
-        match controller.CurrentPlayer with
+        match player with
         | White -> WhiteSymbol
         | Black -> BlackSymbol
 
     let rec loop (fenNumbers :string List) player coord =
         match nextPoint coord with
         | Some c ->
-            let piece = square coord controller.Board
-            match piece.IsSome && isPlayerPiece player coord controller.Board with
+            let piece = square coord board
+            match piece.IsSome && isPlayerPiece player coord board with
             | true ->
                 let isKing = piece.Value.PieceType = PieceType.King
                 let fenNumber = (square coord PDNBoard).Value
