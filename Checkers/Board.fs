@@ -1,7 +1,7 @@
 ﻿module public Checkers.Board
 open Checkers.Types
 open Checkers.Piece
-open System.Collections.Generic
+open System.Linq
 
 type Board = Piece option list list
 
@@ -13,7 +13,7 @@ let rowFromSeq (value :'a seq) =
 let listFromSeq (value :'a seq seq) =
     List.ofSeq (Seq.choose rowFromSeq value)
 
-let defaultBoard = 
+let defaultBoard =
     [
         List.replicate 4 [None; blackChecker] |> List.concat
         List.replicate 4 [blackChecker; None] |> List.concat
@@ -24,3 +24,9 @@ let defaultBoard =
         List.replicate 4 [None; whiteChecker] |> List.concat
         List.replicate 4 [whiteChecker; None] |> List.concat
     ]
+
+let emptyBoard =
+    let row :Piece Option seq = Seq.replicate 8 None
+    let board = Seq.replicate 8 row
+
+    board.Select(fun item -> item.ToList()).ToList()

@@ -4,7 +4,6 @@ open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
 open Checkers.AIs.AmericanCheckersAI
-open System
 
 let rec internal bestMatchInList player highestDifference moveForHighestDifference (list :List<float * Move>) =
     let head::tail = list
@@ -30,49 +29,59 @@ let rec internal bestMatchInList player highestDifference moveForHighestDifferen
     | _ -> bestMatchInList player newHighestDifference newMoveForHighestDifference list.Tail
 
 let internal chooseNewAlpha currentAlpha (candidateAlpha :float Option) =
-    match currentAlpha with
-    | Some x -> if candidateAlpha.IsSome then Some <| max x candidateAlpha.Value else currentAlpha
-    | None -> candidateAlpha
+    match (currentAlpha, candidateAlpha) with
+    | (Some current, Some candidate) -> Some <| max current candidate
+    | (Some current, None) -> Some current
+    | (None, Some candidate) -> Some candidate
+    | _ -> None
 
 let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
-    match currentBeta with
-    | Some x -> if candidateBeta.IsSome then Some <| min x candidateBeta.Value else currentBeta
-    | None -> candidateBeta
+    match (currentBeta, candidateBeta) with
+    | (Some current, Some candidate) -> Some <| min current candidate
+    | (Some current, None) -> Some current
+    | (None, Some candidate) -> Some candidate
+    | _ -> None
 
-let rec minimax player searchDepth alpha beta (board :Board) =
+let rec minimax player searchDepth alpha beta (board:Board) =
     match searchDepth = 0 || (isWon board).IsSome with
     | true ->
         let weightDifference = Some <| calculateWeightDifference board
-
-        let newAlpha = if player = Black then weightDifference else alpha
-        let newBeta = if player = White then weightDifference else beta
-
+        let newAlpha = 
+            match player with
+            | Black -> weightDifference
+            | _ -> alpha
+        let newBeta =
+            match player with
+            | White -> weightDifference
+            | _ -> beta
         { Alpha = newBeta; Beta = newAlpha; Move = [] }
     | false ->
-        let moves = calculateMoves player board
-        let mutable alphaForNode = None
-        let mutable betaForNode = None
+        let getNewValueAndMove chooseMethod nodeValue moveValue currentValue currentMove newMove =
+            let newNodeValue = chooseMethod nodeValue moveValue
+            let newValue = chooseMethod currentValue newNodeValue
+            let finalMove = 
+                match newValue with
+                | a when a = moveValue -> currentMove
+                | _ -> newMove
+            (newNodeValue, newValue, finalMove)
 
-        let mutable newAlpha = alpha
-        let mutable newBeta = beta
-        let mutable move = []
+        let rec loop alphaForNode betaForNode (newAlpha :float Option) (newBeta :float Option) move moves =
+            match List.isEmpty moves with
+            | true -> { Alpha = betaForNode; Beta = alphaForNode; Move = move }
+            | false ->
+                let currentMove = moves |> List.head
 
-        if searchDepth <> 0 then
-            ignore <| List.map (fun x -> if newAlpha.IsNone || newBeta.IsNone || newAlpha.Value < newBeta.Value then
-                                             let newBoard = uncheckedMoveSequence x board
-                                             let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alphaForNode betaForNode newBoard
-                                             
-                                             match player with
-                                             | Black ->
-                                                 alphaForNode <- chooseNewAlpha alphaForNode alphaBetaMove.Alpha
-                                                 newAlpha <- chooseNewAlpha newAlpha alphaForNode
-                                                 move <- if newAlpha = alphaBetaMove.Alpha then x else move
-                                             | White ->
-                                                 betaForNode <- chooseNewBeta betaForNode alphaBetaMove.Beta
-                                                 newBeta <- chooseNewBeta newBeta betaForNode
-                                                 move <- if newBeta = alphaBetaMove.Beta then x else move
+                match newAlpha.IsNone || newBeta.IsNone || newAlpha.Value < newBeta.Value with
+                | false -> loop alphaForNode betaForNode newAlpha newBeta move (moves |> List.tail)
+                | true ->
+                    let newBoard = uncheckedMoveSequence currentMove board
+                    let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alphaForNode betaForNode newBoard
 
-                                         ())
-                               moves
-
-        { Alpha = betaForNode; Beta = alphaForNode; Move = move }
+                    match player with
+                    | Black ->
+                        let (newAlphaForNode, newNewAlpha, newMove) = getNewValueAndMove chooseNewAlpha alphaForNode alphaBetaMove.Alpha newAlpha currentMove move
+                        loop newAlphaForNode betaForNode newNewAlpha newBeta newMove (moves |> List.tail)
+                    | White ->
+                        let (newBetaForNode, newNewBeta, newMove) = getNewValueAndMove chooseNewBeta betaForNode alphaBetaMove.Beta newBeta currentMove move
+                        loop alphaForNode newBetaForNode newAlpha newNewBeta newMove (moves |> List.tail)
+        loop None None alpha beta [] (calculateMoves player board)

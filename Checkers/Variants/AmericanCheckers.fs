@@ -3,14 +3,37 @@ open Checkers.Types
 open Checkers.Piece
 open Checkers.Board
 open Checkers.FSharpExtensions
-open System
-open System.Collections.Generic
 
 [<Literal>]
 let Rows = 7
     
 [<Literal>]
 let Columns = 7
+
+let PDNBoard =
+    [
+        [None; Some 1; None; Some 2; None; Some 3; None; Some 4];
+        [Some 5; None; Some 6; None; Some 7; None; Some 8; None];
+        [None; Some 9; None; Some 10; None; Some 11; None; Some 12];
+        [Some 13; None; Some 14; None; Some 15; None; Some 16; None];
+        [None; Some 17; None; Some 18; None; Some 19; None; Some 20];
+        [Some 21; None; Some 22; None; Some 23; None; Some 24; None];
+        [None; Some 25; None; Some 26; None; Some 27; None; Some 28];
+        [Some 29; None; Some 30; None; Some 31; None; Some 32; None];
+    ]
+
+let PDNBoardCoords =
+    [
+        {Row = -1; Column = -1};    // adjust for FEN's 1-based indexing
+        {Row = 0; Column = 1}; {Row = 0; Column = 3}; {Row = 0; Column = 5}; {Row = 0; Column = 7};
+        {Row = 1; Column = 0}; {Row = 1; Column = 2}; {Row = 1; Column = 4}; {Row = 1; Column = 6};
+        {Row = 2; Column = 1}; {Row = 2; Column = 3}; {Row = 2; Column = 5}; {Row = 2; Column = 7};
+        {Row = 3; Column = 0}; {Row = 3; Column = 2}; {Row = 3; Column = 4}; {Row = 3; Column = 6};
+        {Row = 4; Column = 1}; {Row = 4; Column = 3}; {Row = 4; Column = 5}; {Row = 4; Column = 7};
+        {Row = 5; Column = 0}; {Row = 5; Column = 2}; {Row = 5; Column = 4}; {Row = 5; Column = 6};
+        {Row = 6; Column = 1}; {Row = 6; Column = 3}; {Row = 6; Column = 5}; {Row = 6; Column = 7};
+        {Row = 7; Column = 0}; {Row = 7; Column = 2}; {Row = 7; Column = 4}; {Row = 7; Column = 6};
+    ]
 
 let internal kingRowIndex(player) =
     match player with
@@ -173,7 +196,7 @@ let internal hop startCoord endCoord (board :Board) =
     |> setPieceAt endCoord piece
 
 let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :Board) =
-    let lastMoveWasJump = Math.Abs(move.[0].Row - move.[1].Row) = 2
+    let lastMoveWasJump = abs(move.[0].Row - move.[1].Row) = 2
     let pieceWasPromoted = (square (List.last move) currentBoard).Value.PieceType = King &&
                             (square move.[0] originalBoard).Value.PieceType = Checker
 
@@ -185,7 +208,7 @@ let public isValidMove startCoord endCoord (board :Board) =
     coordExists endCoord &&
     moveIsDiagonal startCoord endCoord &&
     (square startCoord board).IsSome &&
-    match Math.Abs(startCoord.Row - endCoord.Row) with
+    match abs(startCoord.Row - endCoord.Row) with
     | 1 -> isValidHop startCoord endCoord board && not <| jumpAvailable (square startCoord board).Value.Player board
     | 2 -> isValidJump startCoord endCoord board
     | _ -> false
@@ -194,7 +217,7 @@ let public movePiece startCoord endCoord (board :Board) :Option<Board> =
     match isValidMove startCoord endCoord board with
     | false -> None
     | true ->
-        match Math.Abs(startCoord.Row - endCoord.Row) with
+        match abs(startCoord.Row - endCoord.Row) with
         | 1 -> Some <| hop startCoord endCoord board
         | 2 -> Some <| jump startCoord endCoord board
         | _ -> None
@@ -212,7 +235,7 @@ let rec public moveSequence (coordinates :Coord seq) (board :Option<Board>) =
         | _ -> movePiece coords.Head coords.[1] board.Value
 
 let internal uncheckedMovePiece startCoord endCoord (board :Board) =
-    match Math.Abs(startCoord.Row - endCoord.Row) with
+    match abs(startCoord.Row - endCoord.Row) with
     | 1 -> hop startCoord endCoord board
     | 2 -> jump startCoord endCoord board
 

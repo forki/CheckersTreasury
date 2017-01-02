@@ -2,7 +2,7 @@
 open Checkers.Board
 open Checkers.Variants.AmericanCheckers
 open Checkers.Types
-open System
+open Checkers.FSharpExtensions
 
 let checkerWeights =
     [[0.0; 3.20; 0.0; 3.20; 0.0; 3.20; 0.0; 3.10];
@@ -24,10 +24,6 @@ let kingWeights =
     [0.0; 1.05; 0.0; 1.05; 0.0; 1.10; 0.0; 1.05];
     [1.0; 0.0; 1.0; 0.0; 1.0; 0.0; 1.05; 0.0]]
 
-let isPlayerPiece player coord (board :Board) =
-    let piece = square coord board
-    piece.IsSome && player = piece.Value.Player
-
 let nextPoint coord =
     match coord with
     | c when c.Row = Rows && c.Column = Columns -> None
@@ -38,7 +34,7 @@ let calculateCheckerWeight coord (board :Board) =
     let piece = (square coord board).Value
     let kingRow = kingRowIndex piece.Player
 
-    let weight = 8.0 - (float <| Math.Abs(kingRow - coord.Row)) + (square coord checkerWeights)
+    let weight = 8.0 - (float <| abs(kingRow - coord.Row)) + (square coord checkerWeights)
     match piece.Player with
     | Black -> weight
     | White -> -weight
@@ -119,7 +115,7 @@ let getPieceSingleJumps coord (board :Board) =
 
     List.map (fun (item :Option<Move>) -> item.Value) (List.where (fun (item :Option<Move>) -> item.IsSome) hops)
 
-let rec createMoveTree (move :Move) (board :Board) =
+let rec internal createMoveTree (move :Move) (board :Board) =
     let moveTree =
         {
             Move = move;
@@ -165,15 +161,12 @@ let getPieceHops coord (board :Board) =
         | Checker -> checkerHops piece.Player
         | King -> kingHops piece.Player
 
-    let hops = List.ofSeq (seq {
-        for move in moves do
-        let endCoord = offset coord move
-        yield
-            match coordExists endCoord && isValidHop coord endCoord board with
-            | true -> Some [coord; endCoord]
-            | false -> None })
+    let hopsFilter = List.filter (fun (head::tail) ->
+        let startCoord = head
+        let endCoord = tail |> List.head
+        coordExists endCoord && isValidHop startCoord endCoord board)
 
-    List.map (fun (item :Option<Move>) -> item.Value) (List.where (fun (item :Option<Move>) -> item.IsSome) hops)
+    moves |> List.map (fun move -> [coord; offset coord move]) |> hopsFilter
 
 let calculateMoves player (board :Board) =
     let rec loop jumpAcc hopAcc coord =

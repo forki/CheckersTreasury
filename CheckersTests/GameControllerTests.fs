@@ -1,5 +1,4 @@
 ﻿module GameControllerTests
-
 open Checkers
 open Checkers.GameController
 open Checkers.Types
@@ -20,7 +19,7 @@ let ``Opponent cannot move when player turn not ended``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = None }
+    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
 
     Assert.False(isValidMove { Row = 1; Column = 1 } { Row = 3; Column = 3 } controller)
 
@@ -38,7 +37,7 @@ let ``Player cannot move two pieces in multijump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = Some { Row = 2; Column = 2 } }
+    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = Some { Row = 2; Column = 2 }; MoveHistory = [] }
 
     Assert.False(isValidMove { Row = 0; Column = 2 } { Row = 2; Column = 0 } controller)
 
@@ -56,6 +55,92 @@ let ``Player can move one piece in multijump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = Some { Row = 2; Column = 2 } }
+    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = Some { Row = 2; Column = 2 }; MoveHistory = [] }
 
     Assert.True(isValidMove { Row = 2; Column = 2 } { Row = 0; Column = 0 } controller)
+
+[<Fact>]
+let ``Moving records move history: black hop``() =
+    let controller = { Board = Board.defaultBoard; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
+    let newController = movePiece { Row = 2; Column = 1 } { Row = 3; Column = 0 } controller
+
+    Assert.Equal("1: 9-13", (List.last newController.Value.MoveHistory).DisplayString)
+
+[<Fact>]
+let ``Moving records move history: black jump``() =
+    let board =
+        [
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; Piece.whiteKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
+    let newController = movePiece { Row = 0; Column = 1 } { Row = 2; Column = 3 } controller
+
+    Assert.Equal("1: 1x10", (List.last newController.Value.MoveHistory).DisplayString)
+
+[<Fact>]
+let ``Moving records move history: white hop``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.blackKing; None; None; None; None];
+            [None; None; None; None; Piece.whiteKing; None; None; None];
+            [None; None; None; None; None; Piece.whiteKing; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let controller = { Board = board; CurrentPlayer = White; CurrentCoord = None; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; PreviousFen = ""; AfterFen = "" }; WhiteMove = None; DisplayString = "1x10"}] }
+    let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
+
+    Assert.Equal("1: 1x10, 15x6", (List.last newController.Value.MoveHistory).DisplayString)
+
+[<Fact>]
+let ``Create controller from FEN string``() =
+    let expectedBoard =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.blackKing; None; None; None; None];
+            [None; None; None; None; Piece.whiteKing; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+    let expectedPlayer = Player.White
+
+    let fenString = "[FEN \"W:WK15,19:BK10\"]"
+    let controller = controllerFromFEN fenString
+    
+    Assert.Equal(expectedPlayer, controller.CurrentPlayer)
+    Assert.Equal<Checkers.Board.Board>(expectedBoard, controller.Board)
+
+[<Fact>]
+let ``Create FEN from controller string``() =
+    let board =
+        [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.blackKing; None; None; None; None];
+            [None; None; None; None; Piece.whiteKing; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let controller = {Board = board; CurrentPlayer = Player.White; CurrentCoord = None; MoveHistory = []}
+
+    let expectedFENString = "[FEN \"W:WK15,19:BK10\"]"
+    
+    Assert.Equal(expectedFENString, (CreateFen Player.White board))

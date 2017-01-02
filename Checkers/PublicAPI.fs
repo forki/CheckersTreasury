@@ -15,36 +15,67 @@ let isValidMove startCoord endCoord gameController =
     | None -> true
     | coord -> startCoord = coord.Value
 
+let internal getGameHistory (currentGameHistory :PDNTurn List) player move startBoard endBoard =
+    let pdnMove = (List.map (fun item -> (square item PDNBoard).Value) move)
+    let newTurnValue =
+        match player with
+        | Black ->
+            let moveNumber = currentGameHistory.Length + 1
+            {
+                MoveNumber = moveNumber;
+                BlackMove = { Move = pdnMove; PreviousFen = (CreateFen player startBoard); AfterFen = (CreateFen player endBoard)};
+                WhiteMove = None;
+                DisplayString = moveNumber.ToString() + ": " + String.Join((if isJump move then "x" else "-"), pdnMove)
+            }
+        | White ->
+            let lastMovePDN = List.last currentGameHistory
+            let moveNumber = currentGameHistory.Length
+            {
+                MoveNumber = moveNumber;
+                BlackMove = lastMovePDN.BlackMove;
+                WhiteMove = Some { Move = pdnMove; PreviousFen = (CreateFen player startBoard); AfterFen = (CreateFen player endBoard)};
+                DisplayString = moveNumber.ToString() + ": " + lastMovePDN.DisplayString + ", " + String.Join((if isJump move then "x" else "-"), pdnMove)
+            }
+
+    match player with
+    | Black -> currentGameHistory @ [newTurnValue]
+    | White -> (List.take (currentGameHistory.Length - 1) currentGameHistory) @ [newTurnValue]
+
 let movePiece startCoord endCoord gameController :Option<GameController> =
     let board = movePiece startCoord endCoord gameController.Board
 
-    match (isValidMove startCoord endCoord gameController) with
-    | true -> Some <|
-                {
-                    Board = board.Value;
-                    CurrentPlayer = match playerTurnEnds [startCoord; endCoord] gameController.Board board.Value with
-                                    | true -> otherPlayer gameController.CurrentPlayer
-                                    | false -> gameController.CurrentPlayer        
-                    CurrentCoord = match playerTurnEnds [startCoord; endCoord] gameController.Board board.Value with
-                                   | true -> None
-                                   | false -> Some endCoord
-                }
-    | false -> None
+    match board with
+    | None -> None
+    | Some b ->
+        Some <|
+            {
+                Board = b;
+                CurrentPlayer = match playerTurnEnds [startCoord; endCoord] gameController.Board b with
+                                | true -> otherPlayer gameController.CurrentPlayer
+                                | false -> gameController.CurrentPlayer        
+                CurrentCoord = match playerTurnEnds [startCoord; endCoord] gameController.Board b with
+                                | true -> None
+                                | false -> Some endCoord
+                MoveHistory = getGameHistory gameController.MoveHistory gameController.CurrentPlayer [startCoord; endCoord] gameController.Board b
+            }
 
 let move (move :Coord seq) (gameController) :Option<GameController> =
     let board = moveSequence move (Some gameController.Board)
+    let moveAsList = (List.ofSeq move)
     match board with
-    | Some b -> Some <|
-                {
-                    Board = board.Value;
-                    CurrentPlayer = match playerTurnEnds (List.ofSeq move) gameController.Board board.Value with
-                                    | true -> otherPlayer gameController.CurrentPlayer
-                                    | false -> gameController.CurrentPlayer        
-                    CurrentCoord = match playerTurnEnds (List.ofSeq move) gameController.Board board.Value with
-                                   | true -> None
-                                   | false -> Some (Seq.last move)
-                }
     | None -> None
+    | Some b ->
+        Some <|
+            {
+                Board = b;
+                CurrentPlayer = match playerTurnEnds moveAsList gameController.Board b with
+                                | true -> otherPlayer gameController.CurrentPlayer
+                                | false -> gameController.CurrentPlayer        
+                CurrentCoord = match playerTurnEnds moveAsList gameController.Board b with
+                                | true -> None
+                                | false -> Some (Seq.last move)
+                MoveHistory = getGameHistory gameController.MoveHistory gameController.CurrentPlayer moveAsList gameController.Board b
+            }
 
 let getMove searchDepth gameController =
     (minimax gameController.CurrentPlayer searchDepth None None gameController.Board).Move
