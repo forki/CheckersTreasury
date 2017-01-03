@@ -19,7 +19,7 @@ let isValidMove startCoord endCoord gameController =
 let internal getDisplayString (pdnTurn :int List) (move :Move) =
     String.Join((if isJump move then "x" else "-"), pdnTurn)
 
-let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinuedMove move board =
+let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinuedMove isMoveEnding move board =
     let pdnMove = (List.map (fun item -> (square item PDNBoard).Value) move)
 
     let newTurnValue =
@@ -28,7 +28,7 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinue
             let moveNumber = currentGameHistory.Length + 1
             {
                 MoveNumber = moveNumber;
-                BlackMove = { Move = pdnMove; ResultingFen = (createFen player board); DisplayString = getDisplayString pdnMove move };
+                BlackMove = { Move = pdnMove; ResultingFen = (createFen (otherPlayer player) board); DisplayString = getDisplayString pdnMove move };
                 WhiteMove = None;
             }
         | White, false ->
@@ -37,14 +37,14 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinue
             {
                 MoveNumber = moveNumber;
                 BlackMove = lastMovePDN.BlackMove;
-                WhiteMove = Some { Move = pdnMove; ResultingFen = (createFen player board); DisplayString = getDisplayString pdnMove move };
+                WhiteMove = Some { Move = pdnMove; ResultingFen = (createFen (otherPlayer player) board); DisplayString = getDisplayString pdnMove move };
             }
         | Black, true ->
             let lastMovePDN = List.last currentGameHistory
             let newPDNMove = lastMovePDN.BlackMove.Move @ pdnMove.Tail
             {
                 MoveNumber = lastMovePDN.MoveNumber;
-                BlackMove = { Move = newPDNMove; ResultingFen = (createFen player board); DisplayString = getDisplayString newPDNMove move };
+                BlackMove = { Move = newPDNMove; ResultingFen = (createFen (if isMoveEnding then (otherPlayer player) else player) board); DisplayString = getDisplayString newPDNMove move };
                 WhiteMove = None;
             }
         | White, true ->
@@ -53,7 +53,7 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinue
             {
                 MoveNumber = lastMovePDN.MoveNumber;
                 BlackMove = lastMovePDN.BlackMove;
-                WhiteMove = Some { Move = newPDNMove; ResultingFen = (createFen player board); DisplayString = getDisplayString newPDNMove move };
+                WhiteMove = Some { Move = newPDNMove; ResultingFen = (createFen (if isMoveEnding then (otherPlayer player) else player) board); DisplayString = getDisplayString newPDNMove move };
             }
 
     match player, isContinuedMove with
@@ -66,16 +66,15 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
     match board with
     | None -> None
     | Some b ->
+        let isTurnEnding = playerTurnEnds [startCoord; endCoord] gameController.Board b
         Some <|
             {
                 Board = b;
                 CurrentPlayer = match playerTurnEnds [startCoord; endCoord] gameController.Board b with
                                 | true -> otherPlayer gameController.CurrentPlayer
-                                | false -> gameController.CurrentPlayer        
-                CurrentCoord = match playerTurnEnds [startCoord; endCoord] gameController.Board b with
-                                | true -> None
-                                | false -> Some endCoord
-                MoveHistory = getGameHistory gameController.MoveHistory gameController.CurrentPlayer (gameController.CurrentCoord <> None) [startCoord; endCoord] b
+                                | false -> gameController.CurrentPlayer
+                CurrentCoord = if isTurnEnding then None else Some endCoord
+                MoveHistory = getGameHistory gameController.MoveHistory gameController.CurrentPlayer (gameController.CurrentCoord <> None) isTurnEnding [startCoord; endCoord] b
             }
 
 let move (move :Coord seq) (gameController) :Option<GameController> =
@@ -84,16 +83,15 @@ let move (move :Coord seq) (gameController) :Option<GameController> =
     match board with
     | None -> None
     | Some b ->
+        let isTurnEnding = playerTurnEnds moveAsList gameController.Board b
         Some <|
             {
                 Board = b;
                 CurrentPlayer = match playerTurnEnds moveAsList gameController.Board b with
                                 | true -> otherPlayer gameController.CurrentPlayer
-                                | false -> gameController.CurrentPlayer        
-                CurrentCoord = match playerTurnEnds moveAsList gameController.Board b with
-                                | true -> None
-                                | false -> Some (Seq.last move)
-                MoveHistory = getGameHistory gameController.MoveHistory gameController.CurrentPlayer (gameController.CurrentCoord <> None) moveAsList b
+                                | false -> gameController.CurrentPlayer
+                CurrentCoord = if isTurnEnding then None else Some (Seq.last move)
+                MoveHistory = getGameHistory gameController.MoveHistory gameController.CurrentPlayer (gameController.CurrentCoord <> None) isTurnEnding moveAsList b
             }
 
 let getMove searchDepth gameController =
@@ -117,7 +115,7 @@ let takeBackMove gameController =
                 let newLastMove = {lastMove with WhiteMove = None}
                 List.truncate (gameController.MoveHistory.Length - 1) gameController.MoveHistory @ [newLastMove]
 
-    {(controllerFromFen fen) with MoveHistory = newMoveHistory; CurrentPlayer = (otherPlayer gameController.CurrentPlayer)}
+    {(controllerFromFen fen) with MoveHistory = newMoveHistory}
 
 let isWon controller =
     isWon controller.Board
