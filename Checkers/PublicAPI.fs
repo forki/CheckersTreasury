@@ -6,6 +6,7 @@ open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
 open Checkers.Minimax
 open Checkers.GameController
+open Checkers.PortableDraughtsNotation
 open System
 
 let isValidMove startCoord endCoord gameController =

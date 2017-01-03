@@ -1,6 +1,7 @@
 ﻿module GameControllerTests
 open Checkers
 open Checkers.GameController
+open Checkers.PortableDraughtsNotation
 open Checkers.Types
 open Checkers.PublicAPI
 open Xunit
@@ -141,10 +142,7 @@ let ``Create FEN from controller string``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = {Board = board; CurrentPlayer = Player.White; CurrentCoord = None; MoveHistory = []}
-
     let expectedFENString = "[FEN \"W:WK15,19:BK10\"]"
-    
     Assert.Equal(expectedFENString, (createFen Player.White board))
 
 [<Fact>]
