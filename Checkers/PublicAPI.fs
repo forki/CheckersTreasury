@@ -41,7 +41,7 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinue
             }
         | Black, true ->
             let lastMovePDN = List.last currentGameHistory
-            let newPDNMove = lastMovePDN.BlackMove.Move @ pdnMove
+            let newPDNMove = lastMovePDN.BlackMove.Move @ pdnMove.Tail
             {
                 MoveNumber = lastMovePDN.MoveNumber;
                 BlackMove = { Move = newPDNMove; ResultingFen = (createFen player board); DisplayString = getDisplayString newPDNMove move };
@@ -49,16 +49,16 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinue
             }
         | White, true ->
             let lastMovePDN = List.last currentGameHistory
-            let newPDNMove = lastMovePDN.WhiteMove.Value.Move @ pdnMove
+            let newPDNMove = lastMovePDN.WhiteMove.Value.Move @ pdnMove.Tail
             {
                 MoveNumber = lastMovePDN.MoveNumber;
                 BlackMove = lastMovePDN.BlackMove;
                 WhiteMove = Some { Move = newPDNMove; ResultingFen = (createFen player board); DisplayString = getDisplayString newPDNMove move };
             }
 
-    match player with
-    | Black -> currentGameHistory @ [newTurnValue]
-    | White -> (List.take (currentGameHistory.Length - 1) currentGameHistory) @ [newTurnValue]
+    match player, isContinuedMove with
+    | Black, false -> currentGameHistory @ [newTurnValue]
+    | _ -> (List.take (currentGameHistory.Length - 1) currentGameHistory) @ [newTurnValue]
 
 let movePiece startCoord endCoord gameController :Option<GameController> =
     let board = movePiece startCoord endCoord gameController.Board
@@ -117,7 +117,7 @@ let takeBackMove gameController =
                 let newLastMove = {lastMove with WhiteMove = None}
                 List.truncate (gameController.MoveHistory.Length - 1) gameController.MoveHistory @ [newLastMove]
 
-    {(controllerFromFen fen) with MoveHistory = newMoveHistory}
+    {(controllerFromFen fen) with MoveHistory = newMoveHistory; CurrentPlayer = (otherPlayer gameController.CurrentPlayer)}
 
 let isWon controller =
     isWon controller.Board
