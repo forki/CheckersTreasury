@@ -24,7 +24,7 @@ let internal getPieceNotation (fenSections :string[]) (playerSymbol :char) =
          .Remove(0, 1)
          .Split(',')
 
-let controllerFromFEN (fen :string) =
+let controllerFromFen (fen :string) =
     let board = Board.emptyBoard
 
     let fenValue = fen.Split('"').[1]
