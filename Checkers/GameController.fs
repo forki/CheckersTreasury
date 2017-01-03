@@ -25,7 +25,7 @@ let internal getPieceNotation (fenSections :string[]) (playerSymbol :char) =
          .Split(',')
 
 let controllerFromFen (fen :string) =
-    let board = Board.emptyBoard
+    let board = Board.emptyBoard()
 
     let fenValue = fen.Split('"').[1]
     let fenSubsections = fenValue.Split(':')
@@ -60,7 +60,7 @@ let controllerFromFen (fen :string) =
 
     {Board = (listFromSeq ((Seq.map (fun (row :Generic.List<Option<Piece>>) -> row.AsEnumerable()) board).AsEnumerable())); CurrentPlayer = playerTurn; CurrentCoord = None; MoveHistory = []}
 
-let CreateFen player (board :Board) =
+let createFen player (board :Board) =
     let turnSymbol =
         match player with
         | White -> WhiteSymbol

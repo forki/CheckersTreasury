@@ -23,7 +23,7 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player move start
             let moveNumber = currentGameHistory.Length + 1
             {
                 MoveNumber = moveNumber;
-                BlackMove = { Move = pdnMove; ResultingFen = (CreateFen player endBoard)};
+                BlackMove = { Move = pdnMove; ResultingFen = (createFen player endBoard)};
                 WhiteMove = None;
                 DisplayString = moveNumber.ToString() + ": " + String.Join((if isJump move then "x" else "-"), pdnMove)
             }
@@ -33,7 +33,7 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player move start
             {
                 MoveNumber = moveNumber;
                 BlackMove = lastMovePDN.BlackMove;
-                WhiteMove = Some { Move = pdnMove; ResultingFen = (CreateFen player endBoard)};
+                WhiteMove = Some { Move = pdnMove; ResultingFen = (createFen player endBoard)};
                 DisplayString = moveNumber.ToString() + ": " + lastMovePDN.DisplayString + ", " + String.Join((if isJump move then "x" else "-"), pdnMove)
             }
 
