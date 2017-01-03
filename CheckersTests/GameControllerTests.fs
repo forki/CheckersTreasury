@@ -64,7 +64,7 @@ let ``Moving records move history: black hop``() =
     let controller = { Board = Board.defaultBoard; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
     let newController = movePiece { Row = 2; Column = 1 } { Row = 3; Column = 0 } controller
 
-    Assert.Equal("1: 9-13", (List.last newController.Value.MoveHistory).DisplayString)
+    Assert.Equal("9-13", (List.last newController.Value.MoveHistory).BlackMove.DisplayString)
 
 [<Fact>]
 let ``Moving records move history: black jump``() =
@@ -83,7 +83,7 @@ let ``Moving records move history: black jump``() =
     let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
     let newController = movePiece { Row = 0; Column = 1 } { Row = 2; Column = 3 } controller
 
-    Assert.Equal("1: 1x10", (List.last newController.Value.MoveHistory).DisplayString)
+    Assert.Equal("1x10", (List.last newController.Value.MoveHistory).BlackMove.DisplayString)
 
 [<Fact>]
 let ``Moving records move history: white hop``() =
@@ -99,10 +99,12 @@ let ``Moving records move history: white hop``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = White; CurrentCoord = None; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; ResultingFen = "" }; WhiteMove = None; DisplayString = "1x10"}] }
+    let controller = { Board = board; CurrentPlayer = White; CurrentCoord = None; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; ResultingFen = ""; DisplayString = "1x10" }; WhiteMove = None }] }
     let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
+    let lastMove = (List.last newController.Value.MoveHistory)
 
-    Assert.Equal("1: 1x10, 15x6", (List.last newController.Value.MoveHistory).DisplayString)
+    Assert.Equal("1x10", lastMove.BlackMove.DisplayString)
+    Assert.Equal("15x6", lastMove.WhiteMove.Value.DisplayString)
 
 [<Fact>]
 let ``Create controller from FEN string``() =

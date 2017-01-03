@@ -15,46 +15,45 @@ let isValidMove startCoord endCoord gameController =
     | None -> true
     | coord -> startCoord = coord.Value
 
+let internal getDisplayString (pdnTurn :int List) (move :Move) =
+    String.Join((if isJump move then "x" else "-"), pdnTurn)
+
 let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinuedMove move board =
     let pdnMove = (List.map (fun item -> (square item PDNBoard).Value) move)
+
     let newTurnValue =
         match player, isContinuedMove with
-        | Black, true ->
+        | Black, false ->
             let moveNumber = currentGameHistory.Length + 1
             {
                 MoveNumber = moveNumber;
-                BlackMove = { Move = pdnMove; ResultingFen = (createFen player board)};
+                BlackMove = { Move = pdnMove; ResultingFen = (createFen player board); DisplayString = getDisplayString pdnMove move };
                 WhiteMove = None;
-                DisplayString = moveNumber.ToString() + ": " + String.Join((if isJump move then "x" else "-"), pdnMove)
             }
-        | White, true ->
+        | White, false ->
             let lastMovePDN = List.last currentGameHistory
             let moveNumber = currentGameHistory.Length
             {
                 MoveNumber = moveNumber;
                 BlackMove = lastMovePDN.BlackMove;
-                WhiteMove = Some { Move = pdnMove; ResultingFen = (createFen player board)};
-                DisplayString = moveNumber.ToString() + ": " + lastMovePDN.DisplayString + ", " + String.Join((if isJump move then "x" else "-"), pdnMove)
+                WhiteMove = Some { Move = pdnMove; ResultingFen = (createFen player board); DisplayString = getDisplayString pdnMove move };
             }
-        | Black, false ->
+        | Black, true ->
             let lastMovePDN = List.last currentGameHistory
             let newPDNMove = lastMovePDN.BlackMove.Move @ pdnMove
             {
                 MoveNumber = lastMovePDN.MoveNumber;
-                BlackMove = { Move = newPDNMove; ResultingFen = (createFen player board)};
+                BlackMove = { Move = newPDNMove; ResultingFen = (createFen player board); DisplayString = getDisplayString newPDNMove move };
                 WhiteMove = None;
-                DisplayString = lastMovePDN.MoveNumber.ToString() + ": " + String.Join((if isJump move then "x" else "-"), newPDNMove)
             }
-        | White, false ->
+        | White, true ->
             let lastMovePDN = List.last currentGameHistory
             let newPDNMove = lastMovePDN.WhiteMove.Value.Move @ pdnMove
             {
                 MoveNumber = lastMovePDN.MoveNumber;
                 BlackMove = lastMovePDN.BlackMove;
-                WhiteMove = Some { Move = newPDNMove; ResultingFen = (createFen player board)};
-                DisplayString = lastMovePDN.MoveNumber.ToString() + ": " + lastMovePDN.DisplayString.Split(',').[0] + ", " + String.Join((if isJump move then "x" else "-"), newPDNMove)
+                WhiteMove = Some { Move = newPDNMove; ResultingFen = (createFen player board); DisplayString = getDisplayString newPDNMove move };
             }
-            
 
     match player with
     | Black -> currentGameHistory @ [newTurnValue]
@@ -114,7 +113,7 @@ let takeBackMove gameController =
             | [] -> []
             | _ ->
                 let lastMove = (List.last gameController.MoveHistory)
-                let newLastMove = {lastMove with WhiteMove = None; DisplayString = lastMove.DisplayString.Split(',').[0]}
+                let newLastMove = {lastMove with WhiteMove = None}
                 List.truncate (gameController.MoveHistory.Length - 1) gameController.MoveHistory @ [newLastMove]
 
     {(controllerFromFen fen) with MoveHistory = newMoveHistory}
