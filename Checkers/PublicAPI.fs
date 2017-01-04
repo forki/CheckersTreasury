@@ -119,3 +119,6 @@ let takeBackMove gameController =
 
 let isWon controller =
     isWon controller.Board
+
+let getPdnCoord pdnNumber =
+    PDNBoardCoords.[pdnNumber]
