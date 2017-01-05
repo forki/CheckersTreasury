@@ -109,6 +109,7 @@
     <Compile Include="AmericanCheckersTests.fs" />
     <Compile Include="AmericanCheckersAITests.fs" />
     <Compile Include="GameControllerTests.fs" />
+    <Compile Include="PortableDraughtsNotationTests.fs" />
     <Compile Include="MinimaxTests.fs" />
     <None Include="Script.fsx" />
     <Content Include="packages.config" />

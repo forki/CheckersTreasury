@@ -32,7 +32,16 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinue
                 WhiteMove = None;
             }
         | White, false ->
-            let lastMovePDN = List.last currentGameHistory
+            let lastMovePDN =
+                match currentGameHistory with
+                | [] ->
+                    {
+                        MoveNumber = 0;
+                        BlackMove = {Move = []; ResultingFen = (createFen player board); DisplayString = "…"}
+                        WhiteMove = None
+                    }
+                | _ -> (List.last currentGameHistory)
+
             let moveNumber = currentGameHistory.Length
             {
                 MoveNumber = moveNumber;
@@ -58,7 +67,10 @@ let internal getGameHistory (currentGameHistory :PDNTurn List) player isContinue
 
     match player, isContinuedMove with
     | Black, false -> currentGameHistory @ [newTurnValue]
-    | _ -> (List.take (currentGameHistory.Length - 1) currentGameHistory) @ [newTurnValue]
+    | _ ->
+        match currentGameHistory with
+        | [] -> [newTurnValue]
+        | _ -> (List.take (currentGameHistory.Length - 1) currentGameHistory) @ [newTurnValue]
 
 let movePiece startCoord endCoord gameController :Option<GameController> =
     let board = movePiece startCoord endCoord gameController.Board

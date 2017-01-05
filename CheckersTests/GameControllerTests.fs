@@ -108,44 +108,6 @@ let ``Moving records move history: white hop``() =
     Assert.Equal("15x6", lastMove.WhiteMove.Value.DisplayString)
 
 [<Fact>]
-let ``Create controller from FEN string``() =
-    let expectedBoard =
-        [
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; Piece.blackKing; None; None; None; None];
-            [None; None; None; None; Piece.whiteKing; None; None; None];
-            [None; None; None; None; None; Piece.whiteChecker; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-        ];
-    let expectedPlayer = Player.White
-
-    let fenString = "[FEN \"W:WK15,19:BK10\"]"
-    let controller = controllerFromFen fenString
-    
-    Assert.Equal(expectedPlayer, controller.CurrentPlayer)
-    Assert.Equal<Checkers.Board.Board>(expectedBoard, controller.Board)
-
-[<Fact>]
-let ``Create FEN from controller string``() =
-    let board =
-        [
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; Piece.blackKing; None; None; None; None];
-            [None; None; None; None; Piece.whiteKing; None; None; None];
-            [None; None; None; None; None; Piece.whiteChecker; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-        ];
-
-    let expectedFENString = "[FEN \"W:WK15,19:BK10\"]"
-    Assert.Equal(expectedFENString, (createFen Player.White board))
-
-[<Fact>]
 let ``Takeback black's move``() =
     let doMove moveSeq gameController =
         (move moveSeq gameController).Value

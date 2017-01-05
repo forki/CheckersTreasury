@@ -58,7 +58,12 @@ let controllerFromFen (fen :string) =
     loop (List.ofArray whitePieces) Player.White
     loop (List.ofArray blackPieces) Player.Black
 
-    {Board = (nestedListFromSeq ((Seq.map (fun (row :Generic.List<Option<Piece>>) -> row.AsEnumerable()) board).AsEnumerable())); CurrentPlayer = playerTurn; CurrentCoord = None; MoveHistory = []}
+    {
+        Board = (nestedListFromSeq ((Seq.map (fun (row :Generic.List<Option<Piece>>) -> row.AsEnumerable()) board).AsEnumerable()));
+        CurrentPlayer = playerTurn;
+        CurrentCoord = None;
+        MoveHistory = []
+    }
 
 let createFen player (board :Board) =
     let turnSymbol =
