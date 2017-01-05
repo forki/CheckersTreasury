@@ -178,10 +178,13 @@ let internal jump startCoord endCoord (board :Board) =
 
     let jumpedCoord = getJumpedCoord startCoord endCoord
 
-    board
-    |> setPieceAt startCoord None
-    |> setPieceAt endCoord piece
-    |> setPieceAt jumpedCoord None
+    let seqBoard = nestedSystemListFromFSList board
+
+    seqBoard.[startCoord.Row].[startCoord.Column] <- None
+    seqBoard.[endCoord.Row].[endCoord.Column] <- piece
+    seqBoard.[jumpedCoord.Row].[jumpedCoord.Column] <- None
+
+    List.ofSeq (Seq.choose listFromSeq seqBoard)
 
 let internal hop startCoord endCoord (board :Board) =
     let kingRowIndex = kingRowIndex (square startCoord board).Value.Player
@@ -190,10 +193,13 @@ let internal hop startCoord endCoord (board :Board) =
         match endCoord.Row with
         | row when row = kingRowIndex -> Some <| Promote (square startCoord board).Value
         | _ -> (square startCoord board)
-            
-    board
-    |> setPieceAt startCoord None
-    |> setPieceAt endCoord piece
+
+    let seqBoard = nestedSystemListFromFSList board
+
+    seqBoard.[startCoord.Row].[startCoord.Column] <- None
+    seqBoard.[endCoord.Row].[endCoord.Column] <- piece
+    
+    List.ofSeq (Seq.choose listFromSeq seqBoard)
 
 let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :Board) =
     let lastMoveWasJump = abs(move.[0].Row - move.[1].Row) = 2
