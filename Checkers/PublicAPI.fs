@@ -107,7 +107,7 @@ let move (move :Coord seq) (gameController) :Option<GameController> =
             }
 
 let getMove searchDepth gameController =
-    (minimax gameController.CurrentPlayer searchDepth None None gameController.Board).Move
+    (minimax gameController.CurrentPlayer searchDepth searchDepth None None gameController.Board).Move
 
 let takeBackMove gameController =
     let fen =

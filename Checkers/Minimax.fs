@@ -42,8 +42,8 @@ let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
     | (None, Some candidate) -> Some candidate
     | _ -> None
 
-let rec minimax player searchDepth alpha beta (board :Board) =
-    match searchDepth = 0 || (isWon board).IsSome with
+let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) =
+    match currentSearchDepth = 0 || (isWon board).IsSome with
     | true ->
         let weightDifference = Some <| calculateWeightDifference board
         let newAlpha = 
@@ -75,7 +75,7 @@ let rec minimax player searchDepth alpha beta (board :Board) =
                 | true ->
                     let newBoard = uncheckedMoveSequence currentMove board
 
-                    let alphaBetaMove = minimax (otherPlayer player) (searchDepth - 1) alphaForNode betaForNode newBoard
+                    let alphaBetaMove = minimax (otherPlayer player) (currentSearchDepth - 1) searchDepth alphaForNode betaForNode newBoard
 
                     match player with
                     | Black ->
@@ -85,4 +85,7 @@ let rec minimax player searchDepth alpha beta (board :Board) =
                         let (newBetaForNode, newNewBeta, newMove) = getNewValueAndMove chooseNewBeta betaForNode alphaBetaMove.Beta newBeta currentMove move
                         loop alphaForNode newBetaForNode newAlpha newNewBeta newMove (moves |> List.tail)
 
-        loop None None alpha beta [] (calculateMoves player board)
+        let potentialMoves = (calculateMoves player board)
+        match potentialMoves.Length, currentSearchDepth = searchDepth with
+        | 1, true -> {Alpha = None; Beta = None; Move = potentialMoves.[0]}
+        | _ -> loop None None alpha beta [] potentialMoves
