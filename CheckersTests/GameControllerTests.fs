@@ -9,7 +9,7 @@ open Xunit
 [<Fact>]
 let ``Opponent cannot move when player turn not ended``() =
     let board =
-        [
+        array2D [
             [None; None; None; None; None; None; None; None];
             [None; Piece.whiteKing; None; None; None; None; None; None];
             [None; None; Piece.blackKing; None; None; None; None; None];
@@ -27,7 +27,7 @@ let ``Opponent cannot move when player turn not ended``() =
 [<Fact>]
 let ``Player cannot move two pieces in multijump``() =
     let board =
-        [
+        array2D [
             [None; None; Piece.blackKing; None; None; None; None; None];
             [None; Piece.whiteKing; None; None; None; None; None; None];
             [None; None; Piece.blackKing; None; None; None; None; None];
@@ -45,7 +45,7 @@ let ``Player cannot move two pieces in multijump``() =
 [<Fact>]
 let ``Player can move one piece in multijump``() =
     let board =
-        [
+        array2D [
             [None; None; Piece.blackKing; None; None; None; None; None];
             [None; Piece.whiteKing; None; None; None; None; None; None];
             [None; None; Piece.blackKing; None; None; None; None; None];
@@ -70,7 +70,7 @@ let ``Moving records move history: black hop``() =
 [<Fact>]
 let ``Moving records move history: black jump``() =
     let board =
-        [
+        array2D [
             [None; Piece.blackKing; None; None; None; None; None; None];
             [None; None; Piece.whiteKing; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
@@ -89,7 +89,7 @@ let ``Moving records move history: black jump``() =
 [<Fact>]
 let ``Moving records move history: white hop``() =
     let board =
-        [
+        array2D [
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; Piece.blackKing; None; None; None; None];

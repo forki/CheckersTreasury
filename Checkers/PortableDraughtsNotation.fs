@@ -46,7 +46,7 @@ let controllerFromFen (fen :string) =
             | false -> System.Int32.Parse(head)
 
         let boardCoord = PDNBoardCoords.[fenNumber]
-        board.[boardCoord.Row].[boardCoord.Column] <-
+        board.[boardCoord.Row, boardCoord.Column] <-
             match (player, isKing) with
             | (White, true) -> Piece.whiteKing
             | (White, false) -> Piece.whiteChecker
@@ -59,7 +59,7 @@ let controllerFromFen (fen :string) =
     loop (List.ofArray blackPieces) Player.Black
 
     {
-        Board = (nestedListFromSeq ((Seq.map (fun (row :Generic.List<Option<Piece>>) -> row.AsEnumerable()) board).AsEnumerable()));
+        Board = board;
         CurrentPlayer = playerTurn;
         CurrentCoord = None;
         MoveHistory = []

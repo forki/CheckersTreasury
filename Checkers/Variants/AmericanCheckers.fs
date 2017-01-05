@@ -11,7 +11,7 @@ let Rows = 7
 let Columns = 7
 
 let PDNBoard =
-    [
+    array2D [
         [None; Some 1; None; Some 2; None; Some 3; None; Some 4];
         [Some 5; None; Some 6; None; Some 7; None; Some 8; None];
         [None; Some 9; None; Some 10; None; Some 11; None; Some 12];
@@ -124,7 +124,7 @@ let internal hasValidJump startCoord (board :Board) =
 
 let internal jumpAvailable player (board :Board) =
     let pieceHasJump row column =
-        let piece = board.[row].[column]
+        let piece = board.[row, column]
         piece.IsSome && piece.Value.Player = player && hasValidJump { Row = row; Column = column } board
 
     let flattenedList = seq {
@@ -136,7 +136,7 @@ let internal jumpAvailable player (board :Board) =
 
 let internal moveAvailable (board :Board) player =
     let pieceHasMove row column =
-        let piece = board.[row].[column]
+        let piece = board.[row, column]
         piece.IsSome &&
         piece.Value.Player = player &&
         (hasValidJump { Row = row; Column = column } board || hasValidHop { Row = row; Column = column } board)
@@ -155,18 +155,10 @@ let isWon (board :Board) =
     | _ -> None
 
 let internal setPieceAt coord piece (board :Board) =
-    let boardItems = List.init (Rows + 1) (fun row ->
-        match row with
-        | i when i = coord.Row ->
-            List.init (Columns + 1) (fun col ->
-                match col with
-                | j when j = coord.Column -> piece
-                | _ -> board.[row].[col]
-            )
-        | _ -> board.[row]
-    )
-
-    boardItems
+    let newBoard = Array2D.copy board
+    
+    newBoard.[coord.Row, coord.Column] <- piece
+    newBoard
 
 let internal jump startCoord endCoord (board :Board) =
     let kingRowIndex = kingRowIndex((square startCoord board).Value.Player)

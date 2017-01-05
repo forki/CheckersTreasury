@@ -9,7 +9,7 @@ open Xunit
 [<Fact>]
 let ``Create controller from FEN string``() =
     let expectedBoard =
-        [
+        array2D [
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; Piece.blackKing; None; None; None; None];
@@ -25,12 +25,12 @@ let ``Create controller from FEN string``() =
     let controller = controllerFromFen fenString
     
     Assert.Equal(expectedPlayer, controller.CurrentPlayer)
-    Assert.Equal<Checkers.Board.Board>(expectedBoard, controller.Board)
+    Assert.Equal(expectedBoard, controller.Board)
 
 [<Fact>]
 let ``Create FEN from controller string``() =
     let board =
-        [
+        array2D [
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; Piece.blackKing; None; None; None; None];

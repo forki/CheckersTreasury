@@ -13,7 +13,7 @@ let ``Calculate moves returns correct number of hops``() =
 [<Fact>]
 let ``Calculate moves returns correct number of jumps``() =
     let board =
-        [
+        array2D [
             [Piece.blackChecker; None; None; None; None; None; None; None];
             [None; Piece.whiteChecker; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
@@ -30,7 +30,7 @@ let ``Calculate moves returns correct number of jumps``() =
 [<Fact>]
 let ``Calculate moves prefers jumps to hops``() =
     let board =
-        [
+        array2D [
             [None; None; Piece.blackChecker; None; None; None; None; None];
             [None; Piece.whiteChecker; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
@@ -47,7 +47,7 @@ let ``Calculate moves prefers jumps to hops``() =
 [<Fact>]
 let ``Calculate moves prefers jumps to hops 1``() =
     let board =
-        [
+        array2D [
             [None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker];
             [Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
             [None; Piece.blackChecker; None; None; None; None; None; Piece.blackChecker];
@@ -64,7 +64,7 @@ let ``Calculate moves prefers jumps to hops 1``() =
 [<Fact>]
 let ``Calculate moves returns multi double jump``() =
     let board =
-        [
+        array2D [
             [Piece.blackChecker; None; None; None; None; None; None; None];
             [None; Piece.whiteChecker; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];

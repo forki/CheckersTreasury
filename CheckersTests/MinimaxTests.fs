@@ -27,7 +27,7 @@ let ``chooseNewBeta picks some value``() =
 [<Fact>]
 let ``AI forces win``() =
     let board =
-        [
+        array2D [
             [None; None; None; None; None; None; None; Piece.blackKing];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
@@ -44,7 +44,7 @@ let ``AI forces win``() =
 [<Fact>]
 let ``AI forces win 1``() =
     let board =
-        [
+        array2D [
             [None; None; None; None; None; Piece.blackKing; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
@@ -61,7 +61,7 @@ let ``AI forces win 1``() =
 [<Fact>]
 let ``AI prefers double jump to single jump``() =
     let board =
-        [
+        array2D [
             [None; None; None; None; None; None; None; None];
             [None; None; None; Piece.blackKing; None; None; None; None];
             [None; None; Piece.whiteKing; None; Piece.whiteKing; None; None; None];
@@ -78,7 +78,7 @@ let ``AI prefers double jump to single jump``() =
 [<Fact>]
 let ``AI should not give free double jump``() =
     let board =
-        [
+        array2D [
             [None; None; None; None; None; None; None; Piece.blackChecker];
             [Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
             [None; Piece.blackChecker; None; Piece.blackChecker; None; None; None; Piece.blackChecker];
@@ -95,7 +95,7 @@ let ``AI should not give free double jump``() =
 [<Fact>]
 let ``AI should not give free single jump``() =
     let board =
-        [
+        array2D [
             [None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker];
             [None; None; Piece.blackChecker; None; Piece.blackChecker; None; Piece.blackChecker; None];
             [None; None; None; None; None; Piece.blackChecker; None; Piece.blackChecker];
