@@ -20,7 +20,7 @@ let internal getPieceNotation (fenSections :string[]) (playerSymbol :char) =
      | c when c = playerSymbol -> fenSections.[1]
      | _ -> fenSections.[2])
          .Remove(0, 1)
-         .Split(',')
+         .Split([|','|], StringSplitOptions.RemoveEmptyEntries)
 
 let controllerFromFen (fen :string) =
     let board = Board.emptyBoardList()
@@ -53,8 +53,8 @@ let controllerFromFen (fen :string) =
         
         if not tail.IsEmpty then loop tail player
 
-    loop (List.ofArray whitePieces) Player.White
-    loop (List.ofArray blackPieces) Player.Black
+    if whitePieces.Length > 0 then loop (List.ofArray whitePieces) Player.White
+    if blackPieces.Length > 0 then loop (List.ofArray blackPieces) Player.Black
 
     {
         Board = board;

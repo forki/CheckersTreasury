@@ -56,3 +56,24 @@ let ``Create controller from FEN string: white move does not crash``() =
     
     Assert.Equal("…", move.BlackMove.DisplayString)
     Assert.Equal("24-20", move.WhiteMove.Value.DisplayString)
+
+[<Fact>]
+let ``Create controller from FEN string: won position``() =
+    let expectedBoard =
+        array2D [
+            [None; Piece.whiteKing; None; Piece.whiteKing; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.whiteKing; None; None; None; None; None; None];
+            [Piece.whiteChecker; None; Piece.whiteChecker; None; None; None; None; None];
+            [None; Piece.whiteChecker; None; None; None; None; None; Piece.whiteChecker];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; None; None];
+        ];
+    let expectedPlayer = Player.Black
+
+    let fenString = "[FEN \"B:WK1,K2,K9,13,14,17,20,29,30,31:B\"]"
+    let controller = controllerFromFen fenString
+    
+    Assert.Equal(expectedPlayer, controller.CurrentPlayer)
+    Assert.Equal(expectedBoard, controller.Board)
