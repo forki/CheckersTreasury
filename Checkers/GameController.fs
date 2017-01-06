@@ -2,6 +2,6 @@
 open Checkers.Types
 open Checkers.Board
 
-type GameController = { Board :Board; CurrentPlayer :Player; CurrentCoord :Option<Coord>; MoveHistory :PDNTurn List }
+type GameController = { Board :Board; CurrentPlayer :Player; InitialPosition :string; MoveHistory :PDNTurn List; CurrentCoord :Option<Coord>; }
 
-let newGame = { Board = Board.defaultBoard; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
+let newGame = { Board = Board.defaultBoard; CurrentPlayer = Black; InitialPosition = Board.defaultFen; MoveHistory = []; CurrentCoord = None }

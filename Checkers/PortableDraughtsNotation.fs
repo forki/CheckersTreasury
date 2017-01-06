@@ -8,8 +8,6 @@ open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
 open Checkers.AIs.AmericanCheckersAI
 open System
-open System.Collections
-open System.Linq
 
 [<Literal>]
 let BlackSymbol = 'B'
@@ -61,8 +59,9 @@ let controllerFromFen (fen :string) =
     {
         Board = board;
         CurrentPlayer = playerTurn;
+        InitialPosition = fen;
+        MoveHistory = [];
         CurrentCoord = None;
-        MoveHistory = []
     }
 
 let createFen player (board :Board) =

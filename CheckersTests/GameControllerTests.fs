@@ -20,7 +20,7 @@ let ``Opponent cannot move when player turn not ended``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
+    let controller = { Board = board; CurrentPlayer = Black; InitialPosition = ""; MoveHistory = []; CurrentCoord = None }
 
     Assert.False(isValidMove { Row = 1; Column = 1 } { Row = 3; Column = 3 } controller)
 
@@ -38,7 +38,7 @@ let ``Player cannot move two pieces in multijump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = Some { Row = 2; Column = 2 }; MoveHistory = [] }
+    let controller = { Board = board; CurrentPlayer = Black; InitialPosition = ""; MoveHistory = []; CurrentCoord = Some { Row = 2; Column = 2 } }
 
     Assert.False(isValidMove { Row = 0; Column = 2 } { Row = 2; Column = 0 } controller)
 
@@ -56,13 +56,13 @@ let ``Player can move one piece in multijump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = Some { Row = 2; Column = 2 }; MoveHistory = [] }
+    let controller = { Board = board; CurrentPlayer = Black; InitialPosition = ""; MoveHistory = []; CurrentCoord = Some { Row = 2; Column = 2 } }
 
     Assert.True(isValidMove { Row = 2; Column = 2 } { Row = 0; Column = 0 } controller)
 
 [<Fact>]
 let ``Moving records move history: black hop``() =
-    let controller = { Board = Board.defaultBoard; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
+    let controller = { Board = Board.defaultBoard; CurrentPlayer = Black; InitialPosition = ""; MoveHistory = []; CurrentCoord = None }
     let newController = movePiece { Row = 2; Column = 1 } { Row = 3; Column = 0 } controller
 
     Assert.Equal("9-13", (List.last newController.Value.MoveHistory).BlackMove.DisplayString)
@@ -81,7 +81,7 @@ let ``Moving records move history: black jump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = Black; CurrentCoord = None; MoveHistory = [] }
+    let controller = { Board = board; CurrentPlayer = Black; InitialPosition = ""; MoveHistory = []; CurrentCoord = None; }
     let newController = movePiece { Row = 0; Column = 1 } { Row = 2; Column = 3 } controller
 
     Assert.Equal("1x10", (List.last newController.Value.MoveHistory).BlackMove.DisplayString)
@@ -100,7 +100,7 @@ let ``Moving records move history: white hop``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let controller = { Board = board; CurrentPlayer = White; CurrentCoord = None; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; ResultingFen = ""; DisplayString = "1x10" }; WhiteMove = None }] }
+    let controller = { Board = board; CurrentPlayer = White; InitialPosition = ""; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; ResultingFen = ""; DisplayString = "1x10" }; WhiteMove = None }]; CurrentCoord = None }
     let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
     let lastMove = (List.last newController.Value.MoveHistory)
 
