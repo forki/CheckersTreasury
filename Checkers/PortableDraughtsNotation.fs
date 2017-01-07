@@ -4,7 +4,6 @@ open Checkers.Piece
 open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
-open Checkers.AIs.AmericanCheckersAI
 open Checkers.GameController
 open System
 
@@ -21,9 +20,25 @@ let internal getPieceNotation (fenSections :string[]) (playerSymbol :char) =
          .Remove(0, 1)
          .Split([|','|], StringSplitOptions.RemoveEmptyEntries)
 
-let controllerFromFen (fen :string) =
-    let board = Board.emptyBoardList()
+let rec addPieces (fenPieces :string List) player (board :Board) =
+    let (head::tail) = fenPieces
+    let isKing = head.[0] = 'K'
+    let fenNumber =
+        match isKing with
+        | true -> Int32.Parse(head.Remove(0, 1))
+        | false -> Int32.Parse(head)
 
+    let boardCoord = pdnBoardCoords.[fenNumber]
+    board.[boardCoord.Row, boardCoord.Column] <-
+        match (player, isKing) with
+        | (White, true) -> Piece.whiteKing
+        | (White, false) -> Piece.whiteChecker
+        | (Black, true) -> Piece.blackKing
+        | (Black, false) -> Piece.blackChecker
+    
+    if not tail.IsEmpty then addPieces tail player board
+
+let controllerFromFen (fen :string) =
     let fenValue = fen.Split('"').[1]
     let fenSubsections = fenValue.Split(':')
     let playerTurn =
@@ -33,33 +48,19 @@ let controllerFromFen (fen :string) =
         
     let whitePieces = getPieceNotation fenSubsections WhiteSymbol
     let blackPieces = getPieceNotation fenSubsections BlackSymbol
-
-    let rec loop (fenPieces :string List) player =
-        let (head::tail) = fenPieces
-        let isKing = head.[0] = 'K'
-        let fenNumber =
-            match isKing with
-            | true -> System.Int32.Parse(head.Remove(0, 1))
-            | false -> System.Int32.Parse(head)
-
-        let boardCoord = pdnBoardCoords.[fenNumber]
-        board.[boardCoord.Row, boardCoord.Column] <-
-            match (player, isKing) with
-            | (White, true) -> Piece.whiteKing
-            | (White, false) -> Piece.whiteChecker
-            | (Black, true) -> Piece.blackKing
-            | (Black, false) -> Piece.blackChecker
-        
-        if not tail.IsEmpty then loop tail player
-
-    if whitePieces.Length > 0 then loop (List.ofArray whitePieces) Player.White
-    if blackPieces.Length > 0 then loop (List.ofArray blackPieces) Player.Black
+    
+    let board = Board.emptyBoardList()
+    if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) Player.White board
+    if blackPieces.Length > 0 then addPieces (List.ofArray blackPieces) Player.Black board
 
     {
         Board = board;
         CurrentPlayer = playerTurn;
         InitialPosition = fen;
-        MoveHistory = [];
+        MoveHistory =
+            match playerTurn with
+            | White -> [{MoveNumber = 1; BlackMove = {Move = []; ResultingFen = fen; DisplayString = "…"}; WhiteMove = None}]
+            | Black -> []
         CurrentCoord = None;
     }
 

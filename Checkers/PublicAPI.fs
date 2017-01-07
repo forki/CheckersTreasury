@@ -36,20 +36,10 @@ let internal getGameHistory gameController isMoveEnding move board =
                 WhiteMove = None;
             }
         | White, false ->
-            let lastMovePDN =
-                match gameHistory with
-                | [] ->
-                    {
-                        MoveNumber = 0;
-                        BlackMove = {Move = []; ResultingFen = gameController.InitialPosition; DisplayString = "…"}
-                        WhiteMove = None
-                    }
-                | _ -> (List.last gameHistory)
-
             let moveNumber = gameHistory.Length
             {
                 MoveNumber = moveNumber;
-                BlackMove = lastMovePDN.BlackMove;
+                BlackMove = (List.last gameHistory).BlackMove;
                 WhiteMove = Some { Move = pdnMove; ResultingFen = (createFen nextPlayer board); DisplayString = getDisplayString pdnMove move };
             }
         | Black, true ->
