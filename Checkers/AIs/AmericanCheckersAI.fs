@@ -52,25 +52,24 @@ let calculatePieceWeight piece coord =
 let calculateWeight player (board :Board) =
     let rec loop (weight :float) coord :float =
         match nextPoint coord Rows Columns with
+        | None -> weight
         | Some c ->
             let piece = square coord board
             match piece with
             | Some p when p.Player = player -> loop (weight + (calculatePieceWeight p coord)) c
             | _ -> loop weight c
-
-        | None -> weight
     
     loop 0.0 {Row = 0; Column = 0}
 
 let calculateWeightDifference (board :Board) =
     let rec loop (weight :float) coord =
         match nextPoint coord Rows Columns with
+        | None -> weight
         | Some c ->
             let piece = square coord board
             match piece with
             | Some p -> loop (weight + (calculatePieceWeight p coord)) c
             | None -> loop weight c
-        | None -> weight
     
     loop 0.0 {Row = 0; Column = 0}
 
@@ -103,39 +102,40 @@ let getPieceSingleJumps coord (board :Board) =
         | Checker -> checkerJumps piece.Player
         | King -> kingJumps piece.Player
 
-    let hops = List.ofSeq (seq {
-        for move in moves do
+    let rec loop (acc :Move List) moves =
+        let move::tail = moves
         let endCoord = offset coord move
-        yield
-            match coordExists endCoord && isValidJump coord endCoord board with
-            | true -> Some [coord; endCoord]
-            | false -> None })
+        match coordExists endCoord && isValidJump coord endCoord board, tail with
+        | true, [] -> acc @ (List.singleton [coord; endCoord])
+        | true, _ -> loop (acc @ (List.singleton [coord; endCoord])) tail
+        | false, [] -> acc
+        | false, _ -> loop acc tail
 
-    List.map (fun (item :Option<Move>) -> item.Value) (List.where (fun (item :Option<Move>) -> item.IsSome) hops)
+    loop [] moves
 
 let rec internal createMoveTree (move :Move) (board :Board) =
-    let moveTree =
-        {
-            Move = move;
-            Parent = None;
-            Children =
-                let newBoard = if move.Length = 1 then board else uncheckedMoveSequence move board
+    {
+        Move = move;
+        Parent = None;
+        Children =
+            let newBoard =
+                match move.Length with
+                | 1 -> board
+                | _ -> uncheckedMoveSequence move board
 
-                let newJumps = getPieceSingleJumps (List.last move) newBoard
-                let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
+            let newJumps = getPieceSingleJumps (List.last move) newBoard
+            let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
 
-                let oldPieceType = (square move.Head board).Value.PieceType
-                let newPieceType = (square (List.last move) newBoard).Value.PieceType
+            let oldPieceType = (square move.Head board).Value.PieceType
+            let newPieceType = (square (List.last move) newBoard).Value.PieceType
 
-                match newMoveEndCoords.IsEmpty || (oldPieceType = Checker && newPieceType = King) with
-                | false ->
-                    let moves = List.map (fun (item :Coord) -> move @ [item]) newMoveEndCoords
-                    let children = List.map (fun item -> createMoveTree item board) moves
-                    Some children
-                | true -> None
-        }
-
-    moveTree
+            match newMoveEndCoords.IsEmpty || (oldPieceType = Checker && newPieceType = King) with
+            | true -> None
+            | false ->
+                let moves = List.map (fun (item :Coord) -> move @ [item]) newMoveEndCoords
+                let children = List.map (fun item -> createMoveTree item board) moves
+                Some children
+    }
 
 let getPieceJumps coord (board :Board) =
     let moves = new System.Collections.Generic.List<Move>()
@@ -147,7 +147,7 @@ let getPieceJumps coord (board :Board) =
 
     let moveTree = createMoveTree [coord] board
     match moveTree.Children with
-    | Some t -> loop <| createMoveTree [coord] board
+    | Some _ -> loop <| createMoveTree [coord] board
     | None -> ()
 
     List.ofSeq moves
