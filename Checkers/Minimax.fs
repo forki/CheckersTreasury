@@ -1,5 +1,5 @@
 ﻿module internal Checkers.Minimax
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers

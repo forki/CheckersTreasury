@@ -1,6 +1,6 @@
 ﻿module AmericanCheckersAITests
 open Checkers
-open Checkers.Types
+open Checkers.Generic
 open Checkers.AIs.AmericanCheckersAI
 open System
 open Xunit

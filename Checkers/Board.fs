@@ -1,5 +1,5 @@
 ﻿module public Checkers.Board
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Piece
 
 type Board = Piece Option [,]

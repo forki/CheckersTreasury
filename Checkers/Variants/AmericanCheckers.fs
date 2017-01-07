@@ -1,5 +1,5 @@
 ﻿module internal Checkers.Variants.AmericanCheckers
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Piece
 open Checkers.Board
 open Checkers.FSharpExtensions

@@ -2,7 +2,7 @@
 
 open Checkers
 open Checkers.Piece
-open Checkers.Types
+open Checkers.Generic
 open Xunit
 
 [<Fact>]

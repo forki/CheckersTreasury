@@ -1,12 +1,11 @@
 ﻿module Checkers.PortableDraughtsNotation
-open Checkers
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Piece
 open Checkers.Board
-open Checkers.GameController
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
 open Checkers.AIs.AmericanCheckersAI
+open Checkers.GameController
 open System
 
 [<Literal>]

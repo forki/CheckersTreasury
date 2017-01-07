@@ -1,6 +1,6 @@
 ﻿module MinimaxTests
 open Checkers
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Minimax
 open Xunit
 

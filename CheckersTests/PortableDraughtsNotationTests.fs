@@ -2,7 +2,7 @@
 open Checkers
 open Checkers.GameController
 open Checkers.PortableDraughtsNotation
-open Checkers.Types
+open Checkers.Generic
 open Checkers.PublicAPI
 open Xunit
 

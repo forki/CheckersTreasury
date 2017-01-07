@@ -1,12 +1,11 @@
 ﻿module public Checkers.PublicAPI
-open Checkers.Variants
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
-open Checkers.Minimax
 open Checkers.GameController
 open Checkers.PortableDraughtsNotation
+open Checkers.Minimax
 open System
 
 let isValidMove startCoord endCoord gameController =

@@ -1,5 +1,5 @@
 ﻿module public Checkers.Piece
-open Checkers.Types
+open Checkers.Generic
 
 type Piece = { Player :Player; PieceType :PieceType }
 

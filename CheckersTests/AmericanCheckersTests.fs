@@ -3,7 +3,7 @@ open Checkers
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
 open Checkers.Piece
-open Checkers.Types
+open Checkers.Generic
 open Xunit
 
 [<Fact>]

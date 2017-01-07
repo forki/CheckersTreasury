@@ -1,9 +1,9 @@
 ﻿module Checkers.AIs.AmericanCheckersAI
-open Checkers.Board
-open Checkers.Variants.AmericanCheckers
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Piece
+open Checkers.Board
 open Checkers.FSharpExtensions
+open Checkers.Variants.AmericanCheckers
 
 let checkerWeights =
     array2D [

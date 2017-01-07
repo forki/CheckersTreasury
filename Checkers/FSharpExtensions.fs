@@ -1,6 +1,5 @@
 ﻿module internal Checkers.FSharpExtensions
-open Checkers
-open Checkers.Types
+open Checkers.Generic
 open Checkers.Board
 open System
 
