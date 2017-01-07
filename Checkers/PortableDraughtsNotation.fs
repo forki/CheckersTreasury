@@ -42,7 +42,7 @@ let controllerFromFen (fen :string) =
             | true -> System.Int32.Parse(head.Remove(0, 1))
             | false -> System.Int32.Parse(head)
 
-        let boardCoord = PDNBoardCoords.[fenNumber]
+        let boardCoord = pdnBoardCoords.[fenNumber]
         board.[boardCoord.Row, boardCoord.Column] <-
             match (player, isKing) with
             | (White, true) -> Piece.whiteKing
@@ -76,7 +76,7 @@ let createFen player (board :Board) =
             match piece.IsSome && isPlayerPiece player coord board with
             | true ->
                 let isKing = piece.Value.PieceType = PieceType.King
-                let fenNumber = (square coord PDNBoard).Value
+                let fenNumber = (square coord pdnBoard).Value
                 loop (fenNumbers @ [(if isKing then "K" else "") + fenNumber.ToString()]) player c
             | false -> loop fenNumbers player c
         | None -> fenNumbers

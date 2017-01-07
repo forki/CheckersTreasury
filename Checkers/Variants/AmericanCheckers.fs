@@ -10,7 +10,7 @@ let Rows = 7
 [<Literal>]
 let Columns = 7
 
-let PDNBoard =
+let internal pdnBoard =
     array2D [
         [None; Some 1; None; Some 2; None; Some 3; None; Some 4];
         [Some 5; None; Some 6; None; Some 7; None; Some 8; None];
@@ -22,7 +22,7 @@ let PDNBoard =
         [Some 29; None; Some 30; None; Some 31; None; Some 32; None];
     ]
 
-let PDNBoardCoords =
+let internal pdnBoardCoords =
     [
         {Row = -1; Column = -1};    // adjust for FEN's 1-based indexing
         {Row = 0; Column = 1}; {Row = 0; Column = 3}; {Row = 0; Column = 5}; {Row = 0; Column = 7};
@@ -101,11 +101,16 @@ let internal hasValidHop startCoord (board :Board) =
             offset startCoord {Row = 1; Column = -1}
         ]
 
-    let flattenedList = seq {
-        for coord in hopCoords do
-        yield coordExists coord && isValidHop startCoord coord board }
-
-    flattenedList |> Seq.exists id
+    let rec anyHopIsValid jumps =
+        let coord::tail = jumps
+        match coordExists coord && isValidHop startCoord coord board with
+        | true -> true
+        | false ->
+            match tail with
+            | [] -> false
+            | _ -> anyHopIsValid tail
+            
+    anyHopIsValid hopCoords
 
 let internal hasValidJump startCoord (board :Board) =
     let jumpCoords =
@@ -116,11 +121,16 @@ let internal hasValidJump startCoord (board :Board) =
             offset startCoord {Row = 2; Column = -2}
         ]
 
-    let flattenedList = seq {
-        for coord in jumpCoords do
-        yield coordExists coord && isValidJump startCoord coord board }
+    let rec anyJumpIsValid jumps =
+        let coord::tail = jumps
+        match coordExists coord && isValidJump startCoord coord board with
+        | true -> true
+        | false ->
+            match tail with
+            | [] -> false
+            | _ -> anyJumpIsValid tail
             
-    flattenedList |> Seq.exists id
+    anyJumpIsValid jumpCoords
 
 let internal jumpAvailable player (board :Board) =
     let pieceHasJump row column =

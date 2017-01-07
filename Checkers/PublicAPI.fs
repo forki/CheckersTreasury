@@ -23,7 +23,7 @@ let internal getGameHistory gameController isMoveEnding move board =
     let currentPlayer = gameController.CurrentPlayer
     let isContinuedMove = gameController.CurrentCoord <> None
 
-    let pdnMove = (List.map (fun item -> (square item PDNBoard).Value) move)
+    let pdnMove = (List.map (fun item -> (square item pdnBoard).Value) move)
     let nextPlayer = if isMoveEnding then otherPlayer currentPlayer else currentPlayer
 
     let newTurnValue =
@@ -141,4 +141,4 @@ let isWon controller =
     isWon controller.Board
 
 let getPdnCoord pdnNumber =
-    PDNBoardCoords.[pdnNumber]
+    pdnBoardCoords.[pdnNumber]
