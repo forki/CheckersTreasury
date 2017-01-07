@@ -816,7 +816,7 @@ let ``Turn cannot continue after promotion``() =
     Assert.True(playerTurnEnds [{ Row = 2; Column = 5 }; { Row = 0; Column = 3 }] originalBoard newBoard)
 
 [<Fact>]
-let ``Game won returns player``() =
+let ``Winning player returns player``() =
     let board =
         array2D [
             [Piece.whiteKing; None; None; None; None; None; None; None];
@@ -829,8 +829,8 @@ let ``Game won returns player``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    Assert.Equal(Black, (isWon board).Value)
+    Assert.Equal(Black, (winningPlayer board).Value)
 
 [<Fact>]
-let ``Game not won returns None``() =
-    Assert.True((isWon Board.defaultBoard).IsNone)
+let ``Winning player returns None``() =
+    Assert.True((winningPlayer Board.defaultBoard).IsNone)

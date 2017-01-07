@@ -160,7 +160,7 @@ let internal moveAvailable (board :Board) player =
 
     loop <| Some {Row = 0; Column = 0}
 
-let isWon (board :Board) =
+let winningPlayer (board :Board) =
     match (moveAvailable board) with
     | x when not <| x White -> Some Black
     | x when not <| x Black -> Some White

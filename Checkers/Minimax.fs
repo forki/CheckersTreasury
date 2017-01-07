@@ -43,7 +43,7 @@ let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
     | _ -> None
 
 let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) =
-    match currentSearchDepth = 0 || (isWon board).IsSome with
+    match currentSearchDepth = 0 || (winningPlayer board).IsSome with
     | true ->
         let weightDifference = Some <| calculateWeightDifference board
         let newAlpha = 
