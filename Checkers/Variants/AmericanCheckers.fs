@@ -150,12 +150,15 @@ let internal moveAvailable (board :Board) player =
         piece.Value.Player = player &&
         (hasValidJump { Row = row; Column = column } board || hasValidHop { Row = row; Column = column } board)
 
-    let flattenedList = seq {
-        for row in 0 .. Rows do
-        for column in 0 .. Columns do
-        yield (pieceHasMove row column) }
-            
-    flattenedList |> Seq.exists id
+    let rec loop coord =
+        match coord with
+        | None -> false
+        | Some c ->
+            match pieceHasMove c.Row c.Column with
+            | true -> true
+            | false -> loop (nextPoint c Rows Columns)
+
+    loop <| Some {Row = 0; Column = 0}
 
 let isWon (board :Board) =
     match (moveAvailable board) with
