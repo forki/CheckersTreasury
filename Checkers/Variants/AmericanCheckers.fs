@@ -92,7 +92,7 @@ let internal isValidJump startCoord endCoord (board :Board) =
     | PieceType.Checker -> isValidCheckerJump startCoord endCoord board
     | PieceType.King -> isValidKingJump startCoord endCoord board
 
-let internal hasValidHop startCoord (board :Board) =
+let internal validHops startCoord (board :Board) =
     let hopCoords =
         [
             offset startCoord {Row = -1; Column = 1};
@@ -101,18 +101,21 @@ let internal hasValidHop startCoord (board :Board) =
             offset startCoord {Row = 1; Column = -1}
         ]
 
-    let rec anyHopIsValid jumps =
+    let rec anyHopIsValid acc jumps =
         let coord::tail = jumps
         match coordExists coord && isValidHop startCoord coord board with
-        | true -> true
+        | true -> acc @ [coord]
         | false ->
             match tail with
-            | [] -> false
-            | _ -> anyHopIsValid tail
+            | [] -> acc
+            | _ -> anyHopIsValid acc tail
             
-    anyHopIsValid hopCoords
+    anyHopIsValid [] hopCoords
 
-let internal hasValidJump startCoord (board :Board) =
+let internal hasValidHop startCoord (board :Board) =
+    not (validHops startCoord board).IsEmpty
+
+let internal validJumps startCoord (board :Board) =
     let jumpCoords =
         [
             offset startCoord {Row = -2; Column = 2};
@@ -121,16 +124,19 @@ let internal hasValidJump startCoord (board :Board) =
             offset startCoord {Row = 2; Column = -2}
         ]
 
-    let rec anyJumpIsValid jumps =
+    let rec anyJumpIsValid acc jumps =
         let coord::tail = jumps
         match coordExists coord && isValidJump startCoord coord board with
-        | true -> true
+        | true -> acc @ [coord]
         | false ->
             match tail with
-            | [] -> false
-            | _ -> anyJumpIsValid tail
+            | [] -> acc
+            | _ -> anyJumpIsValid acc tail
             
-    anyJumpIsValid jumpCoords
+    anyJumpIsValid [] jumpCoords
+
+let internal hasValidJump startCoord (board :Board) =
+    not (validJumps startCoord board).IsEmpty
 
 let internal jumpAvailable player (board :Board) =
     let pieceHasJump row column =
