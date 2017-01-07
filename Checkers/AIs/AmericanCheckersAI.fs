@@ -29,14 +29,6 @@ let kingWeights =
         [1.0; 0.0; 1.0; 0.0; 1.0; 0.0; 1.05; 0.0]
     ]
 
-let nextPoint coord =
-    match coord.Column with
-    | Columns ->
-        match coord.Row with
-        | Rows -> None
-        | row -> Some {Row = row + 1; Column = 0}
-    | column -> Some {coord with Column = column + 1}
-
 let calculateCheckerWeight piece coord =
     let kingRow = kingRowIndex piece.Player
 
@@ -59,7 +51,7 @@ let calculatePieceWeight piece coord =
 
 let calculateWeight player (board :Board) =
     let rec loop (weight :float) coord :float =
-        match nextPoint coord with
+        match nextPoint coord Rows Columns with
         | Some c ->
             let piece = square coord board
             match piece with
@@ -72,7 +64,7 @@ let calculateWeight player (board :Board) =
 
 let calculateWeightDifference (board :Board) =
     let rec loop (weight :float) coord =
-        match nextPoint coord with
+        match nextPoint coord Rows Columns with
         | Some c ->
             let piece = square coord board
             match piece with
@@ -182,15 +174,15 @@ let calculateMoves player (board :Board) =
             match newJumpAcc with
             | [] ->
                 let newHopAcc = getPieceHops coord board @ hopAcc
-                match nextPoint coord with
+                match nextPoint coord Rows Columns with
                 | Some c -> loop newJumpAcc newHopAcc c
                 | None -> newHopAcc
             | _ ->
-                match nextPoint coord with
+                match nextPoint coord Rows Columns with
                 | Some c -> loop newJumpAcc [] c
                 | None -> newJumpAcc
         | false ->
-            match nextPoint coord with
+            match nextPoint coord Rows Columns with
             | Some c -> loop jumpAcc hopAcc c
             | None -> jumpAcc @ hopAcc
     

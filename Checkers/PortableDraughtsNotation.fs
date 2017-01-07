@@ -70,7 +70,7 @@ let createFen player (board :Board) =
         | Black -> BlackSymbol
 
     let rec loop (fenNumbers :string List) player coord =
-        match nextPoint coord with
+        match nextPoint coord 7 7 with
         | Some c ->
             let piece = square coord board
             match piece.IsSome && isPlayerPiece player coord board with
