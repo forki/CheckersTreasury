@@ -18,7 +18,7 @@ let isValidMove startCoord endCoord gameController =
 let internal getDisplayString (pdnTurn :int List) (move :Move) =
     String.Join((if isJump move then "x" else "-"), pdnTurn)
     
-let (|Move|) (gameController, move, boardFen) =
+let Move gameController move boardFen =
     let gameHistory = gameController.MoveHistory
     let pdnMove = (List.map (fun item -> (square item pdnBoard).Value) move)
 
@@ -39,7 +39,7 @@ let (|Move|) (gameController, move, boardFen) =
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
     
-let (|ContinuedMove|) (gameController, move, boardFen) =
+let ContinuedMove gameController move boardFen =
     let gameHistory = gameController.MoveHistory
     
     let lastMovePdn = List.last gameHistory
@@ -68,12 +68,8 @@ let internal getGameHistory gameController move boardFen =
 
     let newTurnValue =
         match isContinuedMove with
-        | false ->
-            match gameController, move, boardFen with
-            | Move(pdnTurn) -> pdnTurn
-        | true ->
-            match gameController, move, boardFen with
-            | ContinuedMove(pdnTurn) -> pdnTurn
+        | false -> Move gameController move boardFen
+        | true -> ContinuedMove gameController move boardFen
 
     match gameController.CurrentPlayer, isContinuedMove with
     | Black, false -> gameController.MoveHistory @ [newTurnValue]
