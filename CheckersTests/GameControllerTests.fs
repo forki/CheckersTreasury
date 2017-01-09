@@ -119,7 +119,7 @@ let ``Takeback black's move``() =
 
     let takeBack = takeBackMove newController
     let expectedFen = "[FEN \"W:W21,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13\"]"
-    let actualFen = createFen White takeBack.Board
+    let actualFen = createFen White takeBack.Board Checkers.Variants.AmericanCheckers.pdnBoard
 
     Assert.Equal(expectedFen, actualFen)
 
@@ -136,7 +136,7 @@ let ``Takeback white's move``() =
 
     let takeBack = takeBackMove newController
     let expectedFen = "[FEN \"W:W17,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13\"]"
-    let actualFen = createFen White takeBack.Board
+    let actualFen = createFen White takeBack.Board Checkers.Variants.AmericanCheckers.pdnBoard
 
     Assert.Equal(expectedFen, actualFen)
 
@@ -145,7 +145,7 @@ let ``Takeback move--no previous move``() =
     let newController = GameController.newGame
 
     let takeBack = takeBackMove newController
-    let actualFen = createFen Black takeBack.Board
+    let actualFen = createFen Black takeBack.Board Checkers.Variants.AmericanCheckers.pdnBoard
 
     Assert.Equal(Board.defaultFen, actualFen)
 
@@ -159,6 +159,6 @@ let ``Takeback move--single move``() =
         |> doMove [{Row = 2; Column = 1;}; {Row = 3; Column = 0}]
 
     let takeBack = takeBackMove newController
-    let actualFen = createFen Black takeBack.Board
+    let actualFen = createFen Black takeBack.Board Checkers.Variants.AmericanCheckers.pdnBoard
 
     Assert.Equal(Board.defaultFen, actualFen)

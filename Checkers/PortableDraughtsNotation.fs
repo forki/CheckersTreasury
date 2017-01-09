@@ -3,7 +3,6 @@ open Checkers.Generic
 open Checkers.Piece
 open Checkers.Board
 open Checkers.FSharpExtensions
-open Checkers.Variants.AmericanCheckers
 open Checkers.GameController
 open System
 
@@ -20,7 +19,7 @@ let internal getPieceNotation (fenSections :string[]) (playerSymbol :char) =
          .Remove(0, 1)
          .Split([|','|], StringSplitOptions.RemoveEmptyEntries)
 
-let rec addPieces (fenPieces :string List) player (board :Board) =
+let rec addPieces (fenPieces :string List) player (board :Board) (pdnBoardCoords :Coord List) =
     let (head::tail) = fenPieces
     let isKing = head.[0] = 'K'
     let fenNumber =
@@ -36,9 +35,9 @@ let rec addPieces (fenPieces :string List) player (board :Board) =
         | (Black, true) -> Piece.blackKing
         | (Black, false) -> Piece.blackChecker
     
-    if not tail.IsEmpty then addPieces tail player board
+    if not tail.IsEmpty then addPieces tail player board pdnBoardCoords
 
-let controllerFromFen (fen :string) =
+let controllerFromFen (fen :string) (pdnBoardCoords :Coord List) =
     let fenValue = fen.Split('"').[1]
     let fenSubsections = fenValue.Split(':')
     let playerTurn =
@@ -50,8 +49,8 @@ let controllerFromFen (fen :string) =
     let blackPieces = getPieceNotation fenSubsections BlackSymbol
     
     let board = Board.emptyBoardList()
-    if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) Player.White board
-    if blackPieces.Length > 0 then addPieces (List.ofArray blackPieces) Player.Black board
+    if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) Player.White board pdnBoardCoords
+    if blackPieces.Length > 0 then addPieces (List.ofArray blackPieces) Player.Black board pdnBoardCoords
 
     {
         Board = board;
@@ -64,7 +63,7 @@ let controllerFromFen (fen :string) =
         CurrentCoord = None;
     }
 
-let createFen player (board :Board) =
+let createFen player (board :Board) (pdnBoard :int Option [,]) =
     let turnSymbol =
         match player with
         | White -> WhiteSymbol

@@ -119,6 +119,7 @@
     <Compile Include="AIs\AmericanCheckersAI.fs" />
     <Compile Include="GameController.fs" />
     <Compile Include="PortableDraughtsNotation.fs" />
+    <Compile Include="GameVariant.fs" />
     <Compile Include="Minimax.fs" />
     <Compile Include="PublicAPI.fs" />
     <None Include="Script.fsx" />

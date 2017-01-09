@@ -2,8 +2,7 @@
 open Checkers.Generic
 open Checkers.Board
 open Checkers.FSharpExtensions
-open Checkers.Variants.AmericanCheckers
-open Checkers.AIs.AmericanCheckersAI
+open Checkers.GameVariant
 
 let rec internal bestMatchInList player highestDifference moveForHighestDifference (list :List<float * Move>) =
     let head::tail = list
@@ -42,10 +41,10 @@ let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
     | (None, Some candidate) -> Some candidate
     | _ -> None
 
-let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) =
-    match currentSearchDepth = 0 || (winningPlayer board).IsSome with
+let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) (variant :GameVariant) =
+    match currentSearchDepth = 0 || (variant.winningPlayer board).IsSome with
     | true ->
-        let weightDifference = Some <| calculateWeightDifference board
+        let weightDifference = Some <| variant.calculateWeightDifference board
         let newAlpha = 
             match player with
             | Black -> weightDifference
@@ -69,13 +68,13 @@ let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) 
             match moves with
             | [] -> { Alpha = betaForNode; Beta = alphaForNode; Move = move }
             | _ ->
-                let currentMove = moves |> List.head
+                let currentMove :Move = moves.Head
                 match newAlpha.IsNone || newBeta.IsNone || newAlpha.Value < newBeta.Value with
                 | false -> loop alphaForNode betaForNode newAlpha newBeta move (moves |> List.tail)
                 | true ->
-                    let newBoard = uncheckedMoveSequence currentMove board
+                    let newBoard = variant.uncheckedMoveSequence (Seq.ofList currentMove) board
 
-                    let alphaBetaMove = minimax (otherPlayer player) (currentSearchDepth - 1) searchDepth alphaForNode betaForNode newBoard
+                    let alphaBetaMove = minimax (otherPlayer player) (currentSearchDepth - 1) searchDepth alphaForNode betaForNode newBoard variant
 
                     match player with
                     | Black ->
@@ -85,7 +84,7 @@ let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) 
                         let (newBetaForNode, newNewBeta, newMove) = getNewValueAndMove chooseNewBeta betaForNode alphaBetaMove.Beta newBeta currentMove move
                         loop alphaForNode newBetaForNode newAlpha newNewBeta newMove (moves |> List.tail)
 
-        let potentialMoves = (calculateMoves player board)
+        let potentialMoves = (variant.calculateMoves player board)
         match potentialMoves.Length, currentSearchDepth = searchDepth with
         | 1, true -> {Alpha = None; Beta = None; Move = potentialMoves.[0]}
         | _ -> loop None None alpha beta [] potentialMoves

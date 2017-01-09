@@ -22,7 +22,7 @@ let ``Create controller from FEN string``() =
     let expectedPlayer = Player.White
 
     let fenString = "[FEN \"W:WK15,19:BK10\"]"
-    let controller = controllerFromFen fenString
+    let controller = controllerFromFen fenString Checkers.Variants.AmericanCheckers.pdnBoardCoords
     
     Assert.Equal(expectedPlayer, controller.CurrentPlayer)
     Assert.Equal(expectedBoard, controller.Board)
@@ -42,15 +42,13 @@ let ``Create FEN from controller string``() =
         ];
 
     let expectedFENString = "[FEN \"W:WK15,19:BK10\"]"
-    Assert.Equal(expectedFENString, (createFen Player.White board))
+    Assert.Equal(expectedFENString, (createFen Player.White board Checkers.Variants.AmericanCheckers.pdnBoard))
 
 [<Fact>]
 let ``Create controller from FEN string: white move does not crash``() =
     let fenString = "[FEN \"W:W21,22,23,24,25,26,27,28,29,30,31,32:B1,2,3,4,5,6,7,8,10,11,12,13\"]"
-    let controller =
-        fenString
-        |> controllerFromFen
-        |> movePiece {Row = 5; Column = 6} {Row = 4; Column = 7}
+    let controller = controllerFromFen fenString Checkers.Variants.AmericanCheckers.pdnBoardCoords
+    let controller = movePiece {Row = 5; Column = 6} {Row = 4; Column = 7} controller
 
     let move = controller.Value.MoveHistory.Head
     
@@ -73,7 +71,7 @@ let ``Create controller from FEN string: won position``() =
     let expectedPlayer = Player.Black
 
     let fenString = "[FEN \"B:WK1,K2,K9,13,14,17,20,29,30,31:B\"]"
-    let controller = controllerFromFen fenString
+    let controller = controllerFromFen fenString  Checkers.Variants.AmericanCheckers.pdnBoardCoords
     
     Assert.Equal(expectedPlayer, controller.CurrentPlayer)
     Assert.Equal(expectedBoard, controller.Board)
