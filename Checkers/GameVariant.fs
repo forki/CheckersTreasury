@@ -17,3 +17,10 @@ with
             uncheckedMoveSequence = Checkers.Variants.AmericanCheckers.uncheckedMoveSequence
             calculateMoves = Checkers.AIs.AmericanCheckersAI.calculateMoves
         }
+//    static member PoolCheckers =
+//        {
+//            winningPlayer = Checkers.Variants.PoolCheckers.winningPlayer
+//            calculateWeightDifference = Checkers.AIs.PoolCheckersAI.calculateWeightDifference
+//            uncheckedMoveSequence = Checkers.Variants.PoolCheckers.uncheckedMoveSequence
+//            calculateMoves = Checkers.AIs.PoolCheckersAI.calculateMoves
+//        }

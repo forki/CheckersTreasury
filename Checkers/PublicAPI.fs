@@ -2,7 +2,7 @@
 open Checkers.Generic
 open Checkers.Board
 open Checkers.FSharpExtensions
-open Checkers.Variants.AmericanCheckers
+open Checkers.Variants.PoolCheckers
 open Checkers.GameController
 open Checkers.PortableDraughtsNotation
 open Checkers.GameVariant
@@ -96,7 +96,7 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
                 Board = b
                 CurrentPlayer = nextPlayerTurn
                 InitialPosition = gameController.InitialPosition
-                MoveHistory = getGameHistory gameController [startCoord; endCoord] (createFen nextPlayerTurn b Checkers.Variants.AmericanCheckers.pdnBoard)
+                MoveHistory = getGameHistory gameController [startCoord; endCoord] (createFen nextPlayerTurn b Checkers.Variants.PoolCheckers.pdnBoard)
                 CurrentCoord = if isTurnEnding then None else Some endCoord
             }
 
@@ -140,7 +140,7 @@ let takeBackMove gameController =
             let newLastMove = {lastMove with WhiteMove = None}
             List.truncate (gameController.MoveHistory.Length - 1) gameController.MoveHistory @ [newLastMove]
     
-    {(controllerFromFen fen Checkers.Variants.AmericanCheckers.pdnBoardCoords) with MoveHistory = newMoveHistory}
+    {(controllerFromFen fen Checkers.Variants.PoolCheckers.pdnBoardCoords) with MoveHistory = newMoveHistory}
 
 let winningPlayer controller =
     winningPlayer controller.Board
@@ -152,3 +152,12 @@ let isWon controller =
 
 let getPdnCoord pdnNumber =
     pdnBoardCoords.[pdnNumber]
+
+let getPdnNumber coord =
+    square coord pdnBoard
+
+let createFen player (board :Board) =
+    createFen player board Checkers.Variants.PoolCheckers.pdnBoard
+
+let controllerFromFen fen =
+    controllerFromFen fen Checkers.Variants.PoolCheckers.pdnBoardCoords
