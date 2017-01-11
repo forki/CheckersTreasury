@@ -1,7 +1,7 @@
-﻿module PoolCheckersAITests
+﻿module AmericanCheckersAITests
 open Checkers
 open Checkers.Generic
-open Checkers.AIs.AmericanCheckersAI
+open Checkers.AIs.PoolCheckersAI
 open Xunit
 
 [<Fact>]
@@ -13,18 +13,35 @@ let ``Calculate moves returns correct number of hops``() =
 let ``Calculate moves returns correct number of jumps``() =
     let board =
         array2D [
-            [Piece.blackChecker; None; None; None; None; None; None; None];
+            [Piece.blackKing; None; None; None; None; None; None; None];
             [None; Piece.whiteChecker; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
         ];
 
     let moves = calculateMoves Black board
     Assert.Equal(1, moves.Length)
+
+[<Fact>]
+let ``Calculate moves returns correct number of jumps including flying jump``() =
+    let board =
+        array2D [
+            [None; None; None; None; None; None; None; None];
+            [None; Piece.whiteChecker; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; Piece.blackKing; None; None; None];
+            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let moves = calculateMoves Black board
+    Assert.Equal(2, moves.Length)
 
 [<Fact>]
 let ``Calculate moves prefers jumps to hops``() =

@@ -117,12 +117,12 @@ let move (move :Coord seq) (gameController) :Option<GameController> =
                 Board = b;
                 CurrentPlayer = nextPlayerTurn
                 InitialPosition = gameController.InitialPosition
-                MoveHistory = getGameHistory gameController moveAsList (createFen nextPlayerTurn b Checkers.Variants.AmericanCheckers.pdnBoard)
+                MoveHistory = getGameHistory gameController moveAsList (createFen nextPlayerTurn b Checkers.Variants.PoolCheckers.pdnBoard)
                 CurrentCoord = if isTurnEnding then None else Some (Seq.last move)
             }
 
 let getMove searchDepth gameController =
-    (minimax gameController.CurrentPlayer searchDepth searchDepth None None gameController.Board GameVariant.AmericanCheckers).Move
+    (minimax gameController.CurrentPlayer searchDepth searchDepth None None gameController.Board GameVariant.PoolCheckers).Move
 
 let takeBackMove gameController =
     let fen =

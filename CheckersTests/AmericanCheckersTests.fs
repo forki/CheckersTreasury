@@ -2,7 +2,6 @@
 open Checkers
 open Checkers.FSharpExtensions
 open Checkers.Variants.AmericanCheckers
-open Checkers.Piece
 open Checkers.Generic
 open Xunit
 

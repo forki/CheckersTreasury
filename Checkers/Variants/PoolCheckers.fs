@@ -178,16 +178,8 @@ let internal hasValidKingJump startCoord (board :Board) =
         match tail with
         | [] -> currentJumps
         | _ -> getJumps currentJumps tail
-
-    let rec anyJumpIsValid jumps =
-        let coord::tail = jumps
-        match coordExists coord && isValidJump startCoord coord board, tail with
-        | true, _ -> true
-        | false, [] -> false
-        | _ -> anyJumpIsValid tail
     
-    let jumps = getJumps [] jumpCoordOffsets
-    (not jumps.IsEmpty) && anyJumpIsValid jumps
+    not (getJumps [] jumpCoordOffsets).IsEmpty
 
 let internal hasValidJump startCoord (board :Board) =
     let piece = square startCoord board
