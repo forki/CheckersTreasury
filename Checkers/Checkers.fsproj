@@ -25,8 +25,7 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Debug\Checkers.XML</DocumentationFile>
     <StartAction>Project</StartAction>
-    <StartProgram>
-    </StartProgram>
+    <StartProgram>C:\Users\hosch\Documents\Visual Studio 2015\Projects\CheckersUI\CheckersUI\bin\x86\Debug\CheckersUI.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

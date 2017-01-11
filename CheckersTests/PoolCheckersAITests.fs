@@ -78,7 +78,7 @@ let ``Calculate moves prefers jumps to hops 1``() =
     Assert.Equal(1, moves.Length)
 
 [<Fact>]
-let ``Calculate moves returns multi double jump``() =
+let ``Calculate moves returns multi jump``() =
     let board =
         array2D [
             [Piece.blackChecker; None; None; None; None; None; None; None];
@@ -93,3 +93,20 @@ let ``Calculate moves returns multi double jump``() =
 
     let moves = getPieceJumps {Row = 0; Column = 0} board
     Assert.Equal(2, moves.Length)
+
+[<Fact>]
+let ``Calculate moves returns multi jump checker jumps backwards``() =
+    let board =
+        array2D [
+            [Piece.blackChecker; None; None; None; None; None; None; None];
+            [None; Piece.whiteChecker; None; Piece.whiteChecker; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let moves = getPieceJumps {Row = 0; Column = 0} board
+    Assert.Equal(3, moves.[0].Length)

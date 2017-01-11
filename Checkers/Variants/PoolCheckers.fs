@@ -165,7 +165,8 @@ let internal hasValidKingJump startCoord (board :Board) =
             let nextCoord = offset currentCoord {Row = rowSign; Column = colSign}
             match currentCoord, nextCoord with
             | _, c when not <| coordExists c -> None
-            | c, _ when (square c board).IsSome && (square c board).Value.Player <> currentPlayer -> Some (offset currentCoord {Row = rowSign; Column = colSign})
+            | cc, cn when ((square cc board).IsSome && (square cc board).Value.Player = currentPlayer) || (square cn board).IsSome -> None
+            | cc, cn when (square cc board).IsSome && (square cc board).Value.Player <> currentPlayer && (square cn board).IsNone -> Some (offset currentCoord {Row = rowSign; Column = colSign})
             | _ -> checkBetweenCoords nextCoord rowSign colSign
         
         let head::tail = jumpOffsets
@@ -294,7 +295,7 @@ let rec public moveSequence (coordinates :Coord seq) (board :Option<Board>) =
 let internal uncheckedMovePiece startCoord endCoord (board :Board) =
     match abs(startCoord.Row - endCoord.Row) with
     | 1 -> hop startCoord endCoord board
-    | 2 -> jump startCoord endCoord board
+    | _ -> jump startCoord endCoord board
 
 let rec internal uncheckedMoveSequence (coordinates :Coord seq) (board :Board) =
     let coords = List.ofSeq(coordinates)

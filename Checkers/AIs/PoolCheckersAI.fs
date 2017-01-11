@@ -85,11 +85,7 @@ let kingHops player =
         | Black -> [{Row = -1; Column = -1}; {Row = -1; Column = 1}])
 
 let getCheckerSingleJumps coord (board :Board) =
-    let piece = (square coord board).Value
-    let moves =
-        match piece.Player with
-        | White -> [{Row = -2; Column = -2}; {Row = -2; Column = 2}]
-        | Black -> [{Row = 2; Column = -2}; {Row = 2; Column = 2}]
+    let moves = [{Row = -2; Column = -2}; {Row = -2; Column = 2}; {Row = 2; Column = -2}; {Row = 2; Column = 2}]
 
     let rec loop (acc :Move List) moves =
         let move::tail = moves
@@ -100,6 +96,8 @@ let getCheckerSingleJumps coord (board :Board) =
         | false, [] -> acc
         | false, _ -> loop acc tail
 
+    let foo = loop [] moves
+    let fizz = true
     loop [] moves
 
 let getKingSingleJumps startCoord (board :Board) =
@@ -153,10 +151,7 @@ let rec internal createMoveTree (move :Move) (board :Board) =
             let newJumps = getPieceSingleJumps (List.last move) newBoard
             let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
 
-            let oldPieceType = (square move.Head board).Value.PieceType
-            let newPieceType = (square (List.last move) newBoard).Value.PieceType
-
-            match newMoveEndCoords.IsEmpty || (oldPieceType = Checker && newPieceType = King) with
+            match newMoveEndCoords.IsEmpty with
             | true -> None
             | false ->
                 let moves = List.map (fun (item :Coord) -> move @ [item]) newMoveEndCoords
