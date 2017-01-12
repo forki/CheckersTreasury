@@ -2,6 +2,7 @@
 open Checkers.Generic
 open Checkers.Piece
 open Checkers.Board
+open Checkers.GameController
 open Checkers.FSharpExtensions
 open System
 
@@ -10,6 +11,8 @@ let Rows = 7
     
 [<Literal>]
 let Columns = 7
+
+let newGame = { Variant = Variant.PoolCheckers; Board = Checkers.Board.defaultBoard; CurrentPlayer = Black; InitialPosition = Checkers.Board.defaultFen; MoveHistory = []; CurrentCoord = None }
 
 let internal pdnBoard =
     array2D [

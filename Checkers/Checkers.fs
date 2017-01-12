@@ -3,6 +3,8 @@ type Player = Black | White
 
 type PieceType = Checker | King
 
+type Variant = AmericanCheckers | PoolCheckers
+
 type Coord = { Row :int; Column :int }
 
 let offset c1 c2 =

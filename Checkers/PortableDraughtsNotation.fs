@@ -37,7 +37,7 @@ let rec addPieces (fenPieces :string List) player (board :Board) (pdnBoardCoords
     
     if not tail.IsEmpty then addPieces tail player board pdnBoardCoords
 
-let controllerFromFen (fen :string) (pdnBoardCoords :Coord List) =
+let controllerFromFen variant (fen :string) (pdnBoardCoords :Coord List) =
     let fenValue = fen.Split('"').[1]
     let fenSubsections = fenValue.Split(':')
     let playerTurn =
@@ -53,6 +53,7 @@ let controllerFromFen (fen :string) (pdnBoardCoords :Coord List) =
     if blackPieces.Length > 0 then addPieces (List.ofArray blackPieces) Player.Black board pdnBoardCoords
 
     {
+        Variant = variant
         Board = board;
         CurrentPlayer = playerTurn;
         InitialPosition = fen;
