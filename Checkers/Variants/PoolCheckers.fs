@@ -235,20 +235,26 @@ let internal setPieceAt coord piece (board :Board) =
     newBoard.[coord.Row, coord.Column] <- piece
     newBoard
 
+let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :Board) =
+    let lastMoveWasJump = abs(move.[0].Row - move.[1].Row) = 2
+    not (lastMoveWasJump && hasValidJump (List.last move) currentBoard)
+
 let internal jump startCoord endCoord (board :Board) =
     let kingRowIndex = kingRowIndex((square startCoord board).Value.Player)
 
-    let piece =
-        match endCoord.Row with
-        | row when row = kingRowIndex -> Some <| Promote (square startCoord board).Value
-        | _ -> (square startCoord board)
-
+    let piece = (square startCoord board)
     let jumpedCoord = getJumpedCoord startCoord endCoord
 
-    board
-    |> setPieceAt startCoord None
-    |> setPieceAt endCoord piece
-    |> setPieceAt jumpedCoord None
+    let currentBoard =
+        board
+        |> setPieceAt startCoord None
+        |> setPieceAt endCoord piece
+        |> setPieceAt jumpedCoord None
+
+    if playerTurnEnds [startCoord; endCoord] currentBoard currentBoard && endCoord.Row = kingRowIndex then
+        setPieceAt endCoord (Some <| Promote piece.Value) currentBoard
+    else
+        currentBoard
 
 let internal hop startCoord endCoord (board :Board) =
     let kingRowIndex = kingRowIndex (square startCoord board).Value.Player
@@ -261,10 +267,6 @@ let internal hop startCoord endCoord (board :Board) =
     board
     |> setPieceAt startCoord None
     |> setPieceAt endCoord piece
-
-let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :Board) =
-    let lastMoveWasJump = abs(move.[0].Row - move.[1].Row) = 2
-    not (lastMoveWasJump && hasValidJump (List.last move) currentBoard)
 
 let public isValidMove startCoord endCoord (board :Board) =
     coordExists startCoord &&

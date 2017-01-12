@@ -1,5 +1,6 @@
 ﻿module PoolCheckersTests
 open Checkers
+open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.PoolCheckers
 open Checkers.Generic
@@ -111,6 +112,25 @@ let ``Checker can jump forward``() =
         ];
 
     Assert.True(board |> isValidCheckerJump{Row = 2; Column = 1} {Row = 4; Column = 3})
+
+[<Fact>]
+let ``Checker multijump through king rank does not promote``() =
+    let board =
+        array2D [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; Piece.blackChecker; None; Piece.blackChecker; None];
+            [None; None; None; None; None; None; None; Piece.whiteChecker];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let newBoard :Board = uncheckedMoveSequence [{Row = 2; Column = 7}; {Row = 0; Column = 5}; {Row = 2; Column = 3}] board
+    let actualPiece = (square {Row = 2; Column = 3} newBoard).Value
+    
+    Assert.Equal(Checker, actualPiece.PieceType)
 
 [<Fact>]
 let ``Checker cannot jump empty square``() =
