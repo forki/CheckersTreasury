@@ -2,6 +2,7 @@
 open Checkers.Generic
 open Checkers.Board
 open Checkers.FSharpExtensions
+open Checkers.Variants
 open Checkers.GameController
 open Checkers.PortableDraughtsNotation
 open Checkers.GameVariant
@@ -10,19 +11,19 @@ open System
 
 let pdnBoard variant =
     match variant with
-    | AmericanCheckers -> Checkers.Variants.AmericanCheckers.pdnBoard
-    | PoolCheckers -> Checkers.Variants.PoolCheckers.pdnBoard
+    | AmericanCheckers -> AmericanCheckers.pdnBoard
+    | PoolCheckers -> PoolCheckers.pdnBoard
 
 let pdnBoardCoords variant =
     match variant with
-    | AmericanCheckers -> Checkers.Variants.AmericanCheckers.pdnBoardCoords
-    | PoolCheckers -> Checkers.Variants.PoolCheckers.pdnBoardCoords
+    | AmericanCheckers -> AmericanCheckers.pdnBoardCoords
+    | PoolCheckers -> PoolCheckers.pdnBoardCoords
 
 let isValidMove startCoord endCoord gameController =
     let isValidMove =
         match gameController.Variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.isValidMove
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.isValidMove
+        | AmericanCheckers -> AmericanCheckers.isValidMove
+        | PoolCheckers -> PoolCheckers.isValidMove
 
     isValidMove startCoord endCoord gameController.Board &&
     (square startCoord gameController.Board).Value.Player = gameController.CurrentPlayer &&
@@ -33,8 +34,8 @@ let isValidMove startCoord endCoord gameController =
 let internal getDisplayString variant (pdnTurn :int List) (move :Move) =
     let isJump =
         match variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.isJump
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.isJump
+        | AmericanCheckers -> AmericanCheckers.isJump
+        | PoolCheckers -> PoolCheckers.isJump
 
     String.Join((if isJump move then "x" else "-"), pdnTurn)
     
@@ -105,13 +106,13 @@ let internal getGameHistory gameController move boardFen =
 let movePiece startCoord endCoord gameController :Option<GameController> =
     let movePiece =
         match gameController.Variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.movePiece
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.movePiece
+        | AmericanCheckers -> AmericanCheckers.movePiece
+        | PoolCheckers -> PoolCheckers.movePiece
 
     let playerTurnEnds =
         match gameController.Variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.playerTurnEnds
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.playerTurnEnds
+        | AmericanCheckers -> AmericanCheckers.playerTurnEnds
+        | PoolCheckers -> PoolCheckers.playerTurnEnds
 
     let board = movePiece startCoord endCoord gameController.Board
 
@@ -137,13 +138,13 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
 let move (move :Coord seq) (gameController) :Option<GameController> =
     let moveSequence =
         match gameController.Variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.moveSequence
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.moveSequence
+        | AmericanCheckers -> AmericanCheckers.moveSequence
+        | PoolCheckers -> PoolCheckers.moveSequence
 
     let playerTurnEnds =
         match gameController.Variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.playerTurnEnds
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.playerTurnEnds
+        | AmericanCheckers -> AmericanCheckers.playerTurnEnds
+        | PoolCheckers -> PoolCheckers.playerTurnEnds
 
     let board = moveSequence move (Some gameController.Board)
     let moveAsList = (List.ofSeq move)
@@ -195,8 +196,8 @@ let takeBackMove gameController =
 let winningPlayer gameController =
     let winningPlayer =
         match gameController.Variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.winningPlayer
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.winningPlayer
+        | AmericanCheckers -> AmericanCheckers.winningPlayer
+        | PoolCheckers -> PoolCheckers.winningPlayer
 
     winningPlayer gameController.Board
 
@@ -206,12 +207,7 @@ let isWon controller =
     player.Value <> controller.CurrentPlayer
 
 let getPdnCoord variant pdnNumber =
-    let pdnBoardCoords =
-        match variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.pdnBoardCoords
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.pdnBoardCoords
-
-    pdnBoardCoords.[pdnNumber]
+    (pdnBoardCoords variant).[pdnNumber]
 
 let getPdnNumber variant coord =
     square coord (pdnBoard variant)
