@@ -2,6 +2,7 @@
 open Checkers
 open Checkers.Generic
 open Checkers.AIs.PoolCheckersAI
+open Checkers.PortableDraughtsNotation
 open Xunit
 
 [<Fact>]
@@ -13,12 +14,29 @@ let ``Calculate moves returns correct number of hops``() =
 let ``Calculate moves returns correct number of jumps``() =
     let board =
         array2D [
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; Piece.whiteChecker; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let moves = calculateMoves Black board
+    Assert.Equal(1, moves.Length)
+
+[<Fact>]
+let ``Calculate moves returns correct number of moves #2``() =
+    let board =
+        array2D [
             [Piece.blackKing; None; None; None; None; None; None; None];
             [None; Piece.whiteChecker; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; Piece.whiteChecker; None; None];
+            [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
         ];
@@ -127,3 +145,17 @@ let ``Calculate moves returns jump: move ends after promotion``() =
 
     let moves = getPieceJumps {Row = 2; Column = 7} board
     Assert.Equal(2, moves.[0].Length)
+
+[<Fact>]
+let ``King does not attempt to jump off board``() =
+    let controller = controllerFromFen PoolCheckers "[FEN \"B:WK3,13,21,24,29,30,31,32:B4,12\"]" Checkers.Variants.PoolCheckers.pdnBoardCoords
+
+    let moves = getPieceJumps {Row = 0; Column = 5} controller.Board
+    Assert.Equal(0, moves.Length)
+
+[<Fact>]
+let ``King does not attempt to jump onto piece``() =
+    let controller = controllerFromFen PoolCheckers "[FEN \"W:WK23:B9,14\"]" Checkers.Variants.PoolCheckers.pdnBoardCoords
+
+    let moves = getPieceJumps {Row = 5; Column = 4} controller.Board
+    Assert.Equal(0, moves.Length)

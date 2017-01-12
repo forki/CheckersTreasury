@@ -96,8 +96,6 @@ let getCheckerSingleJumps coord (board :Board) =
         | false, [] -> acc
         | false, _ -> loop acc tail
 
-    let foo = loop [] moves
-    let fizz = true
     loop [] moves
 
 let getKingSingleJumps startCoord (board :Board) =
@@ -115,8 +113,12 @@ let getKingSingleJumps startCoord (board :Board) =
         let rec checkBetweenCoords currentCoord rowSign colSign =
             let nextCoord = offset currentCoord {Row = rowSign; Column = colSign}
             match currentCoord, nextCoord with
-            | _, c when not <| coordExists c -> None
-            | c, _ when (square c board).IsSome && (square c board).Value.Player <> currentPlayer -> Some (offset currentCoord {Row = rowSign; Column = colSign})
+            | _, c when (not <| coordExists c) -> None
+            | c, _ when (square c board).IsSome ->
+                match (square c board).Value with
+                | p when p.Player = currentPlayer -> None
+                | _ when (square nextCoord board).IsSome -> None
+                | _ -> Some <| offset currentCoord {Row = rowSign; Column = colSign}
             | _ -> checkBetweenCoords nextCoord rowSign colSign
         
         let head::tail = jumpOffsets
