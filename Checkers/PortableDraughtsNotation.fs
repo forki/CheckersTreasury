@@ -37,7 +37,7 @@ let rec addPieces (fenPieces :string List) player (board :Board) (pdnBoardCoords
     
     if not tail.IsEmpty then addPieces tail player board pdnBoardCoords
 
-let controllerFromFen variant (fen :string) (pdnBoardCoords :Coord List) =
+let controllerFromFen variant (fen :string) =
     let fenValue = fen.Split('"').[1]
     let fenSubsections = fenValue.Split(':')
     let playerTurn =
@@ -47,6 +47,11 @@ let controllerFromFen variant (fen :string) (pdnBoardCoords :Coord List) =
         
     let whitePieces = getPieceNotation fenSubsections WhiteSymbol
     let blackPieces = getPieceNotation fenSubsections BlackSymbol
+
+    let pdnBoardCoords =
+        match variant with
+        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.pdnBoardCoords
+        | PoolCheckers -> Checkers.Variants.PoolCheckers.pdnBoardCoords
     
     let board = Board.emptyBoardList()
     if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) Player.White board pdnBoardCoords
@@ -64,7 +69,7 @@ let controllerFromFen variant (fen :string) (pdnBoardCoords :Coord List) =
         CurrentCoord = None;
     }
 
-let createFen player (board :Board) (pdnBoard :int Option [,]) =
+let createFen variant player (board :Board) =
     let turnSymbol =
         match player with
         | White -> WhiteSymbol
@@ -77,6 +82,12 @@ let createFen player (board :Board) (pdnBoard :int Option [,]) =
             match piece.IsSome && isPlayerPiece player coord board with
             | true ->
                 let isKing = piece.Value.PieceType = PieceType.King
+
+                let pdnBoard =
+                    match variant with
+                    | AmericanCheckers -> Checkers.Variants.AmericanCheckers.pdnBoard
+                    | PoolCheckers -> Checkers.Variants.PoolCheckers.pdnBoard
+
                 let fenNumber = (square coord pdnBoard).Value
                 loop (fenNumbers @ [(if isKing then "K" else "") + fenNumber.ToString()]) player c
             | false -> loop fenNumbers player c

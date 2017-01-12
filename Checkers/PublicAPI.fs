@@ -9,21 +9,19 @@ open Checkers.GameVariant
 open Checkers.Minimax
 open System
 
-let pdnBoard variant =
+let internal gameVariant variant =
     match variant with
-    | AmericanCheckers -> AmericanCheckers.pdnBoard
-    | PoolCheckers -> PoolCheckers.pdnBoard
+    | AmericanCheckers -> GameVariant.AmericanCheckers
+    | PoolCheckers -> GameVariant.PoolCheckers
+
+let pdnBoard variant =
+    (gameVariant variant).pdnBoard
 
 let pdnBoardCoords variant =
-    match variant with
-    | AmericanCheckers -> AmericanCheckers.pdnBoardCoords
-    | PoolCheckers -> PoolCheckers.pdnBoardCoords
+    (gameVariant variant).pdnBoardCoords
 
 let isValidMove startCoord endCoord gameController =
-    let isValidMove =
-        match gameController.Variant with
-        | AmericanCheckers -> AmericanCheckers.isValidMove
-        | PoolCheckers -> PoolCheckers.isValidMove
+    let isValidMove = (gameVariant gameController.Variant).isValidMove
 
     isValidMove startCoord endCoord gameController.Board &&
     (square startCoord gameController.Board).Value.Player = gameController.CurrentPlayer &&
@@ -104,24 +102,15 @@ let internal getGameHistory gameController move boardFen =
         | _ -> (List.take (gameController.MoveHistory.Length - 1) gameController.MoveHistory) @ [newTurnValue]
 
 let movePiece startCoord endCoord gameController :Option<GameController> =
-    let movePiece =
-        match gameController.Variant with
-        | AmericanCheckers -> AmericanCheckers.movePiece
-        | PoolCheckers -> PoolCheckers.movePiece
-
-    let playerTurnEnds =
-        match gameController.Variant with
-        | AmericanCheckers -> AmericanCheckers.playerTurnEnds
-        | PoolCheckers -> PoolCheckers.playerTurnEnds
-
-    let board = movePiece startCoord endCoord gameController.Board
+    let variant = gameVariant gameController.Variant
+    let board = variant.movePiece startCoord endCoord gameController.Board
 
     match board with
     | None -> None
     | Some b ->
-        let isTurnEnding = playerTurnEnds [startCoord; endCoord] gameController.Board b
+        let isTurnEnding = variant.playerTurnEnds [startCoord; endCoord] gameController.Board b
         let nextPlayerTurn = 
-            match playerTurnEnds [startCoord; endCoord] gameController.Board b with
+            match variant.playerTurnEnds [startCoord; endCoord] gameController.Board b with
             | true -> otherPlayer gameController.CurrentPlayer
             | false -> gameController.CurrentPlayer
 
@@ -131,29 +120,21 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
                 Board = b
                 CurrentPlayer = nextPlayerTurn
                 InitialPosition = gameController.InitialPosition
-                MoveHistory = getGameHistory gameController [startCoord; endCoord] (createFen nextPlayerTurn b (pdnBoard gameController.Variant))
+                MoveHistory = getGameHistory gameController [startCoord; endCoord] (createFen gameController.Variant nextPlayerTurn b)
                 CurrentCoord = if isTurnEnding then None else Some endCoord
             }
 
 let move (move :Coord seq) (gameController) :Option<GameController> =
-    let moveSequence =
-        match gameController.Variant with
-        | AmericanCheckers -> AmericanCheckers.moveSequence
-        | PoolCheckers -> PoolCheckers.moveSequence
-
-    let playerTurnEnds =
-        match gameController.Variant with
-        | AmericanCheckers -> AmericanCheckers.playerTurnEnds
-        | PoolCheckers -> PoolCheckers.playerTurnEnds
-
-    let board = moveSequence move (Some gameController.Board)
+    let variant = gameVariant gameController.Variant
+    let board = variant.moveSequence move (Some gameController.Board)
     let moveAsList = (List.ofSeq move)
+
     match board with
     | None -> None
     | Some b ->
-        let isTurnEnding = playerTurnEnds moveAsList gameController.Board b
+        let isTurnEnding = variant.playerTurnEnds moveAsList gameController.Board b
         let nextPlayerTurn =
-            match playerTurnEnds moveAsList gameController.Board b with
+            match variant.playerTurnEnds moveAsList gameController.Board b with
             | true -> otherPlayer gameController.CurrentPlayer
             | false -> gameController.CurrentPlayer
 
@@ -163,17 +144,14 @@ let move (move :Coord seq) (gameController) :Option<GameController> =
                 Board = b;
                 CurrentPlayer = nextPlayerTurn
                 InitialPosition = gameController.InitialPosition
-                MoveHistory = getGameHistory gameController moveAsList (createFen nextPlayerTurn b (pdnBoard gameController.Variant))
+                MoveHistory = getGameHistory gameController moveAsList (createFen gameController.Variant nextPlayerTurn b)
                 CurrentCoord = if isTurnEnding then None else Some (Seq.last move)
             }
 
 let getMove searchDepth gameController =
-    let gameVariant =
-        match gameController.Variant with
-        | AmericanCheckers -> GameVariant.AmericanCheckers
-        | PoolCheckers -> GameVariant.PoolCheckers
+    let variant = gameVariant gameController.Variant
 
-    (minimax gameController.CurrentPlayer searchDepth searchDepth None None gameController.Board gameVariant).Move
+    (minimax gameController.CurrentPlayer searchDepth searchDepth None None gameController.Board variant).Move
 
 let takeBackMove gameController =
     let fen =
@@ -191,14 +169,10 @@ let takeBackMove gameController =
             let newLastMove = {lastMove with WhiteMove = None}
             List.truncate (gameController.MoveHistory.Length - 1) gameController.MoveHistory @ [newLastMove]
     
-    {(controllerFromFen gameController.Variant fen (pdnBoardCoords gameController.Variant)) with MoveHistory = newMoveHistory}
+    {(controllerFromFen gameController.Variant fen) with MoveHistory = newMoveHistory}
 
 let winningPlayer gameController =
-    let winningPlayer =
-        match gameController.Variant with
-        | AmericanCheckers -> AmericanCheckers.winningPlayer
-        | PoolCheckers -> PoolCheckers.winningPlayer
-
+    let winningPlayer = (gameVariant gameController.Variant).winningPlayer
     winningPlayer gameController.Board
 
 let isWon controller =
@@ -207,7 +181,7 @@ let isWon controller =
     player.Value <> controller.CurrentPlayer
 
 let createFen variant player (board :Board) =
-    createFen player board (pdnBoard variant)
+    createFen variant player board
 
 let controllerFromFen variant fen =
-    controllerFromFen variant fen (pdnBoardCoords variant)
+    controllerFromFen variant fen
