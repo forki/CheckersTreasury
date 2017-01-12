@@ -14,7 +14,7 @@ type Move = Coord List
 type PdnMove = { Move :int List; ResultingFen :string; DisplayString :string }
 type PdnTurn = { MoveNumber :int; BlackMove :PdnMove; WhiteMove :PdnMove Option }
 
-type internal MoveTree = { Move :Move; Parent :Option<MoveTree>; Children :Option<List<MoveTree>> }
+type internal MoveTree = { Move :Move; Children :Option<List<MoveTree>> }
 type internal AlphaBetaMove = { Alpha :float Option; Beta :float Option; Move :Move }
 
 let listFromSeq (value :'a seq) =

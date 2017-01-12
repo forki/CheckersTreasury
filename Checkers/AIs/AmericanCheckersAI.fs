@@ -116,7 +116,6 @@ let getPieceSingleJumps coord (board :Board) =
 let rec internal createMoveTree (move :Move) (board :Board) =
     {
         Move = move;
-        Parent = None;
         Children =
             let newBoard =
                 match move.Length with

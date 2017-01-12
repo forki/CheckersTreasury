@@ -132,30 +132,28 @@ let getKingSingleJumps startCoord (board :Board) =
     
     getJumps [] jumpCoordOffsets
 
-let getPieceSingleJumps coord (board :Board) =
-    let piece = (square coord board).Value
-    match piece.PieceType with
+let getPieceSingleJumps pieceType coord (board :Board) =
+    match pieceType with
     | Checker -> getCheckerSingleJumps coord board
     | King -> getKingSingleJumps coord board
 
-let rec internal createMoveTree (move :Move) (board :Board) =
+let rec internal createMoveTree pieceType (move :Move) (board :Board) =
     {
         Move = move;
-        Parent = None;
         Children =
             let newBoard =
                 match move.Length with
                 | 1 -> board
                 | _ -> uncheckedMoveSequence move board
 
-            let newJumps = getPieceSingleJumps (List.last move) newBoard
+            let newJumps = getPieceSingleJumps pieceType (List.last move) newBoard
             let newMoveEndCoords = List.map (fun item -> List.last item) newJumps
 
             match newMoveEndCoords.IsEmpty with
             | true -> None
             | false ->
                 let moves = List.map (fun (item :Coord) -> move @ [item]) newMoveEndCoords
-                let children = List.map (fun item -> createMoveTree item board) moves
+                let children = List.map (fun item -> createMoveTree pieceType item board) moves
                 Some children
     }
 
@@ -167,7 +165,8 @@ let getPieceJumps coord (board :Board) =
         | None -> moves.Add(moveTree.Move)
         | Some t -> List.iter (fun item -> (loop item)) t
 
-    let moveTree = createMoveTree [coord] board
+    let pieceType = (square coord board).Value.PieceType
+    let moveTree = createMoveTree pieceType [coord] board
     match moveTree.Children with
     | Some _ -> loop moveTree
     | None -> ()

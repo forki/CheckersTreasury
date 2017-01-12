@@ -78,7 +78,7 @@ let ``Calculate moves prefers jumps to hops 1``() =
     Assert.Equal(1, moves.Length)
 
 [<Fact>]
-let ``Calculate moves returns multi jump``() =
+let ``Calculate moves returns multijump``() =
     let board =
         array2D [
             [Piece.blackChecker; None; None; None; None; None; None; None];
@@ -95,7 +95,7 @@ let ``Calculate moves returns multi jump``() =
     Assert.Equal(2, moves.Length)
 
 [<Fact>]
-let ``Calculate moves returns multi jump checker jumps backwards``() =
+let ``Calculate moves returns multijump checker jumps backwards``() =
     let board =
         array2D [
             [Piece.blackChecker; None; None; None; None; None; None; None];
@@ -110,3 +110,20 @@ let ``Calculate moves returns multi jump checker jumps backwards``() =
 
     let moves = getPieceJumps {Row = 0; Column = 0} board
     Assert.Equal(3, moves.[0].Length)
+
+[<Fact>]
+let ``Calculate moves returns jump: move ends after promotion``() =
+    let board =
+        array2D [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; Piece.blackChecker; None];
+            [None; None; None; Piece.blackChecker; None; None; None; Piece.whiteChecker];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let moves = getPieceJumps {Row = 2; Column = 7} board
+    Assert.Equal(2, moves.[0].Length)
