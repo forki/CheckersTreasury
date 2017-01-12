@@ -39,7 +39,7 @@ let internal getDisplayString variant (pdnTurn :int List) (move :Move) =
 
     String.Join((if isJump move then "x" else "-"), pdnTurn)
     
-let Move gameController move boardFen =
+let internal getPdnForMove gameController move boardFen =
     let pdnBoard = (pdnBoard gameController.Variant)
 
     let gameHistory = gameController.MoveHistory
@@ -62,7 +62,7 @@ let Move gameController move boardFen =
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
     
-let ContinuedMove gameController move boardFen =
+let internal getPdnForContinuedMove gameController move boardFen =
     let pdnBoard = (pdnBoard gameController.Variant)
 
     let gameHistory = gameController.MoveHistory
@@ -93,8 +93,8 @@ let internal getGameHistory gameController move boardFen =
 
     let newTurnValue =
         match isContinuedMove with
-        | false -> Move gameController move boardFen
-        | true -> ContinuedMove gameController move boardFen
+        | false -> getPdnForMove gameController move boardFen
+        | true -> getPdnForContinuedMove gameController move boardFen
 
     match gameController.CurrentPlayer, isContinuedMove with
     | Black, false -> gameController.MoveHistory @ [newTurnValue]
@@ -205,12 +205,6 @@ let isWon controller =
     let player = winningPlayer controller
     player.IsSome &&
     player.Value <> controller.CurrentPlayer
-
-let getPdnCoord variant pdnNumber =
-    (pdnBoardCoords variant).[pdnNumber]
-
-let getPdnNumber variant coord =
-    square coord (pdnBoard variant)
 
 let createFen variant player (board :Board) =
     createFen player board (pdnBoard variant)
