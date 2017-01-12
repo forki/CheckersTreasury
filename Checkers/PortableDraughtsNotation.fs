@@ -3,6 +3,7 @@ open Checkers.Generic
 open Checkers.Piece
 open Checkers.Board
 open Checkers.FSharpExtensions
+open Checkers.GameVariant
 open Checkers.GameController
 open System
 
@@ -48,10 +49,7 @@ let controllerFromFen variant (fen :string) =
     let whitePieces = getPieceNotation fenSubsections WhiteSymbol
     let blackPieces = getPieceNotation fenSubsections BlackSymbol
 
-    let pdnBoardCoords =
-        match variant with
-        | AmericanCheckers -> Checkers.Variants.AmericanCheckers.pdnBoardCoords
-        | PoolCheckers -> Checkers.Variants.PoolCheckers.pdnBoardCoords
+    let pdnBoardCoords = variant.pdnBoardCoords
     
     let board = Board.emptyBoardList()
     if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) Player.White board pdnBoardCoords
@@ -83,10 +81,7 @@ let createFen variant player (board :Board) =
             | true ->
                 let isKing = piece.Value.PieceType = PieceType.King
 
-                let pdnBoard =
-                    match variant with
-                    | AmericanCheckers -> Checkers.Variants.AmericanCheckers.pdnBoard
-                    | PoolCheckers -> Checkers.Variants.PoolCheckers.pdnBoard
+                let pdnBoard = variant.pdnBoard
 
                 let fenNumber = (square coord pdnBoard).Value
                 loop (fenNumbers @ [(if isKing then "K" else "") + fenNumber.ToString()]) player c

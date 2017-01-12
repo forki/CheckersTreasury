@@ -148,14 +148,14 @@ let ``Calculate moves returns jump: move ends after promotion``() =
 
 [<Fact>]
 let ``King does not attempt to jump off board``() =
-    let controller = controllerFromFen PoolCheckers "[FEN \"B:WK3,13,21,24,29,30,31,32:B4,12\"]"
+    let controller = controllerFromFen GameVariant.GameVariant.PoolCheckers "[FEN \"B:WK3,13,21,24,29,30,31,32:B4,12\"]"
 
     let moves = getPieceJumps {Row = 0; Column = 5} controller.Board
     Assert.Equal(0, moves.Length)
 
 [<Fact>]
 let ``King does not attempt to jump onto piece``() =
-    let controller = controllerFromFen PoolCheckers "[FEN \"W:WK23:B9,14\"]"
+    let controller = controllerFromFen GameVariant.GameVariant.PoolCheckers "[FEN \"W:WK23:B9,14\"]"
 
     let moves = getPieceJumps {Row = 5; Column = 4} controller.Board
     Assert.Equal(0, moves.Length)
