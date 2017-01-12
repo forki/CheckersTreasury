@@ -133,6 +133,24 @@ let ``Checker multijump through king rank does not promote``() =
     Assert.Equal(Checker, actualPiece.PieceType)
 
 [<Fact>]
+let ``Turn cannot continue after promotion``() =
+    let board =
+        array2D [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; Piece.blackChecker; None];
+            [None; None; None; Piece.blackChecker; None; None; None; Piece.whiteChecker];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let newBoard :Board = uncheckedMoveSequence [{Row = 2; Column = 7}; {Row = 0; Column = 5}] board
+
+    Assert.True(playerTurnEnds [{Row = 2; Column = 7}; {Row = 0; Column = 5}] board newBoard)
+
+[<Fact>]
 let ``Checker cannot jump empty square``() =
     let board =
         array2D [
@@ -853,34 +871,6 @@ let ``Player turn ends when no jumps available``() =
         ];
 
     Assert.True(playerTurnEnds [{ Row = 4; Column = 4 }; { Row = 2; Column = 2 }] originalBoard newBoard)
-
-[<Fact>]
-let ``Turn can continue after promotion``() =
-    let originalBoard =
-        array2D [
-            [None; None; None; None; None; None; None; None];
-            [None; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
-            [None; None; None; None; None; Piece.whiteChecker; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-        ];
-
-    let newBoard =
-        array2D [
-            [None; None; None; Piece.whiteKing; None; None; None; None];
-            [None; None; Piece.blackChecker; None; Piece.blackChecker; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-            [None; None; None; None; None; None; None; None];
-        ];
-
-    Assert.False(playerTurnEnds [{ Row = 2; Column = 5 }; { Row = 0; Column = 3 }] originalBoard newBoard)
 
 [<Fact>]
 let ``Winning player returns player``() =
