@@ -41,10 +41,10 @@ let internal chooseNewBeta currentBeta (candidateBeta :float Option) =
     | (None, Some candidate) -> Some candidate
     | _ -> None
 
-let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) (variant :GameVariant) =
-    match currentSearchDepth = 0 || (variant.aiMembers.winningPlayer board).IsSome with
+let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) (aiMembers :AiMembers) =
+    match currentSearchDepth = 0 || (aiMembers.winningPlayer board).IsSome with
     | true ->
-        let weightDifference = Some <| variant.aiMembers.calculateWeightDifference board
+        let weightDifference = Some <| aiMembers.calculateWeightDifference board
         let newAlpha = 
             match player with
             | Black -> weightDifference
@@ -72,9 +72,9 @@ let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) 
                 match newAlpha.IsNone || newBeta.IsNone || newAlpha.Value < newBeta.Value with
                 | false -> loop alphaForNode betaForNode newAlpha newBeta move (moves |> List.tail)
                 | true ->
-                    let newBoard = variant.aiMembers.uncheckedMoveSequence (Seq.ofList currentMove) board
+                    let newBoard = aiMembers.uncheckedMoveSequence (Seq.ofList currentMove) board
 
-                    let alphaBetaMove = minimax (otherPlayer player) (currentSearchDepth - 1) searchDepth alphaForNode betaForNode newBoard variant
+                    let alphaBetaMove = minimax (otherPlayer player) (currentSearchDepth - 1) searchDepth alphaForNode betaForNode newBoard aiMembers
 
                     match player with
                     | Black ->
@@ -84,7 +84,7 @@ let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) 
                         let (newBetaForNode, newNewBeta, newMove) = getNewValueAndMove chooseNewBeta betaForNode alphaBetaMove.Beta newBeta currentMove move
                         loop alphaForNode newBetaForNode newAlpha newNewBeta newMove (moves |> List.tail)
 
-        let potentialMoves = (variant.aiMembers.calculateMoves player board)
+        let potentialMoves = (aiMembers.calculateMoves player board)
         match potentialMoves.Length, currentSearchDepth = searchDepth with
         | 1, true -> {Alpha = None; Beta = None; Move = potentialMoves.[0]}
         | _ -> loop None None alpha beta [] potentialMoves

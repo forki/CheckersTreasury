@@ -39,7 +39,7 @@ let ``AI forces win``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 3 3 None None board GameVariant.AmericanCheckers
+    let move = minimax White 3 3 None None board AiMembers.AmericanCheckers
     Assert.Equal(2, move.Move.[1].Row)
 
 [<Fact>]
@@ -56,7 +56,7 @@ let ``AI forces win 1``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 3 3 None None board GameVariant.AmericanCheckers
+    let move = minimax White 3 3 None None board AiMembers.AmericanCheckers
     Assert.Equal({Row = 2; Column = 5}, move.Move.[1])
 
 [<Fact>]
@@ -73,7 +73,7 @@ let ``AI prefers double jump to single jump``() =
             [None; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax Black 1 1 None None board GameVariant.AmericanCheckers
+    let move = minimax Black 1 1 None None board AiMembers.AmericanCheckers
     Assert.Equal(3, move.Move.Length)
 
 [<Fact>]
@@ -90,7 +90,7 @@ let ``AI should not give free double jump``() =
             [Piece.whiteChecker; None; None; None; None; None; None; None];
         ];
 
-    let move = minimax White 2 2 None None board GameVariant.AmericanCheckers
+    let move = minimax White 2 2 None None board AiMembers.AmericanCheckers
     Assert.Equal({Row = 3; Column = 6}, move.Move.[1])
 
 [<Fact>]
@@ -107,5 +107,5 @@ let ``AI should not give free single jump``() =
             [Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None; Piece.whiteChecker; None];
         ];
 
-    let move = minimax White 8 8 None None board GameVariant.AmericanCheckers
+    let move = minimax White 8 8 None None board AiMembers.AmericanCheckers
     Assert.Equal({Row = 5; Column = 2}, move.Move.[1])
