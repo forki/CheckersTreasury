@@ -41,7 +41,7 @@ let ``Create FEN from controller string``() =
         ];
 
     let expectedFENString = "[FEN \"W:WK15,19:BK10\"]"
-    Assert.Equal(expectedFENString, (createFen GameVariant.GameVariant.AmericanCheckers Player.White board))
+    Assert.Equal(expectedFENString, (createFen GameVariant.PdnMembers.AmericanCheckers Player.White board))
 
 [<Fact>]
 let ``Create controller from FEN string: white move does not crash``() =

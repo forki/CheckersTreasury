@@ -49,7 +49,7 @@ let controllerFromFen variant (fen :string) =
     let whitePieces = getPieceNotation fenSubsections WhiteSymbol
     let blackPieces = getPieceNotation fenSubsections BlackSymbol
 
-    let pdnBoardCoords = variant.pdnBoardCoords
+    let pdnBoardCoords = variant.pdnMembers.pdnBoardCoords
     
     let board = Board.emptyBoardList()
     if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) Player.White board pdnBoardCoords
