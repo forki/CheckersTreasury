@@ -26,7 +26,7 @@ let ``chooseNewBeta picks some value``() =
     Assert.Equal(1.0, newBeta.Value)
 
 [<Fact>]
-let ``AI forces win``() =
+let ``AI forces win: American Checkers``() =
     let board =
         array2D [
             [None; None; None; None; None; None; None; Piece.blackKing];
@@ -40,6 +40,23 @@ let ``AI forces win``() =
         ];
 
     let move = minimax White 3 3 None None board AiMembers.AmericanCheckers
+    Assert.Equal(2, move.Move.[1].Row)
+
+[<Fact>]
+let ``AI forces win: Pool Checkers``() =
+    let board =
+        array2D [
+            [None; None; None; None; None; None; None; Piece.blackKing];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; Piece.whiteKing; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let move = minimax White 3 3 None None board AiMembers.PoolCheckers
     Assert.Equal(2, move.Move.[1].Row)
 
 [<Fact>]

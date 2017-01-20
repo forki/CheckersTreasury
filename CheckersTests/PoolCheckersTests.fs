@@ -295,6 +295,22 @@ let ``King can make flying jump``() =
     Assert.True(board |> isValidKingJump{Row = 0; Column = 1} {Row = 4; Column = 5})
 
 [<Fact>]
+let ``King cannot make flying jump over another piece``() =
+    let board =
+        array2D [
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; Piece.whiteChecker; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; Piece.whiteChecker; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.False(board |> isValidKingJump{Row = 0; Column = 1} {Row = 4; Column = 5})
+
+[<Fact>]
 let ``King cannot jump empty square``() =
     let board =
         array2D [

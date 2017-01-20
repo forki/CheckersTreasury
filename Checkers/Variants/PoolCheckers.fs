@@ -58,8 +58,7 @@ let internal checkMoveDirection piece startCoord endCoord =
     match piece.PieceType, piece.Player, isJump with
     | Checker, Black, false -> startCoord.Row < endCoord.Row
     | Checker, White, false -> startCoord.Row > endCoord.Row
-    | _, _, true -> true
-    | King, _, _ -> true
+    | _, _, true | King, _, _ -> true
 
 let internal isValidCheckerHop startCoord endCoord (board :Board) =
     let piece = (square startCoord board).Value

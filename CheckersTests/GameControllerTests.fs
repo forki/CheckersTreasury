@@ -67,7 +67,7 @@ let ``Moving records move history: black hop``() =
     Assert.Equal("9-13", (List.last newController.Value.MoveHistory).BlackMove.DisplayString)
 
 [<Fact>]
-let ``Moving records move history: black jump``() =
+let ``Moving records move history: American Checkers black jump``() =
     let board =
         array2D [
             [None; Piece.blackKing; None; None; None; None; None; None];
@@ -86,7 +86,7 @@ let ``Moving records move history: black jump``() =
     Assert.Equal("1x10", (List.last newController.Value.MoveHistory).BlackMove.DisplayString)
 
 [<Fact>]
-let ``Moving records move history: white hop``() =
+let ``Moving records move history: American Checkers white hop``() =
     let board =
         array2D [
             [None; None; None; None; None; None; None; None];
@@ -100,6 +100,46 @@ let ``Moving records move history: white hop``() =
         ];
 
     let controller = { Variant = GameVariant.GameVariant.AmericanCheckers; Board = board; CurrentPlayer = White; InitialPosition = ""; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; ResultingFen = ""; DisplayString = "1x10" }; WhiteMove = None }]; CurrentCoord = None }
+    let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
+    let lastMove = (List.last newController.Value.MoveHistory)
+
+    Assert.Equal("1x10", lastMove.BlackMove.DisplayString)
+    Assert.Equal("15x6", lastMove.WhiteMove.Value.DisplayString)
+
+[<Fact>]
+let ``Moving records move history: Pool Checkers black jump``() =
+    let board =
+        array2D [
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; Piece.whiteKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let controller = { Variant = GameVariant.GameVariant.PoolCheckers; Board = board; CurrentPlayer = Black; InitialPosition = ""; MoveHistory = []; CurrentCoord = None; }
+    let newController = movePiece { Row = 0; Column = 1 } { Row = 2; Column = 3 } controller
+
+    Assert.Equal("1x10", (List.last newController.Value.MoveHistory).BlackMove.DisplayString)
+
+[<Fact>]
+let ``Moving records move history: Pool Checkers white hop``() =
+    let board =
+        array2D [
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.blackKing; None; None; None; None];
+            [None; None; None; None; Piece.whiteKing; None; None; None];
+            [None; None; None; None; None; Piece.whiteKing; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let controller = { Variant = GameVariant.GameVariant.PoolCheckers; Board = board; CurrentPlayer = White; InitialPosition = ""; MoveHistory = [{MoveNumber = 1; BlackMove = { Move = [1; 10]; ResultingFen = ""; DisplayString = "1x10" }; WhiteMove = None }]; CurrentCoord = None }
     let newController = movePiece { Row = 3; Column = 4 } { Row = 1; Column = 2 } controller
     let lastMove = (List.last newController.Value.MoveHistory)
 

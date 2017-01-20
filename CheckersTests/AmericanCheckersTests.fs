@@ -97,6 +97,22 @@ let ``Checker cannot move forward to claimed square``() =
     Assert.False(board |> isValidCheckerHop{Row = 1; Column = 0} {Row = 2; Column = 1})
 
 [<Fact>]
+let ``Checker cannot make flying jump``() =
+    let board =
+        array2D [
+            [None; Piece.blackKing; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; Piece.whiteKing; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.False(board |> isValidMove {Row = 0; Column = 1} {Row = 3; Column = 4})
+
+[<Fact>]
 let ``Checker can jump forward``() =
     let board =
         array2D [
