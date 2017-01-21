@@ -99,7 +99,6 @@ let internal isValidKingJump startCoord endCoord (board :Board) =
     let nextCoord = offset startCoord {Row = rowSign; Column = colSign}
 
     let jumpTarget = getJumpTarget piece.Player nextCoord rowSign colSign board
-    let foo = true
 
     jumpTarget.IsSome &&
     jumpTarget.Value = endCoord &&
@@ -232,9 +231,6 @@ let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :B
     let lastMoveWasJump = abs(move.[0].Row - move.[1].Row) > 1
     let pieceWasPromoted = (square (List.last move) currentBoard).Value.PieceType = King &&
                             (square move.[0] originalBoard).Value.PieceType = Checker
-
-    let foo = hasValidJump (List.last move) currentBoard
-    let bar = true
 
     pieceWasPromoted ||
     not (lastMoveWasJump && hasValidJump (List.last move) currentBoard)
