@@ -4,6 +4,8 @@ open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.PoolCheckers
 open Checkers.Generic
+open Checkers.PortableDraughtsNotation
+open Checkers.GameVariant
 open Xunit
 
 [<Fact>]
@@ -293,6 +295,22 @@ let ``King can make flying jump``() =
         ];
 
     Assert.True(board |> isValidKingJump{Row = 0; Column = 1} {Row = 4; Column = 5})
+
+[<Fact>]
+let ``King can make flying jump 1``() =
+    let board =
+        array2D [
+            [None; None; None; Piece.whiteKing; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; Piece.blackKing; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    Assert.True(board |> isValidKingJump{Row = 0; Column = 3} {Row = 3; Column = 6})
 
 [<Fact>]
 let ``King cannot make flying jump over another piece``() =
@@ -803,6 +821,20 @@ let ``Player turn not ended``() =
         ];
 
     Assert.False(playerTurnEnds [{ Row = 4; Column = 4 }; { Row = 2; Column = 2 }] originalBoard newBoard)
+
+[<Fact>]
+let ``Player turn does not end during flying king jump``() =
+    let originalBoard = (controllerFromFen GameVariant.PoolCheckers "[FEN \"W:WK9:BK6,K11,K23\"]").Board
+    let newBoard = (controllerFromFen GameVariant.PoolCheckers "[FEN \"W:WK2:BK11,K23\"]").Board
+
+    Assert.False(playerTurnEnds [{ Row = 2; Column = 1 }; { Row = 0; Column = 3 }] originalBoard newBoard)
+
+[<Fact>]
+let ``Player turn does not end during flying king jump 1``() =
+    let originalBoard = (controllerFromFen GameVariant.PoolCheckers "[FEN \"W:WK2:BK11,K23\"]").Board
+    let newBoard = (controllerFromFen GameVariant.PoolCheckers "[FEN \"W:WK16:BK23\"]").Board
+
+    Assert.False(playerTurnEnds [{ Row = 0; Column = 3 }; { Row = 3; Column = 6 }] originalBoard newBoard)
 
 [<Fact>]
 let ``Player turn not ended--checker piece``() =

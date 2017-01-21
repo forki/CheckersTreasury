@@ -114,7 +114,7 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
 
 let move (move :Coord seq) (gameController) :Option<GameController> =
     let board = gameController.Variant.apiMembers.moveSequence move (Some gameController.Board)
-    let moveAsList = (List.ofSeq move)
+    let moveAsList = List.ofSeq move
 
     match board with
     | None -> None
