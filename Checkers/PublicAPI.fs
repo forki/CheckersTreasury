@@ -8,6 +8,7 @@ open Checkers.PortableDraughtsNotation
 open Checkers.GameVariant
 open Checkers.Minimax
 open System
+open System.Threading
 
 let getGameVariant variant =
     match variant with
@@ -135,8 +136,11 @@ let move (move :Coord seq) (gameController) :Option<GameController> =
                 CurrentCoord = if isTurnEnding then None else Some (Seq.last move)
             }
 
-let getMove searchDepth gameController =
-    (minimax gameController.CurrentPlayer searchDepth searchDepth None None gameController.Board gameController.Variant.aiMembers).Move
+let getMove searchDepth gameController cancellationToken =
+    (minimax gameController.CurrentPlayer searchDepth searchDepth None None gameController.Board gameController.Variant.aiMembers cancellationToken).Move
+
+let getValidMoves gameController =
+    gameController.Variant.aiMembers.calculateMoves gameController.CurrentPlayer gameController.Board
 
 let takeBackMove gameController =
     let fen =
