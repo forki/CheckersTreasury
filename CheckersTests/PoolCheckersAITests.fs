@@ -1,4 +1,4 @@
-﻿module AmericanCheckersAITests
+﻿module PoolCheckersAITests
 open Checkers
 open Checkers.Generic
 open Checkers.AIs.PoolCheckersAI
@@ -8,6 +8,23 @@ open Xunit
 [<Fact>]
 let ``Calculate moves returns correct number of hops``() =
     let moves = calculateMoves Black Board.defaultBoard
+    Assert.Equal(7, moves.Length)
+
+[<Fact>]
+let ``Calculate moves returns correct number of king hops``() =
+    let board =
+        array2D [
+            [None; None; Piece.blackKing; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+            [None; None; None; None; None; None; None; None];
+        ];
+
+    let moves = calculateMoves Black board
     Assert.Equal(7, moves.Length)
 
 [<Fact>]

@@ -94,7 +94,7 @@ let rec minimax player currentSearchDepth searchDepth alpha beta (board :Board) 
                                 let (newBetaForNode, newNewBeta, newMove) = getNewValueAndMove chooseNewBeta betaForNode alphaBetaMove.Beta newBeta currentMove move
                                 loop alphaForNode newBetaForNode newAlpha newNewBeta newMove (moves |> List.tail)
 
-            let potentialMoves = (aiMembers.calculateMoves player board)
+            let potentialMoves = aiMembers.calculateMoves player board
             match cancellationToken.IsCancellationRequested with
             | true -> {Alpha = None; Beta = None; Move = []}
             | _ ->

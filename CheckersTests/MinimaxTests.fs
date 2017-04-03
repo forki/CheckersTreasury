@@ -47,7 +47,7 @@ let ``AI forces win: American Checkers``() =
 let ``AI forces win: Pool Checkers``() =
     let board =
         array2D [
-            [None; None; None; None; None; None; None; Piece.blackKing];
+            [None; None; None; None; None; None; None; Piece.blackChecker];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; None; None];
             [None; None; None; None; None; None; Piece.whiteKing; None];

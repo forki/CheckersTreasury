@@ -4,6 +4,7 @@ open Checkers.Piece
 open Checkers.Board
 open Checkers.FSharpExtensions
 open Checkers.Variants.PoolCheckers
+open System.Linq
 
 let checkerWeights =
     array2D [
@@ -73,16 +74,46 @@ let calculateWeightDifference (board :Board) =
     
     loop 0.0 {Row = 0; Column = 0}
 
-let checkerHops player =
+let checkerHopDirections player =
     match player with
     | White -> [{Row = -1; Column = -1}; {Row = -1; Column = 1}]
     | Black -> [{Row = 1; Column = -1}; {Row = 1; Column = 1}]
 
-let kingHops player =
-    (checkerHops player) @
-        (match player with
-        | White -> [{Row = 1; Column = -1}; {Row = 1; Column = 1}]
-        | Black -> [{Row = -1; Column = -1}; {Row = -1; Column = 1}])
+let checkerHops player startCoord board =
+    let hopDirections = checkerHopDirections player
+
+    let getHopForDirection currentCoord rowSign colSign board =
+        let nextCoord = offset currentCoord {Row = rowSign; Column = colSign}
+        match nextCoord with
+        | c when not <| coordExists c -> None
+        | _ ->
+            match (square nextCoord board) with
+            | Some c -> None
+            | _ -> Some nextCoord
+
+    List.choose id (List.map (fun i -> getHopForDirection startCoord i.Row i.Column board) hopDirections)
+
+let kingHops player startCoord board =
+    let hopDirections = (checkerHopDirections player) @
+                        (match player with
+                        | White -> [{Row = 1; Column = -1}; {Row = 1; Column = 1}]
+                        | Black -> [{Row = -1; Column = -1}; {Row = -1; Column = 1}])
+    
+    let rec getHopsForDirection hops currentCoord rowSign colSign board =
+        let nextCoord = offset currentCoord {Row = rowSign; Column = colSign}
+        match nextCoord with
+        | c when not <| coordExists c -> hops
+        | _ ->
+            match (square nextCoord board) with
+            | Some c -> hops
+            | _ ->
+                let newHops = hops @ [nextCoord]
+                getHopsForDirection newHops nextCoord rowSign colSign board
+        
+    let moves = List.concat (List.map (fun i -> getHopsForDirection [] startCoord i.Row i.Column board) hopDirections)
+    let foo = moves.ToList()
+    
+    moves
 
 let getCheckerSingleJumps coord (board :Board) =
     let moves = [{Row = -2; Column = -2}; {Row = -2; Column = 2}; {Row = 2; Column = -2}; {Row = 2; Column = 2}]
@@ -177,17 +208,12 @@ let getPieceJumps coord (board :Board) =
 
 let getPieceHops coord (board :Board) =
     let piece = (square coord board).Value
-    let moves = 
+    let moveEndCoords = 
         match piece.PieceType with
-        | Checker -> checkerHops piece.Player
-        | King -> kingHops piece.Player
+        | Checker -> checkerHops piece.Player coord board
+        | King -> kingHops piece.Player coord board
 
-    let hopsFilter = List.filter (fun (head::tail) ->
-        let startCoord = head
-        let endCoord = tail |> List.head
-        coordExists endCoord && isValidHop startCoord endCoord board)
-
-    moves |> List.map (fun move -> [coord; offset coord move]) |> hopsFilter
+    List.map (fun endCoord -> [coord; endCoord]) moveEndCoords
 
 let calculateMoves player (board :Board) =
     let rec loop jumpAcc hopAcc coord =
@@ -198,7 +224,7 @@ let calculateMoves player (board :Board) =
             | [] ->
                 let newHopAcc = getPieceHops coord board @ hopAcc
                 match nextPoint coord Rows Columns with
-                | Some c -> loop newJumpAcc newHopAcc c
+                | Some c -> loop [] newHopAcc c
                 | None -> newHopAcc
             | _ ->
                 match nextPoint coord Rows Columns with
@@ -207,6 +233,9 @@ let calculateMoves player (board :Board) =
         | false ->
             match nextPoint coord Rows Columns with
             | Some c -> loop jumpAcc hopAcc c
-            | None -> jumpAcc @ hopAcc
+            | None ->
+                match jumpAcc with
+                | [] -> hopAcc
+                | _ -> jumpAcc
     
     loop [] [] {Row = 0; Column = 0}

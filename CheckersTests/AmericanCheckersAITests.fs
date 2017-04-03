@@ -1,4 +1,4 @@
-﻿module PoolCheckersAITests
+﻿module AmericanCheckersAITests
 open Checkers
 open Checkers.Generic
 open Checkers.AIs.AmericanCheckersAI

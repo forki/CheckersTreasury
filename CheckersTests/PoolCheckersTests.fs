@@ -329,7 +329,7 @@ let ``King cannot make flying jump over another piece``() =
     Assert.False(board |> isValidKingJump{Row = 0; Column = 1} {Row = 4; Column = 5})
 
 [<Fact>]
-let ``King cannot jump empty square``() =
+let ``King can make flying hop``() =
     let board =
         array2D [
             [None; None; None; None; None; None; None; None];
@@ -342,7 +342,13 @@ let ``King cannot jump empty square``() =
             [None; None; None; None; None; None; None; None];
         ];
     
-    Assert.False(board |> isValidCheckerJump{Row = 4; Column = 5} {Row = 6; Column = 3})
+    Assert.False(board |> isValidCheckerJump {Row = 4; Column = 5} {Row = 6; Column = 3})
+
+[<Fact>]
+let ``King can make flying hop to edge``() =
+    let controller = controllerFromFen GameVariant.PoolCheckers "[FEN \"B:WK11:BK10\"]"
+
+    Assert.True(isValidMove {Row = 2; Column = 3} {Row = 0; Column = 5} controller.Board)
 
 [<Fact>]
 let ``King cannot jump friend``() =

@@ -31,10 +31,10 @@ let rec addPieces (fenPieces :string List) player (board :Board) (pdnBoardCoords
     let boardCoord = pdnBoardCoords.[fenNumber]
     board.[boardCoord.Row, boardCoord.Column] <-
         match (player, isKing) with
-        | (White, true) -> Piece.whiteKing
-        | (White, false) -> Piece.whiteChecker
-        | (Black, true) -> Piece.blackKing
-        | (Black, false) -> Piece.blackChecker
+        | (White, true) -> whiteKing
+        | (White, false) -> whiteChecker
+        | (Black, true) -> blackKing
+        | (Black, false) -> blackChecker
     
     if not tail.IsEmpty then addPieces tail player board pdnBoardCoords
 
@@ -43,17 +43,17 @@ let controllerFromFen variant (fen :string) =
     let fenSubsections = fenValue.Split(':')
     let playerTurn =
         match fenSubsections.[0].[0] with
-        | BlackSymbol -> Player.Black
-        | WhiteSymbol -> Player.White
+        | BlackSymbol -> Black
+        | WhiteSymbol -> White
         
     let whitePieces = getPieceNotation fenSubsections WhiteSymbol
     let blackPieces = getPieceNotation fenSubsections BlackSymbol
 
     let pdnBoardCoords = variant.pdnMembers.pdnBoardCoords
     
-    let board = Board.emptyBoardList()
-    if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) Player.White board pdnBoardCoords
-    if blackPieces.Length > 0 then addPieces (List.ofArray blackPieces) Player.Black board pdnBoardCoords
+    let board = emptyBoardList()
+    if whitePieces.Length > 0 then addPieces (List.ofArray whitePieces) White board pdnBoardCoords
+    if blackPieces.Length > 0 then addPieces (List.ofArray blackPieces) Black board pdnBoardCoords
 
     {
         Variant = variant
@@ -79,7 +79,7 @@ let createFen variant player (board :Board) =
             let piece = square coord board
             match piece.IsSome && isPlayerPiece player coord board with
             | true ->
-                let isKing = piece.Value.PieceType = PieceType.King
+                let isKing = piece.Value.PieceType = King
 
                 let pdnBoard = variant.pdnBoard
 
@@ -88,7 +88,7 @@ let createFen variant player (board :Board) =
             | false -> loop fenNumbers player c
         | None -> fenNumbers
 
-    let whitePieceFEN = String.Join(",", (loop [] Player.White {Row = 0; Column = 0}))
-    let blackPieceFEN = String.Join(",", (loop [] Player.Black {Row = 0; Column = 0}))
+    let whitePieceFEN = String.Join(",", (loop [] White {Row = 0; Column = 0}))
+    let blackPieceFEN = String.Join(",", (loop [] Black {Row = 0; Column = 0}))
 
     "[FEN \"" + turnSymbol.ToString() + ":W" + whitePieceFEN + ":B" + blackPieceFEN + "\"]"
