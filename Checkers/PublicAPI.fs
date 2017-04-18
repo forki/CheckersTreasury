@@ -2,13 +2,11 @@
 open Checkers.Generic
 open Checkers.Board
 open Checkers.FSharpExtensions
-open Checkers.Variants
 open Checkers.GameController
 open Checkers.PortableDraughtsNotation
 open Checkers.GameVariant
 open Checkers.Minimax
 open System
-open System.Threading
 
 let getGameVariant variant =
     match variant with
@@ -28,10 +26,10 @@ let isValidMove startCoord endCoord gameController =
     | None -> true
     | coord -> startCoord = coord.Value
 
-let internal getDisplayString variant (pdnTurn :int List) (move :Move) =
-    String.Join((if variant.isJump move then "x" else "-"), pdnTurn)
+let internal getDisplayString variant (pdnTurn :int List) (move :Move) (board :Board) =
+    String.Join((if variant.isJump move board then "x" else "-"), pdnTurn)
     
-let internal getPdnForMove gameController move boardFen =
+let internal getPdnForMove gameController move boardFen originalBoard =
     let gameHistory = gameController.MoveHistory
     let pdnMove = (List.map (fun item -> (square item gameController.Variant.pdnMembers.pdnBoard).Value) move)
 
@@ -42,17 +40,17 @@ let internal getPdnForMove gameController move boardFen =
 
     let blackMove =
         match gameController.CurrentPlayer with
-        | Black -> { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move }
+        | Black -> { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard }
         | White -> (List.last gameHistory).BlackMove
 
     let whiteMove =
         match gameController.CurrentPlayer with
         | Black -> None
-        | White -> Some { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move }
+        | White -> Some { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard }
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
     
-let internal getPdnForContinuedMove gameController move boardFen =
+let internal getPdnForContinuedMove gameController move boardFen originalBoard =
     let gameHistory = gameController.MoveHistory
     
     let lastMovePdn = List.last gameHistory
@@ -64,7 +62,7 @@ let internal getPdnForContinuedMove gameController move boardFen =
         match gameController.CurrentPlayer with
         | Black ->
             let newPdnMove = lastMovePdn.BlackMove.Move @ pdnMove.Tail
-            { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move }
+            { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard }
         | White -> lastMovePdn.BlackMove
 
     let whiteMove =
@@ -72,17 +70,17 @@ let internal getPdnForContinuedMove gameController move boardFen =
         | Black -> None
         | White ->
             let newPdnMove = lastMovePdn.WhiteMove.Value.Move @ pdnMove.Tail
-            Some { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move }
+            Some { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard }
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
 
-let internal getGameHistory gameController move boardFen =
+let internal getGameHistory gameController move boardFen originalBoard =
     let isContinuedMove = gameController.CurrentCoord <> None
 
     let newTurnValue =
         match isContinuedMove with
-        | false -> getPdnForMove gameController move boardFen
-        | true -> getPdnForContinuedMove gameController move boardFen
+        | false -> getPdnForMove gameController move boardFen originalBoard
+        | true -> getPdnForContinuedMove gameController move boardFen originalBoard
 
     match gameController.CurrentPlayer, isContinuedMove with
     | Black, false -> gameController.MoveHistory @ [newTurnValue]
@@ -92,6 +90,7 @@ let internal getGameHistory gameController move boardFen =
         | _ -> (List.take (gameController.MoveHistory.Length - 1) gameController.MoveHistory) @ [newTurnValue]
 
 let movePiece startCoord endCoord gameController :Option<GameController> =
+    let originalBoard = gameController.Board
     let board = gameController.Variant.apiMembers.movePiece startCoord endCoord gameController.Board
 
     match board with
@@ -109,11 +108,12 @@ let movePiece startCoord endCoord gameController :Option<GameController> =
                 Board = b
                 CurrentPlayer = nextPlayerTurn
                 InitialPosition = gameController.InitialPosition
-                MoveHistory = getGameHistory gameController [startCoord; endCoord] (createFen gameController.Variant.pdnMembers nextPlayerTurn b)
+                MoveHistory = getGameHistory gameController [startCoord; endCoord] (createFen gameController.Variant.pdnMembers nextPlayerTurn b) originalBoard
                 CurrentCoord = if isTurnEnding then None else Some endCoord
             }
 
 let move (move :Coord seq) (gameController) :Option<GameController> =
+    let originalBoard = gameController.Board
     let board = gameController.Variant.apiMembers.moveSequence move (Some gameController.Board)
     let moveAsList = List.ofSeq move
 
@@ -132,7 +132,7 @@ let move (move :Coord seq) (gameController) :Option<GameController> =
                 Board = b;
                 CurrentPlayer = nextPlayerTurn
                 InitialPosition = gameController.InitialPosition
-                MoveHistory = getGameHistory gameController moveAsList (createFen gameController.Variant.pdnMembers nextPlayerTurn b)
+                MoveHistory = getGameHistory gameController moveAsList (createFen gameController.Variant.pdnMembers nextPlayerTurn b) originalBoard
                 CurrentCoord = if isTurnEnding then None else Some (Seq.last move)
             }
 

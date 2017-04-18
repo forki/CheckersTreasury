@@ -12,17 +12,17 @@ type AiMembers =
 with
     static member AmericanCheckers =
         {
-            uncheckedMoveSequence = Checkers.Variants.AmericanCheckers.uncheckedMoveSequence
-            calculateMoves = Checkers.AIs.AmericanCheckersAI.calculateMoves
-            winningPlayer = Checkers.Variants.AmericanCheckers.winningPlayer
-            calculateWeightDifference = Checkers.AIs.AmericanCheckersAI.calculateWeightDifference
+            uncheckedMoveSequence = Variants.AmericanCheckers.uncheckedMoveSequence
+            calculateMoves = AIs.AmericanCheckersAI.calculateMoves
+            winningPlayer = Variants.AmericanCheckers.winningPlayer
+            calculateWeightDifference = AIs.AmericanCheckersAI.calculateWeightDifference
         }
     static member PoolCheckers =
         {
-            uncheckedMoveSequence = Checkers.Variants.PoolCheckers.uncheckedMoveSequence
-            calculateMoves = Checkers.AIs.PoolCheckersAI.calculateMoves
-            winningPlayer = Checkers.Variants.PoolCheckers.winningPlayer
-            calculateWeightDifference = Checkers.AIs.PoolCheckersAI.calculateWeightDifference
+            uncheckedMoveSequence = Variants.PoolCheckers.uncheckedMoveSequence
+            calculateMoves = AIs.PoolCheckersAI.calculateMoves
+            winningPlayer = Variants.PoolCheckers.winningPlayer
+            calculateWeightDifference = AIs.PoolCheckersAI.calculateWeightDifference
         }
 
 type PdnMembers =
@@ -33,13 +33,13 @@ type PdnMembers =
 with
     static member AmericanCheckers =
         {
-            pdnBoard = Checkers.Variants.AmericanCheckers.pdnBoard
-            pdnBoardCoords = Checkers.Variants.AmericanCheckers.pdnBoardCoords
+            pdnBoard = Variants.AmericanCheckers.pdnBoard
+            pdnBoardCoords = Variants.AmericanCheckers.pdnBoardCoords
         }
     static member PoolCheckers =
         {
-            pdnBoard = Checkers.Variants.PoolCheckers.pdnBoard
-            pdnBoardCoords = Checkers.Variants.PoolCheckers.pdnBoardCoords
+            pdnBoard = Variants.PoolCheckers.pdnBoard
+            pdnBoardCoords = Variants.PoolCheckers.pdnBoardCoords
         }
 
 type ApiMembers =
@@ -47,28 +47,28 @@ type ApiMembers =
         isValidMove :Coord -> Coord -> Board -> bool
         movePiece :Coord -> Coord -> Board -> Board Option
         moveSequence :Coord seq -> Board Option -> Board Option
-        isJump :Move -> bool
+        isJump :Move -> Board -> bool
         winningPlayer :Board -> Player Option
         playerTurnEnds :Move -> Board -> Board -> bool
     }
 with
     static member AmericanCheckers =
         {
-            isValidMove = Checkers.Variants.AmericanCheckers.isValidMove
-            movePiece = Checkers.Variants.AmericanCheckers.movePiece
-            moveSequence = Checkers.Variants.AmericanCheckers.moveSequence
-            isJump = Checkers.Variants.AmericanCheckers.isJump
-            winningPlayer = Checkers.Variants.AmericanCheckers.winningPlayer
-            playerTurnEnds = Checkers.Variants.AmericanCheckers.playerTurnEnds
+            isValidMove = Variants.AmericanCheckers.isValidMove
+            movePiece = Variants.AmericanCheckers.movePiece
+            moveSequence = Variants.AmericanCheckers.moveSequence
+            isJump = Variants.AmericanCheckers.isJump
+            winningPlayer = Variants.AmericanCheckers.winningPlayer
+            playerTurnEnds = Variants.AmericanCheckers.playerTurnEnds
         }
     static member PoolCheckers =
         {
-            isValidMove = Checkers.Variants.PoolCheckers.isValidMove
-            movePiece = Checkers.Variants.PoolCheckers.movePiece
-            moveSequence = Checkers.Variants.PoolCheckers.moveSequence
-            isJump = Checkers.Variants.PoolCheckers.isJump
-            winningPlayer = Checkers.Variants.PoolCheckers.winningPlayer
-            playerTurnEnds = Checkers.Variants.PoolCheckers.playerTurnEnds
+            isValidMove = Variants.PoolCheckers.isValidMove
+            movePiece = Variants.PoolCheckers.movePiece
+            moveSequence = Variants.PoolCheckers.moveSequence
+            isJump = Variants.PoolCheckers.isJump
+            winningPlayer = Variants.PoolCheckers.winningPlayer
+            playerTurnEnds = Variants.PoolCheckers.playerTurnEnds
         }
 
 type GameVariant =

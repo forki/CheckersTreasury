@@ -48,7 +48,7 @@ let internal coordExists coord =
     coord.Row >= 0 && coord.Row <= Rows &&
     coord.Column >= 0 && coord.Column <= Columns
     
-let internal isJump (move :Move) =
+let internal isJump (move :Move) (originalBoard :Board) =
     match abs (move.[0].Row - move.[1].Row) with
     | 2 -> true
     | 1 -> false

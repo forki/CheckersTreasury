@@ -41,17 +41,25 @@ let internal getJumpedCoord startCoord endCoord =
 
 let internal kingRowIndex(player) =
     match player with
-    | Player.Black -> Rows
-    | Player.White -> 0
+    | Black -> Rows
+    | White -> 0
     
 let internal coordExists coord =
     coord.Row >= 0 && coord.Row <= Rows &&
     coord.Column >= 0 && coord.Column <= Columns
     
-let internal isJump (move :Move) =
+let internal isJump (move :Move) (originalBoard :Board) =
     match abs (move.[0].Row - move.[1].Row) with
     | 1 -> false
-    | _ -> true
+    | _ ->
+        let rowSign = Math.Sign(move.[0].Row - move.[1].Row)
+        let colSign = Math.Sign(move.[0].Column - move.[1].Column)
+
+        let targetCoord = {Row = (List.last move).Row + rowSign; Column = (List.last move).Column + colSign}
+
+        match square targetCoord originalBoard with
+        | None -> false
+        | _ -> true
 
 let rec getJumpTarget currentPlayer currentCoord rowSign colSign (board :Board) =
     let nextCoord = offset currentCoord {Row = rowSign; Column = colSign}
@@ -72,8 +80,8 @@ let getHopTargets currentPlayer currentCoord rowSign colSign (board :Board) =
 
     getTargets [] currentPlayer currentCoord rowSign colSign board
 
-let internal checkMoveDirection piece startCoord endCoord =
-    let isJump = abs (startCoord.Row - endCoord.Row) <> 1
+let internal checkMoveDirection piece startCoord endCoord (board :Board) =
+    let isJump = isJump [startCoord; endCoord] board
     match piece.PieceType, piece.Player, isJump with
     | Checker, Black, false -> startCoord.Row < endCoord.Row
     | Checker, White, false -> startCoord.Row > endCoord.Row
@@ -82,7 +90,7 @@ let internal checkMoveDirection piece startCoord endCoord =
 let internal isValidCheckerHop startCoord endCoord (board :Board) =
     let piece = (square startCoord board).Value
 
-    checkMoveDirection piece startCoord endCoord &&
+    checkMoveDirection piece startCoord endCoord board &&
     (square endCoord board).IsNone
     
 let internal isValidKingHop startCoord endCoord (board :Board) =
@@ -126,13 +134,13 @@ let internal isValidKingJump startCoord endCoord (board :Board) =
     
 let internal isValidHop startCoord endCoord (board :Board) =
     match (square startCoord board).Value.PieceType with
-    | PieceType.Checker -> isValidCheckerHop startCoord endCoord board
-    | PieceType.King -> isValidKingHop startCoord endCoord board
+    | Checker -> isValidCheckerHop startCoord endCoord board
+    | King -> isValidKingHop startCoord endCoord board
         
 let internal isValidJump startCoord endCoord (board :Board) =
     match (square startCoord board).Value.PieceType with
-    | PieceType.Checker -> isValidCheckerJump startCoord endCoord board
-    | PieceType.King -> isValidKingJump startCoord endCoord board
+    | Checker -> isValidCheckerJump startCoord endCoord board
+    | King -> isValidKingJump startCoord endCoord board
 
 let internal hasValidHop startCoord (board :Board) =
     let hopCoords =
@@ -246,7 +254,7 @@ let internal setPieceAt coord piece (board :Board) =
     newBoard
 
 let internal playerTurnEnds (move :Move) (originalBoard :Board) (currentBoard :Board) =
-    let lastMoveWasJump = abs(move.[0].Row - move.[1].Row) > 1
+    let lastMoveWasJump = isJump move originalBoard
     let pieceWasPromoted = (square (List.last move) currentBoard).Value.PieceType = King &&
                             (square move.[0] originalBoard).Value.PieceType = Checker
 
