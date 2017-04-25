@@ -1,4 +1,4 @@
-# Checkers
+# Checkers Treasury
 This is a project that I am doing for credit in school.  Code reviews and bug reports are welcome, but all PRs will be rejected until May 1st, 2017.
 
 ## Playing
