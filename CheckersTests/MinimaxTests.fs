@@ -5,6 +5,7 @@ open Checkers.GameVariant
 open Checkers.Minimax
 open Xunit
 open System.Threading
+open Checkers.PublicAPI
 
 [<Fact>]
 let ``chooseNewAlpha picks highest value``() =

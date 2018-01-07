@@ -57,9 +57,12 @@ let internal isJump (move :Move) (originalBoard :Board) =
 
         let targetCoord = {Row = (List.last move).Row + rowSign; Column = (List.last move).Column + colSign}
 
-        match square targetCoord originalBoard with
-        | None -> false
-        | _ -> true
+        match coordExists targetCoord with
+        | false -> false
+        | true ->
+            match square targetCoord originalBoard with
+            | None -> false
+            | _ -> true
 
 let rec getJumpTarget currentPlayer currentCoord rowSign colSign (board :Board) =
     let nextCoord = offset currentCoord {Row = rowSign; Column = colSign}
