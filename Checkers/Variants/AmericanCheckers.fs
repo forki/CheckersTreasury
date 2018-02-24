@@ -175,6 +175,40 @@ let winningPlayer (board :Board) =
     | x when not <| x Black -> Some White
     | _ -> None
 
+let isDrawn (moveHistory :PdnTurn list) =
+    let fens =
+        List.collect (fun item ->
+            (
+            match item.WhiteMove with
+            | Some _ -> [item.BlackMove.ResultingFen; item.WhiteMove.Value.ResultingFen]
+            | None -> [item.BlackMove.ResultingFen]
+            )) moveHistory
+    let positionsByTimesReached = List.groupBy (fun item -> item) fens
+    let hasReachedPositionThreeTimes = List.exists (fun (_, (values :string list)) -> values.Length >= 3) positionsByTimesReached
+
+    match moveHistory.Length with
+    | f when f >= 40 ->
+        let currentPlayer =
+            match (List.last moveHistory).WhiteMove with
+            | Some _ -> White
+            | None -> Black
+
+        let moves =
+            List.map (fun (item :PdnTurn) ->
+                (
+                match currentPlayer with
+                | White -> item.WhiteMove.Value
+                | Black -> item.BlackMove
+                )) moveHistory
+        
+        let lastFortyMoves =
+            match moves.Length with
+            | t when t < 40 -> moves
+            | _ -> List.skip (moves.Length - 40) (List.filter (fun item -> item.Move <> []) moves)
+
+        hasReachedPositionThreeTimes || not (List.exists (fun (item :PdnMove) -> item.PieceTypeMoved.Value = PieceType.Checker) lastFortyMoves)
+    | _ -> hasReachedPositionThreeTimes
+
 let internal setPieceAt coord piece (board :Board) =
     let newBoard = Array2D.copy board
     

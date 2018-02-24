@@ -49,6 +49,7 @@ type ApiMembers =
         moveSequence :Coord seq -> Board Option -> Board Option
         isJump :Move -> Board -> bool
         winningPlayer :Board -> Player Option
+        isDrawn : PdnTurn list -> bool
         playerTurnEnds :Move -> Board -> Board -> bool
     }
 with
@@ -59,6 +60,7 @@ with
             moveSequence = Variants.AmericanCheckers.moveSequence
             isJump = Variants.AmericanCheckers.isJump
             winningPlayer = Variants.AmericanCheckers.winningPlayer
+            isDrawn = Variants.AmericanCheckers.isDrawn
             playerTurnEnds = Variants.AmericanCheckers.playerTurnEnds
         }
     static member PoolCheckers =
@@ -68,6 +70,7 @@ with
             moveSequence = Variants.PoolCheckers.moveSequence
             isJump = Variants.PoolCheckers.isJump
             winningPlayer = Variants.PoolCheckers.winningPlayer
+            isDrawn = Variants.PoolCheckers.isDrawn
             playerTurnEnds = Variants.PoolCheckers.playerTurnEnds
         }
 

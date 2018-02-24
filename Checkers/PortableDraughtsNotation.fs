@@ -62,7 +62,8 @@ let controllerFromFen variant (fen :string) =
         InitialPosition = fen;
         MoveHistory =
             match playerTurn with
-            | White -> [{MoveNumber = 1; BlackMove = {Move = []; ResultingFen = fen; DisplayString = "…"}; WhiteMove = None}]
+            | White ->
+                [{MoveNumber = 1; BlackMove = {Move = []; ResultingFen = fen; DisplayString = "…"; PieceTypeMoved = None}; WhiteMove = None}]
             | Black -> []
         CurrentCoord = None;
     }

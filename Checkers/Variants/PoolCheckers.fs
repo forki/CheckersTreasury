@@ -249,6 +249,9 @@ let winningPlayer (board :Board) =
     | x when not <| x White -> Some Black
     | x when not <| x Black -> Some White
     | _ -> None
+    
+let isDrawn (moveHistory :PdnTurn list) =
+    false
 
 let internal setPieceAt coord piece (board :Board) =
     let newBoard = Array2D.copy board

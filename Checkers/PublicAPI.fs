@@ -38,15 +38,19 @@ let internal getPdnForMove gameController move boardFen originalBoard =
         | Black -> gameHistory.Length + 1
         | White -> gameHistory.Length
 
+    let piece :Checkers.Piece.Piece Option = square move.Head originalBoard
+
     let blackMove =
         match gameController.CurrentPlayer with
-        | Black -> { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard }
+        | Black ->
+                { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
         | White -> (List.last gameHistory).BlackMove
 
     let whiteMove =
         match gameController.CurrentPlayer with
         | Black -> None
-        | White -> Some { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard }
+        | White ->
+                Some { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
     
@@ -58,11 +62,13 @@ let internal getPdnForContinuedMove gameController move boardFen originalBoard =
 
     let moveNumber = lastMovePdn.MoveNumber
 
+    let piece :Checkers.Piece.Piece Option = square move.Head originalBoard
+
     let blackMove =
         match gameController.CurrentPlayer with
         | Black ->
             let newPdnMove = lastMovePdn.BlackMove.Move @ pdnMove.Tail
-            { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard }
+            { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
         | White -> lastMovePdn.BlackMove
 
     let whiteMove =
@@ -70,7 +76,7 @@ let internal getPdnForContinuedMove gameController move boardFen originalBoard =
         | Black -> None
         | White ->
             let newPdnMove = lastMovePdn.WhiteMove.Value.Move @ pdnMove.Tail
-            Some { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard }
+            Some { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
 
@@ -173,3 +179,6 @@ let createFen variant player (board :Board) =
 
 let controllerFromFen variant fen =
     controllerFromFen variant fen
+
+let isDrawn (controller :GameController) =
+    controller.Variant.apiMembers.isDrawn controller.MoveHistory
