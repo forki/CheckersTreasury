@@ -251,7 +251,17 @@ let winningPlayer (board :Board) =
     | _ -> None
     
 let isDrawn (moveHistory :PdnTurn list) =
-    false
+    let fens =
+        List.collect (fun item ->
+            (
+            match item.WhiteMove with
+            | Some _ -> [item.BlackMove.ResultingFen; item.WhiteMove.Value.ResultingFen]
+            | None -> [item.BlackMove.ResultingFen]
+            )) moveHistory
+    let positionsByTimesReached = List.groupBy (fun item -> item) fens
+    let hasReachedPositionThreeTimes = List.exists (fun (_, (values :string list)) -> values.Length >= 3) positionsByTimesReached
+
+    hasReachedPositionThreeTimes
 
 let internal setPieceAt coord piece (board :Board) =
     let newBoard = Array2D.copy board
