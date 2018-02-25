@@ -175,6 +175,12 @@ let winningPlayer (board :Board) =
     | x when not <| x Black -> Some White
     | _ -> None
 
+let wasCheckerMoved moves =
+    List.exists (fun (item :PdnMove) -> item.PieceTypeMoved.Value = PieceType.Checker) moves
+
+let wasPieceJumped moves =
+    List.exists (fun (item :PdnMove) -> item.IsJump.Value) moves
+
 let isDrawn (moveHistory :PdnTurn list) =
     let fens =
         List.collect (fun item ->
@@ -186,28 +192,27 @@ let isDrawn (moveHistory :PdnTurn list) =
     let positionsByTimesReached = List.groupBy (fun item -> item) fens
     let hasReachedPositionThreeTimes = List.exists (fun (_, (values :string list)) -> values.Length >= 3) positionsByTimesReached
 
-    match moveHistory.Length with
-    | f when f >= 40 ->
-        let currentPlayer =
-            match (List.last moveHistory).WhiteMove with
-            | Some _ -> White
-            | None -> Black
-
-        let moves =
-            List.map (fun (item :PdnTurn) ->
-                (
-                match currentPlayer with
-                | White -> item.WhiteMove.Value
-                | Black -> item.BlackMove
-                )) moveHistory
+    let whiteMoves =
+        List.map (fun (item :PdnTurn) -> item.WhiteMove.Value) (List.filter (fun (item :PdnTurn) -> item.WhiteMove.IsSome) moveHistory)
         
-        let lastFortyMoves =
-            match moves.Length with
-            | t when t < 40 -> moves
-            | _ -> List.skip (moves.Length - 40) (List.filter (fun item -> item.Move <> []) moves)
+    let blackMoves =
+        List.map (fun (item :PdnTurn) -> item.BlackMove) moveHistory
 
-        hasReachedPositionThreeTimes || not (List.exists (fun (item :PdnMove) -> item.PieceTypeMoved.Value = PieceType.Checker) lastFortyMoves)
-    | _ -> hasReachedPositionThreeTimes
+    let lastFortyWhiteMoves =
+        List.skip (whiteMoves.Length - 40) (List.filter (fun (item :PdnMove) -> item.Move <> []) whiteMoves)
+
+    let lastFortyBlackMoves =
+        List.skip (blackMoves.Length - 40) (List.filter (fun (item :PdnMove) -> item.Move <> []) blackMoves)
+
+    hasReachedPositionThreeTimes ||
+    (
+    lastFortyWhiteMoves.Length = 40 &&
+    lastFortyBlackMoves.Length = 40 &&
+    not (wasCheckerMoved lastFortyWhiteMoves) &&
+    not (wasCheckerMoved lastFortyBlackMoves) &&
+    not (wasPieceJumped lastFortyWhiteMoves) &&
+    not (wasPieceJumped lastFortyBlackMoves)
+    )
 
 let internal setPieceAt coord piece (board :Board) =
     let newBoard = Array2D.copy board

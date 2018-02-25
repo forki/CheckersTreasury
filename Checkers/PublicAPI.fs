@@ -43,14 +43,27 @@ let internal getPdnForMove gameController move boardFen originalBoard =
     let blackMove =
         match gameController.CurrentPlayer with
         | Black ->
-                { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
+            {
+                Move = pdnMove;
+                ResultingFen = boardFen;
+                DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard;
+                PieceTypeMoved = Some piece.Value.PieceType;
+                IsJump = Some (gameController.Variant.apiMembers.isJump move originalBoard)
+            }
         | White -> (List.last gameHistory).BlackMove
 
     let whiteMove =
         match gameController.CurrentPlayer with
         | Black -> None
         | White ->
-                Some { Move = pdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
+            Some 
+                {
+                    Move = pdnMove;
+                    ResultingFen = boardFen;
+                    DisplayString = getDisplayString gameController.Variant.apiMembers pdnMove move originalBoard;
+                    PieceTypeMoved = Some piece.Value.PieceType;
+                    IsJump = Some (gameController.Variant.apiMembers.isJump move originalBoard)
+                }
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
     
@@ -68,7 +81,13 @@ let internal getPdnForContinuedMove gameController move boardFen originalBoard =
         match gameController.CurrentPlayer with
         | Black ->
             let newPdnMove = lastMovePdn.BlackMove.Move @ pdnMove.Tail
-            { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
+            {
+                Move = newPdnMove;
+                ResultingFen = boardFen;
+                DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard;
+                PieceTypeMoved = Some piece.Value.PieceType;
+                IsJump = Some (gameController.Variant.apiMembers.isJump move originalBoard)
+            }
         | White -> lastMovePdn.BlackMove
 
     let whiteMove =
@@ -76,7 +95,14 @@ let internal getPdnForContinuedMove gameController move boardFen originalBoard =
         | Black -> None
         | White ->
             let newPdnMove = lastMovePdn.WhiteMove.Value.Move @ pdnMove.Tail
-            Some { Move = newPdnMove; ResultingFen = boardFen; DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard; PieceTypeMoved = Some piece.Value.PieceType }
+            Some
+                {
+                    Move = newPdnMove;
+                    ResultingFen = boardFen;
+                    DisplayString = getDisplayString gameController.Variant.apiMembers newPdnMove move originalBoard;
+                    PieceTypeMoved = Some piece.Value.PieceType;
+                    IsJump = Some (gameController.Variant.apiMembers.isJump move originalBoard)
+                }
 
     {MoveNumber = moveNumber; BlackMove = blackMove; WhiteMove = whiteMove}
 
