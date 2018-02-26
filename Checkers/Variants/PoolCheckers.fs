@@ -249,19 +249,41 @@ let winningPlayer (board :Board) =
     | x when not <| x White -> Some Black
     | x when not <| x Black -> Some White
     | _ -> None
+
+let playerHasOneKing (fen :string) =
+    let fenValue = fen.Split('"').[1]
+    let fenSubsections = fenValue.Split(':')
+    
+    let whitePieces = fenSubsections.[1]
+                        .Remove(0, 1)
+                        .Split([|','|], StringSplitOptions.RemoveEmptyEntries)
+        
+    let blackPieces = fenSubsections.[2]
+                        .Remove(0, 1)
+                        .Split([|','|], StringSplitOptions.RemoveEmptyEntries)
+                        
+    match whitePieces, blackPieces with
+    | whitePieces, _ when whitePieces.Length = 1 && whitePieces.[0].[0] = 'K' -> true
+    | _ , blackPieces when blackPieces.Length = 1 && blackPieces.[0].[0] = 'K' -> true
+    | _ -> false
     
 let isDrawn (moveHistory :PdnTurn list) =
     let fens =
         List.collect (fun item ->
             (
-            match item.WhiteMove with
-            | Some _ -> [item.BlackMove.ResultingFen; item.WhiteMove.Value.ResultingFen]
-            | None -> [item.BlackMove.ResultingFen]
+            match item.BlackMove, item.WhiteMove with
+            | blackMove, Some whiteMove when not blackMove.Move.IsEmpty && not whiteMove.Move.IsEmpty -> [blackMove.ResultingFen; whiteMove.ResultingFen]
+            | blackMove, whiteMove when not blackMove.Move.IsEmpty && (whiteMove.IsNone || whiteMove.IsSome && whiteMove.Value.Move.IsEmpty) -> [blackMove.ResultingFen]
+            | blackMove, Some whiteMove when blackMove.Move.IsEmpty && not whiteMove.Move.IsEmpty -> [whiteMove.ResultingFen]
+            | _ -> []
             )) moveHistory
     let positionsByTimesReached = List.groupBy (fun item -> item) fens
     let hasReachedPositionThreeTimes = List.exists (fun (_, (values :string list)) -> values.Length >= 3) positionsByTimesReached
 
-    hasReachedPositionThreeTimes
+    let playerWithOneKing = List.skipWhile (fun item -> not (playerHasOneKing item)) fens
+    System.Diagnostics.Debug.WriteLine(playerWithOneKing.Length);
+
+    hasReachedPositionThreeTimes || playerWithOneKing.Length = 26
 
 let internal setPieceAt coord piece (board :Board) =
     let newBoard = Array2D.copy board

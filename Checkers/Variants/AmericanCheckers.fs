@@ -185,9 +185,11 @@ let isDrawn (moveHistory :PdnTurn list) =
     let fens =
         List.collect (fun item ->
             (
-            match item.WhiteMove with
-            | Some _ -> [item.BlackMove.ResultingFen; item.WhiteMove.Value.ResultingFen]
-            | None -> [item.BlackMove.ResultingFen]
+            match item.BlackMove, item.WhiteMove with
+            | blackMove, Some whiteMove when not blackMove.Move.IsEmpty && not whiteMove.Move.IsEmpty -> [blackMove.ResultingFen; whiteMove.ResultingFen]
+            | blackMove, whiteMove when not blackMove.Move.IsEmpty && (whiteMove.IsNone || whiteMove.IsSome && whiteMove.Value.Move.IsEmpty) -> [blackMove.ResultingFen]
+            | blackMove, Some whiteMove when blackMove.Move.IsEmpty && not whiteMove.Move.IsEmpty -> [whiteMove.ResultingFen]
+            | _ -> []
             )) moveHistory
     let positionsByTimesReached = List.groupBy (fun item -> item) fens
     let hasReachedPositionThreeTimes = List.exists (fun (_, (values :string list)) -> values.Length >= 3) positionsByTimesReached
@@ -199,10 +201,10 @@ let isDrawn (moveHistory :PdnTurn list) =
         List.map (fun (item :PdnTurn) -> item.BlackMove) moveHistory
 
     let lastFortyWhiteMoves =
-        List.skip (whiteMoves.Length - 40) (List.filter (fun (item :PdnMove) -> item.Move <> []) whiteMoves)
+        List.skip (whiteMoves.Length - 40) (List.filter (fun (item :PdnMove) -> not item.Move.IsEmpty) whiteMoves)
 
     let lastFortyBlackMoves =
-        List.skip (blackMoves.Length - 40) (List.filter (fun (item :PdnMove) -> item.Move <> []) blackMoves)
+        List.skip (blackMoves.Length - 40) (List.filter (fun (item :PdnMove) -> not item.Move.IsEmpty) blackMoves)
 
     hasReachedPositionThreeTimes ||
     (

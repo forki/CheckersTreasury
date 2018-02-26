@@ -14,6 +14,7 @@
     <TargetFSharpCoreVersion>3.47.4.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>Checkers</Name>
+    <UseStandardResourceNames>False</UseStandardResourceNames>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,7 +26,8 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Debug\Checkers.XML</DocumentationFile>
     <StartAction>Project</StartAction>
-    <StartProgram>C:\Users\hosch\Documents\Visual Studio 2015\Projects\CheckersUI\CheckersUI\bin\x86\Debug\CheckersUI.exe</StartProgram>
+    <StartProgram>
+    </StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
